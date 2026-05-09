@@ -33,6 +33,13 @@ copy_file_if_exists() {
 # Multi-page generated vision site from the 3am one-time job.
 copy_dir_if_exists "$OUT_DIR/krahnie-orchestrator-vision" "artifacts/html-sites/krahnie-orchestrator-vision"
 
+# Daily AI news reports.
+if [ -d "$OUT_DIR/ai-news" ]; then
+  mkdir -p artifacts/reports/ai-news
+  rsync -a --delete "$OUT_DIR/ai-news"/ "artifacts/reports/ai-news"/
+  echo "synced ai-news reports"
+fi
+
 # Daily indie/PvP prototype HTML reports.
 if [ -d "$OUT_DIR/indie-pvp-retro-inspo" ]; then
   mkdir -p artifacts/reports/indie-pvp-retro-inspo
