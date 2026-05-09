@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HERMES_AGENT_DIR="${HERMES_AGENT_DIR:-$HOME/.hermes/hermes-agent}"
+OUT_DIR="$HERMES_AGENT_DIR/outputs"
+COMIC_DIR="$HERMES_AGENT_DIR/comic"
+WIKI_NOTE="$HOME/agent-krahn-sdk-build/docs/system-wiki/14-krahnie-process-orchestrator.md"
+
+cd "$REPO_DIR"
+mkdir -p artifacts/html-sites artifacts/reports artifacts/comics artifacts/media artifacts/docs
+
+copy_dir_if_exists() {
+  local src="$1"
+  local dst="$2"
+  if [ -d "$src" ]; then
+    mkdir -p "$dst"
+    rsync -a --delete --exclude '.git/' "$src"/ "$dst"/
+    echo "synced directory: $src -> $dst"
+  fi
+}
+
+copy_file_if_exists() {
+  local src="$1"
+  local dst="$2"
+  if [ -f "$src" ]; then
+    mkdir -p "$(dirname "$dst")"
+    cp -p "$src" "$dst"
+    echo "synced file: $src -> $dst"
+  fi
+}
+
+# Multi-page generated vision site from the 3am one-time job.
+copy_dir_if_exists "$OUT_DIR/krahnie-orchestrator-vision" "artifacts/html-sites/krahnie-orchestrator-vision"
+
+# Daily indie/PvP prototype HTML reports.
+if [ -d "$OUT_DIR/indie-pvp-retro-inspo" ]; then
+  mkdir -p artifacts/reports/indie-pvp-retro-inspo
+  rsync -a --delete "$OUT_DIR/indie-pvp-retro-inspo"/ "artifacts/reports/indie-pvp-retro-inspo"/
+  echo "synced indie-pvp-retro-inspo reports"
+fi
+
+# Generated comics.
+copy_dir_if_exists "$COMIC_DIR" "artifacts/comics"
+
+# Media and source scripts from outputs root. Keep folders above in their semantic homes.
+if [ -d "$OUT_DIR" ]; then
+  find "$OUT_DIR" -maxdepth 1 -type f \( \
+    -iname '*.wav' -o -iname '*.mp3' -o -iname '*.m4a' -o -iname '*.ogg' -o \
+    -iname '*.mp4' -o -iname '*.mov' -o -iname '*.gif' -o \
+    -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' -o \
+    -iname '*.py' -o -iname '*.md' -o -iname '*.html' -o -iname '*.svg' \
+  \) -print0 | while IFS= read -r -d '' file; do
+    copy_file_if_exists "$file" "artifacts/media/$(basename "$file")"
+  done
+fi
+
+# Durable architecture/write-up note saved outside Hermes outputs.
+copy_file_if_exists "$WIKI_NOTE" "artifacts/docs/krahnie-process-orchestrator.md"
+
+# Useful index for browsing from GitHub.
+{
+  echo "# Artifact Index"
+  echo
+  echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%SZ')"
+  echo
+  echo "## Files"
+  echo
+  find artifacts -type f | sort | sed 's#^#- #'
+} > ARTIFACT_INDEX.md
+
+git add README.md ARTIFACT_INDEX.md scripts/sync_artifacts.sh artifacts
+if git diff --cached --quiet; then
+  echo "No artifact changes to commit."
+  exit 0
+fi
+
+git commit -m "chore: sync Krahnie generated artifacts"
+git push -u origin main

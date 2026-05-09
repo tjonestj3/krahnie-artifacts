@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workflow | Krahnie Orchestrator Vision</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<nav class="nav"><div class="wrap navin"><a class="brand" href="index.html"><span class="bot">K↯</span><span>Krahnie Orchestrator<small>Workflow design</small></span></a><div class="links"><a href="index.html">Vision</a><a class="active" href="workflow.html">Workflow</a><a href="architecture.html">Architecture</a><a href="roadmap.html">Roadmap</a></div></div></nav>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow"><span class="pulse"></span> Standard client-work lifecycle</span>
+      <h1>From request thread to documented delivery.</h1>
+      <p class="lead">Krahnie’s job is to keep work moving through a clear, observable, repeatable sequence — regardless of whether the implementer is an AI agent, Salesforce developer, admin, architect, or mixed pair.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap timeline">
+      <div class="step"><div class="num">1</div><div class="stepbody"><strong>Client request intake</strong><p>A Slack request thread, form, email, or client message is captured. Krahnie extracts client, org, urgency, artifacts, acceptance criteria, and unknowns.</p></div></div>
+      <div class="step"><div class="num">2</div><div class="stepbody"><strong>Card creation and identity mapping</strong><p>A delivery card is created or linked. Slack user identity maps to GitHub/Jira/Linear/Asana identity, so ownership and audit trails stay clean.</p></div></div>
+      <div class="step"><div class="num">3</div><div class="stepbody"><strong>Estimate, due date, assignment</strong><p>Krahnie proposes complexity, effort, due date, assignee, reviewer, and dependencies. Humans can approve or edit in the thread.</p></div></div>
+      <div class="step"><div class="num">4</div><div class="stepbody"><strong>Triage and routing</strong><p>The request is routed to the right client context, repository, Salesforce org, sandbox, metadata package, runbook, and knowledge base.</p></div></div>
+      <div class="step"><div class="num">5</div><div class="stepbody"><strong>Work identification</strong><p>Krahnie identifies impacted metadata, likely files, tests, data requirements, feature flags, and documentation touchpoints before anyone starts changing code.</p></div></div>
+      <div class="step"><div class="num">6</div><div class="stepbody"><strong>Isolated developer box / git worktree / feature branch</strong><p>Each request gets an isolated workspace. Branch names are generated from card IDs. Admins do not need to know the Git mechanics; developers can inspect everything.</p></div></div>
+      <div class="step"><div class="num">7</div><div class="stepbody"><strong>Implementation by agent or human</strong><p>Krahnie can implement low-risk changes, scaffold work, write tests, or pair with a human. All work stays tied to the card and branch.</p></div></div>
+      <div class="step"><div class="num">8</div><div class="stepbody"><strong>Commit and PR</strong><p>Commits reference the card. PR templates include intent, changed metadata, test plan, deployment plan, screenshots, risks, rollback notes, and documentation updates.</p></div></div>
+      <div class="step"><div class="num">9</div><div class="stepbody"><strong>Review and merge to partial branch</strong><p>Reviewers get a concise summary and diff highlights. Approved changes merge to a connected partial branch, not directly to production.</p></div></div>
+      <div class="step"><div class="num">10</div><div class="stepbody"><strong>GitHub Actions deployment</strong><p>CI detects changed Salesforce metadata and deploys only the relevant delta to the connected partial sandbox. Deployment logs return to the request thread.</p></div></div>
+      <div class="step"><div class="num">11</div><div class="stepbody"><strong>Validation evidence</strong><p>Krahnie guides validation: automated tests, smoke checks, admin QA steps, user acceptance notes, screenshots, and known limitations.</p></div></div>
+      <div class="step"><div class="num">12</div><div class="stepbody"><strong>Functional and technical documentation</strong><p>Functional docs explain what changed and how users should operate it. Technical docs explain metadata, integration impact, dependencies, and rollback path.</p></div></div>
+      <div class="step"><div class="num">13</div><div class="stepbody"><strong>Feedback and lessons loop</strong><p>After delivery, Krahnie captures what surprised the team, what should be automated, client-specific quirks, reusable prompts, and runbook updates.</p></div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Role matrix</h2>
+      <table class="matrix" aria-label="Role matrix">
+        <thead><tr><th>Role</th><th>What they do</th><th>How Krahnie helps</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Client stakeholder</strong></td><td>Requests change, validates business outcome.</td><td>Receives crisp status, acceptance criteria, and UAT prompts without seeing delivery complexity.</td></tr>
+          <tr><td><strong>Salesforce admin</strong></td><td>Configures declarative changes, validates org behavior, documents functional impact.</td><td>Uses guided Slack actions instead of memorizing Git, branches, PRs, and CI commands.</td></tr>
+          <tr><td><strong>Developer</strong></td><td>Implements code/metadata, tests, reviews, handles complex diffs.</td><td>Gets prebuilt worktree, context pack, impacted files, PR scaffold, and deployment feedback.</td></tr>
+          <tr><td><strong>Architect / lead</strong></td><td>Approves patterns, reviews risk, protects standards.</td><td>Sees triage summaries, guardrail exceptions, cross-client patterns, and documentation gaps.</td></tr>
+          <tr><td><strong>Krahnie/Hermes</strong></td><td>Orchestrates the process and performs safe automated work.</td><td>Keeps every step linked, observable, auditable, and documented.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap callout">
+      <h2>Request thread/card pattern</h2>
+      <p>Every request gets a canonical thread and a canonical card. The thread is the live cockpit; the card is the system of record. Krahnie mirrors important state both ways: owner, due date, branch, PR, deploy status, validation evidence, doc links, and final outcome.</p>
+      <div class="pillrow"><span class="pill">Thread: discussion</span><span class="pill">Card: accountability</span><span class="pill">Branch: isolation</span><span class="pill">PR: review</span><span class="pill">Docs: delivery memory</span></div>
+    </div>
+  </section>
+</main>
+<footer class="footer"><div class="wrap"><a href="index.html">← Back to vision</a> • <a href="architecture.html">Next: architecture →</a></div></footer>
+</body>
+</html>

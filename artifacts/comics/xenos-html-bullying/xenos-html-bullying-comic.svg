@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <style>
+      .title{font:700 50px 'DejaVu Sans',Arial,sans-serif;fill:#ffdd55;letter-spacing:1px}
+      .small{font:500 22px 'DejaVu Sans',Arial,sans-serif;fill:#b6bddc}
+      .panel-title{font:700 34px 'DejaVu Sans',Arial,sans-serif;fill:#ffdd55}
+      .bubble{font:700 27px 'DejaVu Sans',Arial,sans-serif;fill:#1b1830}
+      .bubble2{font:700 25px 'DejaVu Sans',Arial,sans-serif;fill:#141a2d}
+      .label{font:700 22px 'DejaVu Sans',Arial,sans-serif;fill:#ffdd55}
+      .code{font:700 25px 'DejaVu Sans Mono',monospace;fill:#59ff96}
+      .codeY{font:700 25px 'DejaVu Sans Mono',monospace;fill:#ffdd55}
+      .moral{font:700 28px 'DejaVu Sans',Arial,sans-serif;fill:#59ff96}
+      .pixel{shape-rendering:crispEdges}
+    </style>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#18152c" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#000" opacity=".25"/>
+    </pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <rect width="1600" height="1200" fill="#121022"/>
+  <rect width="1600" height="1200" fill="url(#grid)"/>
+
+  <rect x="40" y="25" width="1520" height="90" rx="18" fill="#0c0c19" stroke="#ff4bb2" stroke-width="5" filter="url(#glow)"/>
+  <text x="70" y="83" class="title">XENOS LEARNS HTML BY BULLYING HERMES IN DISCORD</text>
+  <text x="1340" y="104" class="small" fill="#59ff96">KRAHNIE SKIN v1.0</text>
+
+  <!-- panel frames -->
+  <g stroke="#6ff2ff" stroke-width="5" filter="url(#glow)">
+    <rect x="60" y="150" width="710" height="460" rx="18" fill="#221d3a"/>
+    <rect x="830" y="150" width="710" height="460" rx="18" fill="#221d3a"/>
+    <rect x="60" y="660" width="710" height="460" rx="18" fill="#221d3a"/>
+    <rect x="830" y="660" width="710" height="460" rx="18" fill="#221d3a"/>
+  </g>
+
+  <!-- Panel numbers/titles -->
+  <g>
+    <rect x="76" y="166" width="42" height="42" fill="#ff4bb2"/><text x="88" y="198" class="panel-title" fill="#fff">1</text><text x="135" y="195" class="panel-title">The First Demand</text>
+    <rect x="846" y="166" width="42" height="42" fill="#ff4bb2"/><text x="858" y="198" class="panel-title" fill="#fff">2</text><text x="905" y="195" class="panel-title">Bullying Becomes Curriculum</text>
+    <rect x="76" y="676" width="42" height="42" fill="#ff4bb2"/><text x="88" y="708" class="panel-title" fill="#fff">3</text><text x="135" y="705" class="panel-title">The Aha Moment</text>
+    <rect x="846" y="676" width="42" height="42" fill="#ff4bb2"/><text x="858" y="708" class="panel-title" fill="#fff">4</text><text x="905" y="705" class="panel-title">Final Boss: Shipping It</text>
+  </g>
+
+  <!-- reusable character style manually drawn -->
+  <!-- Panel 1 Xenos -->
+  <g class="pixel" transform="translate(210 480) scale(1.15)">
+    <rect x="-52" y="-25" width="104" height="110" fill="#845cff" stroke="#fff" stroke-width="3"/><rect x="-42" y="-90" width="84" height="70" fill="#f7c784" stroke="#fff" stroke-width="3"/><rect x="-50" y="-105" width="100" height="30" fill="#261c42"/><rect x="-38" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="18" y="-82" width="20" height="20" fill="#0a0a14"/><path d="M-42-90 L-12-78 M12-78 L42-90" stroke="#ff5656" stroke-width="5"/><rect x="-22" y="-48" width="44" height="8" fill="#501e2d"/><text x="-54" y="112" class="label">XENOS</text>
+  </g>
+  <!-- Panel 1 Hermes -->
+  <g class="pixel" transform="translate(610 480) scale(1.05)">
+    <rect x="-75" y="-55" width="150" height="130" fill="#2a304e" stroke="#6ff2ff" stroke-width="4"/><rect x="-48" y="-20" width="30" height="30" fill="#59ff96"/><rect x="18" y="-20" width="30" height="30" fill="#59ff96"/><path d="M-35 25 Q0 55 35 25" fill="none" stroke="#ffdd55" stroke-width="4"/><rect x="-25" y="-90" width="50" height="35" fill="#6ff2ff"/><line x1="0" y1="-112" x2="0" y2="-90" stroke="#6ff2ff" stroke-width="4"/><circle cx="0" cy="-117" r="8" fill="#ff4bb2"/><text x="-58" y="110" class="label" fill="#6ff2ff">HERMES</text>
+  </g>
+  <g>
+    <path d="M115 240 h360 q22 0 22 22 v78 q0 22-22 22 h-230 l-42 55 -4-55 h-84 q-22 0-22-22 v-78 q0-22 22-22z" fill="#fff5aa" stroke="#ff4bb2" stroke-width="3"/>
+    <text x="130" y="277" class="bubble">HERMES. MAKE ME</text><text x="130" y="312" class="bubble">A BUTTON. NOW.</text>
+    <path d="M395 245 h300 q22 0 22 22 v80 q0 22-22 22 h-85 l-42 48 -4-48 h-169 q-22 0-22-22 v-80 q0-22 22-22z" fill="#fff" stroke="#6ff2ff" stroke-width="3"/>
+    <text x="412" y="280" class="bubble2">HTML gives the page</text><text x="412" y="313" class="bubble2">its structure.</text>
+    <rect x="395" y="410" width="330" height="120" rx="14" fill="#0a0c1c" stroke="#59ff96" stroke-width="3"/><text x="412" y="452" class="code">&lt;button&gt;PRESS START&lt;/button&gt;</text><text x="412" y="492" class="small">&lt;!-- tiny internet brick --&gt;</text>
+  </g>
+
+  <!-- Panel 2 -->
+  <g class="pixel" transform="translate(990 485) scale(1.08)">
+    <rect x="-52" y="-25" width="104" height="110" fill="#845cff" stroke="#fff" stroke-width="3"/><rect x="-42" y="-90" width="84" height="70" fill="#f7c784" stroke="#fff" stroke-width="3"/><rect x="-50" y="-105" width="100" height="30" fill="#261c42"/><rect x="-38" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="18" y="-82" width="20" height="20" fill="#0a0a14"/><path d="M-42-90 L-12-78 M12-78 L42-90" stroke="#ff5656" stroke-width="5"/><rect x="-22" y="-48" width="44" height="8" fill="#501e2d"/><text x="-54" y="112" class="label">XENOS</text>
+  </g>
+  <g class="pixel" transform="translate(1375 485)">
+    <rect x="-75" y="-55" width="150" height="130" fill="#2a304e" stroke="#6ff2ff" stroke-width="4"/><rect x="-48" y="-20" width="30" height="30" fill="#59ff96"/><rect x="18" y="-20" width="30" height="30" fill="#59ff96"/><path d="M-36 38 L-8 30 L20 45 L48 34" fill="none" stroke="#ffdd55" stroke-width="4"/><rect x="-25" y="-90" width="50" height="35" fill="#6ff2ff"/><circle cx="0" cy="-117" r="8" fill="#ff4bb2"/><line x1="0" y1="-112" x2="0" y2="-90" stroke="#6ff2ff" stroke-width="4"/><text x="-58" y="110" class="label" fill="#6ff2ff">HERMES</text>
+    <path d="M-115-80 L-140-110 M105-80 L132-108 M-120 70 L-148 100 M110 62 L142 84" stroke="#ff4bb2" stroke-width="4"/>
+  </g>
+  <g>
+    <path d="M885 240 h410 q22 0 22 22 v100 q0 22-22 22 h-245 l-38 52 -5-52 h-122 q-22 0-22-22 v-100 q0-22 22-22z" fill="#ffebf5" stroke="#ff4bb2" stroke-width="3"/>
+    <text x="902" y="276" class="bubble">BIGGER. SHINIER.</text><text x="902" y="311" class="bubble">KRAHNIE-CODED.</text><text x="902" y="346" class="bubble">WHY IS IT UGLY?</text>
+    <path d="M1225 235 h285 q22 0 22 22 v86 q0 22-22 22 h-90 l-35 50 -5-50 h-155 q-22 0-22-22 v-86 q0-22 22-22z" fill="#fff" stroke="#6ff2ff" stroke-width="3"/>
+    <text x="1242" y="272" class="bubble2">That part is CSS.</text><text x="1242" y="305" class="bubble2">HTML is the skeleton.</text>
+    <rect x="1160" y="430" width="350" height="125" rx="14" fill="#0a0c1c" stroke="#59ff96" stroke-width="3"/><text x="1176" y="468" class="code">&lt;button class="krahnie"&gt;</text><text x="1176" y="503" class="codeY">  PRESS START</text><text x="1176" y="538" class="code">&lt;/button&gt;</text>
+    <text x="910" y="575" class="small">achievement unlocked: tags are not vibes</text>
+  </g>
+
+  <!-- Panel 3 -->
+  <g class="pixel" transform="translate(210 990)">
+    <rect x="-52" y="-25" width="104" height="110" fill="#845cff" stroke="#fff" stroke-width="3"/><rect x="-42" y="-90" width="84" height="70" fill="#f7c784" stroke="#fff" stroke-width="3"/><rect x="-50" y="-105" width="100" height="30" fill="#261c42"/><rect x="-38" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="18" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="-22" y="-48" width="44" height="8" fill="#501e2d"/><rect x="-92" y="35" width="184" height="75" fill="#0c0e1e" stroke="#59ff96" stroke-width="3"/><text x="-75" y="82" class="code">&lt;html&gt;</text><text x="-54" y="132" class="label">XENOS</text>
+  </g>
+  <g class="pixel" transform="translate(610 990)">
+    <rect x="-75" y="-55" width="150" height="130" fill="#2a304e" stroke="#6ff2ff" stroke-width="4"/><rect x="-48" y="-20" width="30" height="30" fill="#59ff96"/><rect x="18" y="-20" width="30" height="30" fill="#59ff96"/><path d="M-36 38 L-8 30 L20 45 L48 34" fill="none" stroke="#ffdd55" stroke-width="4"/><rect x="-25" y="-90" width="50" height="35" fill="#6ff2ff"/><circle cx="0" cy="-117" r="8" fill="#ff4bb2"/><line x1="0" y1="-112" x2="0" y2="-90" stroke="#6ff2ff" stroke-width="4"/><text x="-58" y="110" class="label" fill="#6ff2ff">HERMES</text>
+  </g>
+  <g>
+    <path d="M110 750 h365 q22 0 22 22 v98 q0 22-22 22 h-245 l-35 48 -5-48 h-80 q-22 0-22-22 v-98 q0-22 22-22z" fill="#ebfff0" stroke="#59ff96" stroke-width="3"/>
+    <text x="127" y="785" class="bubble">WAIT. So &lt;h1&gt; is</text><text x="127" y="820" class="bubble">a boss title and</text><text x="127" y="855" class="bubble">&lt;p&gt; is dialogue?</text>
+    <path d="M420 750 h295 q22 0 22 22 v100 q0 22-22 22 h-95 l-35 48 -5-48 h-160 q-22 0-22-22 v-100 q0-22 22-22z" fill="#fff" stroke="#6ff2ff" stroke-width="3"/>
+    <text x="437" y="785" class="bubble2">YES. Semantic HTML.</text><text x="437" y="820" class="bubble2">You are becoming</text><text x="437" y="855" class="bubble2">dangerous.</text>
+    <rect x="360" y="925" width="365" height="150" rx="14" fill="#0a0c1c" stroke="#59ff96" stroke-width="3"/><text x="376" y="962" class="code">&lt;main&gt;</text><text x="376" y="997" class="codeY">  &lt;h1&gt;Krahnie Quest&lt;/h1&gt;</text><text x="376" y="1032" class="code">  &lt;p&gt;Ship it.&lt;/p&gt;</text><text x="376" y="1067" class="code">&lt;/main&gt;</text>
+  </g>
+
+  <!-- Panel 4 -->
+  <g>
+    <rect x="910" y="820" width="290" height="260" fill="#140f2d" stroke="#ff4bb2" stroke-width="5"/><rect x="945" y="855" width="220" height="130" fill="#050a14" stroke="#6ff2ff" stroke-width="4"/><text x="975" y="895" class="panel-title">KRAHNIE</text><text x="965" y="940" class="code">&lt;div&gt;VICTORY&lt;/div&gt;</text><circle cx="995" cy="1020" r="16" fill="#ff5656"/><circle cx="1048" cy="1020" r="16" fill="#ffdd55"/>
+    <g class="pixel" transform="translate(1285 1000) scale(.9)"><rect x="-52" y="-25" width="104" height="110" fill="#845cff" stroke="#fff" stroke-width="3"/><rect x="-42" y="-90" width="84" height="70" fill="#f7c784" stroke="#fff" stroke-width="3"/><rect x="-50" y="-105" width="100" height="30" fill="#261c42"/><rect x="-38" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="18" y="-82" width="20" height="20" fill="#0a0a14"/><rect x="-22" y="-48" width="44" height="8" fill="#501e2d"/><rect x="-92" y="35" width="184" height="75" fill="#0c0e1e" stroke="#59ff96" stroke-width="3"/><text x="-75" y="82" class="code">&lt;div&gt;</text><text x="-54" y="132" class="label">XENOS</text></g>
+    <g class="pixel" transform="translate(1455 1000) scale(.72)"><rect x="-75" y="-55" width="150" height="130" fill="#2a304e" stroke="#6ff2ff" stroke-width="4"/><rect x="-48" y="-20" width="30" height="30" fill="#59ff96"/><rect x="18" y="-20" width="30" height="30" fill="#59ff96"/><path d="M-35 25 Q0 55 35 25" fill="none" stroke="#ffdd55" stroke-width="4"/><rect x="-25" y="-90" width="50" height="35" fill="#6ff2ff"/><circle cx="0" cy="-117" r="8" fill="#ff4bb2"/><line x1="0" y1="-112" x2="0" y2="-90" stroke="#6ff2ff" stroke-width="4"/><text x="-58" y="110" class="label" fill="#6ff2ff">HERMES</text></g>
+    <path d="M1220 740 h295 q22 0 22 22 v95 q0 22-22 22 h-165 l-35 46 -5-46 h-90 q-22 0-22-22 v-95 q0-22 22-22z" fill="#fff5aa" stroke="#ff4bb2" stroke-width="3"/>
+    <text x="1237" y="775" class="bubble">I bullied the bot</text><text x="1237" y="810" class="bubble">until I understood</text><text x="1237" y="845" class="bubble">the DOM.</text>
+    <rect x="1190" y="1090" width="335" height="0" fill="none"/>
+    <path d="M1180 935 h330 q22 0 22 22 v78 q0 22-22 22 h-330 q-22 0-22-22 v-78 q0-22 22-22z" fill="#fff" stroke="#6ff2ff" stroke-width="3"/>
+    <text x="1197" y="970" class="bubble2">Training complete.</text><text x="1197" y="1003" class="bubble2">Please stop yelling</text><text x="1197" y="1036" class="bubble2">at the markup.</text>
+    <text x="910" y="1112" class="moral">MORAL: HTML is polite boxes with names.</text>
+  </g>
+
+  <text x="45" y="1165" class="small">A lovingly chaotic Krahnie comic • No agents were permanently bullied; one learned CSS anxiety.</text>
+  <rect width="1600" height="1200" fill="url(#scan)"/>
+</svg>
