@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2200" viewBox="0 0 1600 2200">
+<defs>
+<style><![CDATA[
+.bg{fill:#07020f} .title{font:900 62px 'Courier New',monospace;fill:#ffd447;filter:url(#glow)} .sub{font:700 24px 'Courier New',monospace;fill:#00f6ff} .num{font:900 40px 'Courier New',monospace;fill:#ff3df2} .head{font:900 30px 'Courier New',monospace;fill:#ffd447} .txt{font:700 21px 'Courier New',monospace;fill:#fff7d6} .tiny{font:700 16px 'Courier New',monospace;fill:#56ff68} .panel{fill:#16072e;stroke:#ffee7a;stroke-width:8} .inner{fill:#0b0618;stroke:#000;stroke-width:5} .bubble{fill:#fff7d6;stroke:#000;stroke-width:5} .bubbletxt{font:900 19px 'Courier New',monospace;fill:#160522} .neon{fill:none;stroke:#00f6ff;stroke-width:4;stroke-dasharray:12 10;opacity:.8}
+]]></style>
+<filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#07020f"/><rect y="6" width="8" height="1" fill="#ffffff" opacity=".08"/></pattern>
+</defs>
+<rect class="bg" width="100%" height="100%"/><rect width="100%" height="100%" fill="url(#scan)"/>
+<text x="80" y="90" class="title">XENOS // KRAHNIE SERVER QUEST</text>
+<text x="84" y="132" class="sub">8-PAGE RETRO ARCADE COMIC • DISCORD COCKPIT EDITION</text>
+<path class="neon" d="M70 155H1530"/>
+<g transform="translate(70,190)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P1</text><text x="105" y="50" class="head">THE SUMMONS</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Midnight in the Dev Arcade...</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Xenos: My needs are everywhere.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Xenos: What if one Discord DM ran it all?</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">NEW QUEST: CUSTOM KRAHNIE SERVER</text>
+</g>
+<g transform="translate(850,190)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P2</text><text x="105" y="50" class="head">FORGE THE MACHINE</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Linode neon. SSH keys. Firewalls.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Hermes installs. Services restart.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Logs become boss dialogue.</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">SERVER HEARTBEAT: ONLINE</text>
+</g>
+<g transform="translate(70,725)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P3</text><text x="105" y="50" class="head">DISCORD PORTAL</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">OAuth gate opens.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Xenos: Krahnie, meet my cockpit.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Krahnie: Connected. I hear the summons.</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">DISCORD DM = CONTROL PANEL</text>
+</g>
+<g transform="translate(850,725)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P4</text><text x="105" y="50" class="head">TOOLBELT POWER-UP</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Media cartridge: audio + pixel art.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Research cartridge: fresh facts.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Code cartridge: tests, git, PRs.</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">Memory crystal: stable facts only.</text>
+</g>
+<g transform="translate(70,1260)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P5</text><text x="105" y="50" class="head">SKILLS DUNGEON</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Boss: Blank Prompt Hydra.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Krahnie equips durable workflows.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Vague vibes take 9999 damage.</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">SHORT PROMPTS → FINISHED ARTIFACTS</text>
+</g>
+<g transform="translate(850,1260)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P6</text><text x="105" y="50" class="head">CLIENT WORK LANE</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Krahnborn rails ignite.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Intake → Estimate → Work ID</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Branch → PR/CI → Docs</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">Every quest gets receipts.</text>
+</g>
+<g transform="translate(70,1795)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P7</text><text x="105" y="50" class="head">ALL NEEDS, ONE CHAT</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Morning briefings. Creative lab.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Dev station. Ops watchdog.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Cron pings only when needed.</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">Discord becomes the daily cockpit.</text>
+</g>
+<g transform="translate(850,1795)">
+<rect class="panel" width="740" height="500" rx="0"/><rect class="inner" x="22" y="78" width="696" height="390"/>
+<text x="30" y="50" class="num">P8</text><text x="105" y="50" class="head">COMMAND KINGDOM</text>
+<rect x="54" y="130" width="80" height="120" fill="#253bff" stroke="#000" stroke-width="5"/><rect x="68" y="90" width="52" height="48" fill="#ffd39c" stroke="#000" stroke-width="5"/><text x="50" y="286" class="tiny">XENOS</text>
+<rect x="575" y="110" width="100" height="100" rx="18" fill="#00f6ff" stroke="#000" stroke-width="5"/><text x="603" y="178" font-family="Courier New" font-weight="900" font-size="62" fill="#081225">K</text><text x="558" y="240" class="tiny">KRAHNIE</text>
+<text x="230" y="156" font-family="Courier New" font-weight="900" font-size="46" fill="#ff3df2">⚡</text><text x="485" y="185" font-family="Courier New" font-weight="900" font-size="42" fill="#ffd447">✦</text>
+<rect class="bubble" x="170" y="252" width="500" height="44" rx="12"/><text x="188" y="282" class="bubbletxt">Xenos and Krahnie stand victorious.</text>
+<rect class="bubble" x="170" y="304" width="500" height="44" rx="12"/><text x="188" y="334" class="bubbletxt">Custom server online through Discord.</text>
+<rect class="bubble" x="170" y="356" width="500" height="44" rx="12"/><text x="188" y="386" class="bubbletxt">Achievements: skills, memory, media, code, clien</text>
+<rect class="bubble" x="170" y="408" width="500" height="44" rx="12"/><text x="188" y="438" class="bubbletxt">YOU WIN! PRESS START AGAIN.</text>
+</g>
+<text x="80" y="2155" class="sub">HIGH SCORE: one private Krahnie server you can Discord for creative, code, research, ops, and Krahnborn client-work quests.</text></svg>
