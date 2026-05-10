@@ -7,13 +7,37 @@ ARTIFACTS = ROOT / "artifacts"
 
 VIEW_EXTS = {".html", ".htm", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp3", ".wav", ".mp4", ".md"}
 BAD_PARTS = {"prompts", "__pycache__"}
-LABELS = {"prototypes": "Playable Prototypes", "html-sites": "HTML Sites", "reports": "Reports", "comics": "Comics", "media": "Media", "docs": "Docs"}
+LABELS = {
+    "prototypes": "Playable Prototypes",
+    "game-dev-research": "Game Dev Research HTML Prototypes",
+    "html-sites": "HTML Sites",
+    "reports": "Reports",
+    "comics": "Comics",
+    "media": "Media",
+    "docs": "Docs",
+}
+
+
+def is_game_dev_research_prototype(path: Path) -> bool:
+    rel_parts = path.relative_to(ROOT).parts if path.is_relative_to(ROOT) else path.parts
+    return (
+        "reports" in rel_parts
+        and "indie-pvp-retro-inspo" in rel_parts
+        and path.suffix.lower() in {".html", ".htm"}
+        and "prototype" in path.name.lower()
+    )
 
 
 def titleize(path: Path) -> str:
     stem = path.stem if path.suffix else path.name
     if path.name.lower() == "index.html" and len(path.parts) > 1:
         stem = path.parent.name
+    if is_game_dev_research_prototype(path):
+        parts = stem.split("-", 3)
+        date = "-".join(parts[:3]) if len(parts) == 4 and all(part.isdigit() for part in parts[:3]) else ""
+        label = parts[3] if date else stem
+        pretty = label.replace("-", " ").replace("_", " ").title()
+        return f"{date} · {pretty}" if date else pretty
     # Strip leading ISO-ish date for nicer cards.
     parts = stem.split("-", 3)
     if len(parts) == 4 and all(part.isdigit() for part in parts[:3]):
@@ -26,6 +50,8 @@ def icon(path: Path) -> str:
     if s in {".html", ".htm"}:
         if "prototypes" in path.parts:
             return "🎮"
+        if is_game_dev_research_prototype(path):
+            return "🕹️"
         return "🌐"
     if s == ".md": return "📝"
     if s == ".svg": return "🎨"
@@ -67,10 +93,15 @@ files.sort(key=sort_key)
 cards_by_section = {}
 for p in files:
     rel = p.relative_to(ROOT)
-    section = rel.parts[1] if len(rel.parts) > 1 else "other"
+    if is_game_dev_research_prototype(p):
+        section = "game-dev-research"
+    else:
+        section = rel.parts[1] if len(rel.parts) > 1 else "other"
     cards_by_section.setdefault(section, []).append(p)
 
-featured = files[:8]
+featured = cards_by_section.get("prototypes", [])[:4] + cards_by_section.get("game-dev-research", [])[:4]
+if len(featured) < 8:
+    featured += [p for p in files if p not in featured][: 8 - len(featured)]
 
 
 def card_html(p: Path) -> str:
@@ -89,7 +120,7 @@ def card_html(p: Path) -> str:
 
 featured_html = "\n".join(card_html(p) for p in featured) or '<p class="empty">No artifacts yet.</p>'
 sections_html = []
-for section in ["prototypes", "html-sites", "reports", "comics", "media", "docs"]:
+for section in ["prototypes", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
