@@ -65,7 +65,7 @@ fi
 # Durable architecture/write-up note saved outside Hermes outputs.
 copy_file_if_exists "$WIKI_NOTE" "artifacts/docs/krahnie-process-orchestrator.md"
 
-# Useful index for browsing from GitHub.
+# Useful indexes for browsing from GitHub and iPhone-friendly GitHub Pages.
 {
   echo "# Artifact Index"
   echo
@@ -76,7 +76,9 @@ copy_file_if_exists "$WIKI_NOTE" "artifacts/docs/krahnie-process-orchestrator.md
   find artifacts -type f | sort | sed 's#^#- #'
 } > ARTIFACT_INDEX.md
 
-git add README.md ARTIFACT_INDEX.md scripts/sync_artifacts.sh artifacts
+./scripts/generate_mobile_index.py
+
+git add README.md ARTIFACT_INDEX.md index.html .nojekyll scripts/sync_artifacts.sh scripts/generate_mobile_index.py artifacts
 if git diff --cached --quiet; then
   echo "No artifact changes to commit."
   exit 0
