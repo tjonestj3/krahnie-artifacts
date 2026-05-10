@@ -6,6 +6,7 @@ HERMES_AGENT_DIR="${HERMES_AGENT_DIR:-$HOME/.hermes/hermes-agent}"
 OUT_DIR="$HERMES_AGENT_DIR/outputs"
 COMIC_DIR="$HERMES_AGENT_DIR/comic"
 WIKI_NOTE="$HOME/agent-krahn-sdk-build/docs/system-wiki/14-krahnie-process-orchestrator.md"
+XENOS_ROYALE_WEB="$HOME/game-lab/projects/xenos-royale-prototype/export/web"
 
 cd "$REPO_DIR"
 mkdir -p artifacts/html-sites artifacts/reports artifacts/comics artifacts/media artifacts/docs
@@ -49,6 +50,9 @@ fi
 
 # Generated comics.
 copy_dir_if_exists "$COMIC_DIR" "artifacts/comics"
+
+# Playable browser prototypes / web exports.
+copy_dir_if_exists "$XENOS_ROYALE_WEB" "artifacts/prototypes/xenos-royale-prototype"
 
 # Media and source scripts from outputs root. Keep folders above in their semantic homes.
 if [ -d "$OUT_DIR" ]; then

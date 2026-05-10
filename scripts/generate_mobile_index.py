@@ -7,11 +7,13 @@ ARTIFACTS = ROOT / "artifacts"
 
 VIEW_EXTS = {".html", ".htm", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp3", ".wav", ".mp4", ".md"}
 BAD_PARTS = {"prompts", "__pycache__"}
-LABELS = {"html-sites": "HTML Sites", "reports": "Reports", "comics": "Comics", "media": "Media", "docs": "Docs"}
+LABELS = {"prototypes": "Playable Prototypes", "html-sites": "HTML Sites", "reports": "Reports", "comics": "Comics", "media": "Media", "docs": "Docs"}
 
 
 def titleize(path: Path) -> str:
     stem = path.stem if path.suffix else path.name
+    if path.name.lower() == "index.html" and len(path.parts) > 1:
+        stem = path.parent.name
     # Strip leading ISO-ish date for nicer cards.
     parts = stem.split("-", 3)
     if len(parts) == 4 and all(part.isdigit() for part in parts[:3]):
@@ -21,7 +23,10 @@ def titleize(path: Path) -> str:
 
 def icon(path: Path) -> str:
     s = path.suffix.lower()
-    if s in {".html", ".htm"}: return "🌐"
+    if s in {".html", ".htm"}:
+        if "prototypes" in path.parts:
+            return "🎮"
+        return "🌐"
     if s == ".md": return "📝"
     if s == ".svg": return "🎨"
     if s in {".png", ".jpg", ".jpeg", ".webp", ".gif"}: return "🖼️"
@@ -35,6 +40,8 @@ def is_primary(path: Path) -> bool:
     if any(part in BAD_PARTS for part in rel.parts):
         return False
     if path.suffix.lower() not in VIEW_EXTS:
+        return False
+    if "prototypes" in rel.parts and path.name.lower() != "index.html":
         return False
     name = path.name.lower()
     if name.endswith((".import", ".uid")) or path.suffix.lower() == ".py":
@@ -82,7 +89,7 @@ def card_html(p: Path) -> str:
 
 featured_html = "\n".join(card_html(p) for p in featured) or '<p class="empty">No artifacts yet.</p>'
 sections_html = []
-for section in ["html-sites", "reports", "comics", "media", "docs"]:
+for section in ["prototypes", "html-sites", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
