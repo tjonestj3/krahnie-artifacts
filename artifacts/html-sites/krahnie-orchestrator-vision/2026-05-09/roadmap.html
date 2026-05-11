@@ -19,10 +19,10 @@
 
   <section class="section">
     <div class="wrap roadmap">
-      <div class="phase"><b>1</b><h3>Foundation</h3><p>Define card schema, source intake rules, identity mapping, branch naming, PR template, and client/org/project registry.</p><div class="pillrow"><span class="pill">2–4 weeks</span><span class="pill">Low risk</span></div></div>
-      <div class="phase"><b>2</b><h3>Guided workflow</h3><p>Add workflow actions for card creation/enrichment, Ready for Customer Review, metadata capture, PR creation, status summaries, and documentation prompts.</p><div class="pillrow"><span class="pill">4–6 weeks</span><span class="pill">Team pilot</span></div></div>
-      <div class="phase"><b>3</b><h3>CI/CD lane</h3><p>Deploy changed metadata to testing environments through standard CI/CD, with validation evidence posted back to the card and PR.</p><div class="pillrow"><span class="pill">6–10 weeks</span><span class="pill">Sandbox first</span></div></div>
-      <div class="phase"><b>4</b><h3>Agent execution</h3><p>After the orchestration lane is trusted, let Krahnie attempt low-risk implementation tasks while humans continue to approve high-risk work.</p><div class="pillrow"><span class="pill">Iterative</span><span class="pill">Trust gates</span></div></div>
+      <div class="phase"><b>1</b><h3>Foundation</h3><p>Define card schema, Slack thread conventions, identity mapping, branch naming, PR template, and client/repo/org registry.</p><div class="pillrow"><span class="pill">2–4 weeks</span><span class="pill">Low risk</span></div></div>
+      <div class="phase"><b>2</b><h3>Guided workflow</h3><p>Add Slack actions for card creation, start-work, branch/worktree setup, PR creation, status summaries, and documentation prompts.</p><div class="pillrow"><span class="pill">4–6 weeks</span><span class="pill">Team pilot</span></div></div>
+      <div class="phase"><b>3</b><h3>CI/CD lane</h3><p>Deploy changed metadata to partial sandboxes through GitHub Actions, with validation evidence posted back to Slack and the card.</p><div class="pillrow"><span class="pill">6–10 weeks</span><span class="pill">Sandbox first</span></div></div>
+      <div class="phase"><b>4</b><h3>Agent execution</h3><p>Let Krahnie implement low-risk changes, generate tests/docs, and propose fixes while humans approve high-risk work.</p><div class="pillrow"><span class="pill">Iterative</span><span class="pill">Trust gates</span></div></div>
     </div>
   </section>
 
@@ -40,7 +40,7 @@
       <div>
         <h2>Risks and mitigations</h2>
         <div class="timeline">
-          <div class="step"><div class="num">!</div><div class="stepbody"><strong>Tool sprawl</strong><p>Mitigate by making cards the source of accountability and treating every intake source as a feeder, not adding another destination.</p></div></div>
+          <div class="step"><div class="num">!</div><div class="stepbody"><strong>Tool sprawl</strong><p>Mitigate by making Slack the cockpit and cards the source of accountability, not adding another destination.</p></div></div>
           <div class="step"><div class="num">!</div><div class="stepbody"><strong>Over-automation too early</strong><p>Mitigate with human approval gates and begin with orchestration before implementation autonomy.</p></div></div>
           <div class="step"><div class="num">!</div><div class="stepbody"><strong>Salesforce metadata complexity</strong><p>Mitigate with client-specific runbooks, delta deploy previews, validation recipes, and rollback documentation.</p></div></div>
           <div class="step"><div class="num">!</div><div class="stepbody"><strong>Inconsistent adoption</strong><p>Mitigate with the simple principle: no work/card, no code/branch, no branch/PR, no merge/validation, no delivery/docs.</p></div></div>
@@ -52,7 +52,7 @@
   <section class="section">
     <div class="wrap callout">
       <h2>Recommended pilot</h2>
-      <p>Pick one internal-friendly client or sandbox-heavy workstream. Route all requests into cards. Let humans do the Salesforce work, then have Krahnie automate metadata capture, branch/commit/PR, CI/CD tracking, summaries, templates, and documentation first. Only then allow low-risk implementation tasks.</p>
+      <p>Pick one internal-friendly client or sandbox-heavy workstream. Route all requests through Slack threads and cards. Require branch/PR/validation/docs for every change. Let Krahnie automate setup, summaries, templates, and documentation first. Only then allow low-risk implementation tasks.</p>
       <div class="pillrow"><span class="pill">Pilot success metric: fewer orphan requests</span><span class="pill">Faster PR readiness</span><span class="pill">Better validation evidence</span><span class="pill">Reusable client KB entries</span></div>
     </div>
   </section>

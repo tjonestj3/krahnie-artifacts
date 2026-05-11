@@ -17,11 +17,11 @@
         <p class="lead">Krahnie/Hermes does not need to replace Krahnborn’s existing systems. It should connect them, enforce the delivery contract, and make each handoff easier for humans.</p>
       </div>
       <div class="agent-map" aria-label="Agent roles">
-        <div class="agent"><div class="face">◉_◉</div><strong>Intake</strong><p class="mini">Creates/enriches cards</p></div>
-        <div class="agent"><div class="face">⌁_⌁</div><strong>Card PM</strong><p class="mini">Tracks states</p></div>
-        <div class="agent"><div class="face">▣_▣</div><strong>Metadata</strong><p class="mini">Retrieve + branch</p></div>
-        <div class="agent"><div class="face">✓_✓</div><strong>Reviewer</strong><p class="mini">PR + CI/CD watch</p></div>
-        <div class="agent"><div class="face">✎_✎</div><strong>Docbot</strong><p class="mini">Docs accepted work</p></div>
+        <div class="agent"><div class="face">◉_◉</div><strong>Intake</strong><p class="mini">Classifies and scopes</p></div>
+        <div class="agent"><div class="face">⌁_⌁</div><strong>Router</strong><p class="mini">Finds client/repo/org</p></div>
+        <div class="agent"><div class="face">▣_▣</div><strong>Builder</strong><p class="mini">Branch + implementation</p></div>
+        <div class="agent"><div class="face">✓_✓</div><strong>Reviewer</strong><p class="mini">Checks standards</p></div>
+        <div class="agent"><div class="face">✎_✎</div><strong>Docbot</strong><p class="mini">Writes memory</p></div>
       </div>
     </div>
   </section>
@@ -30,11 +30,11 @@
     <div class="wrap">
       <h2>Stack diagram</h2>
       <div class="diagram stack" aria-label="Architecture stack diagram">
-        <div class="layer"><b>Intake sources</b><div class="chips"><span class="chip">Slack</span><span class="chip alt">Email</span><span class="chip alt">Meeting notes</span><span class="chip alt">Client portal</span><span class="chip alt">Webhook/API</span></div></div>
+        <div class="layer"><b>Team cockpit</b><div class="chips"><span class="chip">Slack</span><span class="chip alt">Request threads</span><span class="chip alt">Approvals</span><span class="chip alt">Status</span><span class="chip">Discord</span></div></div>
         <div class="layer"><b>Orchestration brain</b><div class="chips"><span class="chip">Krahnie/Hermes</span><span class="chip alt">State machine</span><span class="chip alt">Policy checks</span><span class="chip alt">Identity mapping</span><span class="chip alt">Agent roles</span></div></div>
         <div class="layer"><b>Work system</b><div class="chips"><span class="chip">Cards</span><span class="chip alt">Estimates</span><span class="chip alt">Assignments</span><span class="chip alt">Due dates</span><span class="chip alt">Acceptance criteria</span></div></div>
-        <div class="layer"><b>Engineering lane</b><div class="chips"><span class="chip">GitHub</span><span class="chip alt">Feature branches</span><span class="chip alt">PR templates</span><span class="chip alt">Reviews</span><span class="chip alt">CI/CD</span></div></div>
-        <div class="layer"><b>Salesforce lane</b><div class="chips"><span class="chip">Dev box / Setup</span><span class="chip alt">Salesforce CLI retrieve</span><span class="chip alt">Changed metadata deploys</span><span class="chip alt">Customer testing</span></div></div>
+        <div class="layer"><b>Engineering lane</b><div class="chips"><span class="chip">GitHub</span><span class="chip alt">Worktrees</span><span class="chip alt">Feature branches</span><span class="chip alt">PR templates</span><span class="chip alt">Reviews</span></div></div>
+        <div class="layer"><b>Salesforce lane</b><div class="chips"><span class="chip">Connected orgs</span><span class="chip alt">Partial sandbox</span><span class="chip alt">Changed metadata deploys</span><span class="chip alt">Validation</span></div></div>
         <div class="layer"><b>Knowledge lane</b><div class="chips"><span class="chip">Client KB</span><span class="chip alt">Runbooks</span><span class="chip alt">Functional docs</span><span class="chip alt">Technical docs</span><span class="chip alt">Lessons learned</span></div></div>
       </div>
     </div>
@@ -42,11 +42,11 @@
 
   <section class="section">
     <div class="wrap grid3">
-      <div class="card"><div class="icon">A</div><h3>Source-agnostic intake</h3><p>Requests from Slack, email, meetings, client portals, manual entry, or APIs all trigger the same safe actions: create/enrich card, capture metadata, open PR, track CI/CD, request validation, and close with docs.</p></div>
-      <div class="card"><div class="icon">B</div><h3>Identity and permission mapping</h3><p>Requesters map to card owners, GitHub users, Salesforce permissions, and approval roles. Krahnie can prevent accidental actions by the wrong person or context.</p></div>
-      <div class="card"><div class="icon">C</div><h3>Per-request isolation</h3><p>Every request receives a dedicated card/branch lane so human admin metadata changes, developer edits, and PR packaging do not collide across clients or tasks.</p></div>
+      <div class="card"><div class="icon">A</div><h3>Slack as delivery cockpit</h3><p>Commands and buttons trigger safe actions: create card, start branch, summarize PR, deploy to partial, request validation, close with docs. Thread state becomes a readable activity log.</p></div>
+      <div class="card"><div class="icon">B</div><h3>Identity and permission mapping</h3><p>Slack users map to card owners, GitHub users, Salesforce permissions, and approval roles. Krahnie can prevent accidental actions by the wrong person or context.</p></div>
+      <div class="card"><div class="icon">C</div><h3>Per-request isolation</h3><p>Every request receives a dedicated branch and worktree so agent work, admin metadata changes, and human edits do not collide across clients or tasks.</p></div>
       <div class="card"><div class="icon">D</div><h3>PR templates as control surface</h3><p>The PR is not just a diff. It is the checkpoint for intent, risk, test plan, changed metadata, rollback, screenshots, and documentation completeness.</p></div>
-      <div class="card"><div class="icon">E</div><h3>CI/CD for Salesforce deltas</h3><p>GitHub Actions or the standard deployment pipeline deploys changed metadata to the connected testing environment and returns deployment evidence to the card and PR.</p></div>
+      <div class="card"><div class="icon">E</div><h3>CI/CD for Salesforce deltas</h3><p>GitHub Actions deploy changed metadata to the connected partial sandbox and returns deployment evidence to Slack and the card.</p></div>
       <div class="card"><div class="icon">F</div><h3>Knowledge capture by default</h3><p>Client-specific quirks, org routing rules, metadata dependencies, validation tricks, and reusable prompts become durable assets instead of lost context.</p></div>
     </div>
   </section>
@@ -58,7 +58,7 @@
         <div class="card risk"><h3>Human approvals for risky actions</h3><p>Production deploys, destructive changes, permission/security changes, managed package updates, and client-visible communications should require explicit approval.</p></div>
         <div class="card risk"><h3>Client context boundaries</h3><p>Krahnie should never mix repositories, org credentials, or client knowledge without explicit routing. Each action should display the active client/org/repo.</p></div>
         <div class="card risk"><h3>Auditability over magic</h3><p>Automated decisions should leave traces: why an estimate was proposed, why files were changed, what tests ran, and what evidence supports validation.</p></div>
-        <div class="card risk"><h3>Fallback to human-friendly operations</h3><p>If CI, sandbox auth, metadata retrieve, or PR packaging fails, the process should degrade gracefully: preserve the card, branch, logs, and next recommended human action.</p></div>
+        <div class="card risk"><h3>Fallback to human-friendly operations</h3><p>If CI, sandbox auth, or agent implementation fails, the process should degrade gracefully: preserve the card, branch, logs, and next recommended human action.</p></div>
       </div>
     </div>
   </section>
