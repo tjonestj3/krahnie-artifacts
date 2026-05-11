@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log Bait Mastery // Krahnie Royale Coach</title>
+  <meta name="description" content="Retro interactive Log Bait mastery guide for Clash Royale: deck identity, spell tracking, matchups, rotations, and current meta notes." />
+  <style>
+    :root{
+      --bg:#100718; --bg2:#180f2c; --panel:#24133f; --panel2:#321d55; --ink:#fff6d7; --muted:#c9b9e8;
+      --gold:#ffd166; --pink:#ff4fd8; --cyan:#36f5ff; --green:#7cff6b; --red:#ff5f6d; --purple:#8f5cff;
+      --line:rgba(255,255,255,.16); --shadow:0 18px 60px rgba(0,0,0,.45); --pix:4px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:
+      radial-gradient(circle at 15% 0%, rgba(255,79,216,.28), transparent 35%),
+      radial-gradient(circle at 85% 12%, rgba(54,245,255,.20), transparent 32%),
+      linear-gradient(180deg,var(--bg),#09040e 70%); overflow-x:hidden;}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(#000,transparent 78%)}
+    body:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 5px);mix-blend-mode:overlay;opacity:.55}
+    a{color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 22px}.nav{position:sticky;top:0;z-index:30;background:rgba(12,5,20,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .navin{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:72px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.sprite{width:44px;height:44px;border:3px solid var(--ink);background:var(--gold);box-shadow:4px 4px 0 #000;display:grid;place-items:center;color:#201000;font-weight:1000}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.13em}.links{display:flex;gap:8px;flex-wrap:wrap}.links a,.chipbtn{border:1px solid var(--line);background:rgba(255,255,255,.06);padding:9px 12px;text-decoration:none;border-radius:0;box-shadow:3px 3px 0 rgba(0,0,0,.45);font-weight:800;font-size:13px}.links a:hover,.chipbtn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(0,0,0,.55);border-color:var(--cyan)}
+    .hero{padding:72px 0 34px}.heroGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--cyan);font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:12px}.blink{width:10px;height:10px;background:var(--green);box-shadow:0 0 18px var(--green);animation:blink 1.2s steps(2) infinite}@keyframes blink{50%{opacity:.25}}
+    h1{font-size:clamp(44px,7vw,86px);line-height:.92;margin:18px 0 18px;letter-spacing:-.06em;text-shadow:5px 5px 0 #000, 0 0 30px rgba(255,79,216,.28)} h2{font-size:clamp(30px,4vw,52px);line-height:1;margin:0 0 16px;letter-spacing:-.04em} h3{margin:0 0 8px;font-size:22px}.lead{font-size:clamp(18px,2.1vw,24px);color:var(--muted);max-width:780px}.panel{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03)),var(--panel);border:2px solid var(--line);box-shadow:var(--shadow),6px 6px 0 #000;padding:20px;position:relative}.panel:before{content:"";position:absolute;inset:8px;border:1px dashed rgba(255,255,255,.12);pointer-events:none}.deck{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{min-height:112px;padding:10px;border:2px solid rgba(255,255,255,.18);background:linear-gradient(160deg,var(--panel2),#1b1030);box-shadow:4px 4px 0 #000;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.card:after{content:"";position:absolute;right:-16px;bottom:-20px;width:58px;height:58px;background:rgba(255,255,255,.06);transform:rotate(45deg)}.elixir{align-self:flex-start;background:#4d2c82;color:#fff;border:2px solid #c7a1ff;width:30px;height:30px;display:grid;place-items:center;font-weight:1000;box-shadow:2px 2px 0 #000}.card b{font-size:13px;line-height:1.05;z-index:1}.icon{font-size:30px;filter:drop-shadow(3px 3px 0 #000)}
+    .section{padding:54px 0}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.kpi{font-size:42px;font-weight:1000;color:var(--gold);letter-spacing:-.06em;text-shadow:3px 3px 0 #000}.tag{display:inline-flex;padding:4px 8px;background:#000;border:1px solid var(--line);color:var(--green);font:800 12px ui-monospace,monospace;text-transform:uppercase}.pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.pill{border:1px solid var(--line);background:rgba(0,0,0,.22);padding:7px 10px;color:var(--muted);font-weight:800;font-size:13px}.arcade{display:grid;grid-template-columns:1fr 1fr;gap:18px}.meter{height:16px;background:#10091b;border:2px solid #000;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}.meter span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--cyan),var(--pink));box-shadow:0 0 18px var(--cyan)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{cursor:pointer;color:var(--ink)}.tab.active{background:var(--gold);color:#251500;border-color:#fff}.tabpane{display:none}.tabpane.active{display:block}.playbook{display:grid;gap:12px}.move{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start;padding:14px;border:1px solid var(--line);background:rgba(255,255,255,.045)}.move strong{color:var(--cyan)}.danger{color:var(--red)}.good{color:var(--green)}.gold{color:var(--gold)}
+    .trainer{display:grid;grid-template-columns:.92fr 1.08fr;gap:18px}.spellBoard{min-height:390px;display:grid;align-content:start;gap:12px}.spellRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;background:rgba(0,0,0,.23);border:1px solid var(--line)}.status{font-weight:1000}.ready{color:var(--green)}.notready{color:var(--red)}button{font:inherit;color:inherit;background:rgba(255,255,255,.08);border:1px solid var(--line);padding:10px 12px;box-shadow:3px 3px 0 #000;cursor:pointer;font-weight:900}button:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #000}.primary{background:var(--pink);color:#fff;border-color:#ffc4f4}.secondary{background:var(--cyan);color:#041315;border-color:#c8fcff}.tiny{font-size:12px;padding:7px 9px}.barrel{position:relative;height:170px;background:linear-gradient(180deg,#2b1b47,#120b1f);border:2px solid var(--line);overflow:hidden}.tower{position:absolute;right:28px;top:42px;width:62px;height:92px;background:#5b335d;border:3px solid #ffc7ef;box-shadow:5px 5px 0 #000}.tower:before{content:"";position:absolute;left:9px;right:9px;top:-22px;height:22px;background:#ffc857;border:3px solid #000}.barrelSprite{position:absolute;left:32px;top:78px;font-size:42px;transition:transform .65s cubic-bezier(.2,1.2,.2,1)}.barrel.launch .barrelSprite{transform:translate(410px,-44px) rotate(720deg)}.gobpop{position:absolute;right:92px;top:96px;color:var(--green);font-weight:1000;opacity:0}.barrel.launch .gobpop{animation:pop .8s .45s forwards}@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .matchups{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.match{padding:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);min-height:190px}.match h3{font-size:18px}.rating{font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:1000}.quizQ{font-size:22px;font-weight:900}.answers{display:grid;gap:10px;margin-top:14px}.answer{text-align:left}.answer.correct{outline:3px solid var(--green)}.answer.wrong{outline:3px solid var(--red)}.console{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#07040d;color:#b8ffb1;border:2px solid #2c5730;padding:16px;box-shadow:inset 0 0 30px rgba(124,255,107,.08),5px 5px 0 #000;white-space:pre-wrap;min-height:150px}.footer{padding:34px 0 54px;color:var(--muted);border-top:1px solid var(--line)}
+    @media(max-width:900px){.heroGrid,.grid3,.grid2,.arcade,.trainer{grid-template-columns:1fr}.matchups{grid-template-columns:1fr 1fr}.links{display:none}.deck{grid-template-columns:repeat(2,1fr)}.move{grid-template-columns:1fr}.barrel.launch .barrelSprite{transform:translate(250px,-44px) rotate(720deg)}}
+    @media(max-width:560px){.matchups{grid-template-columns:1fr}h1{font-size:44px}.navin{min-height:64px}.hero{padding-top:44px}.card{min-height:96px}}
+    @media(prefers-reduced-motion:reduce){*,html{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="wrap navin"><a class="brand" href="#top"><span class="sprite">LB</span><span>Log Bait Mastery<small>Krahnie Royale Coach // ChaoticStoner</small></span></a><div class="links"><a href="#deck">Deck</a><a href="#gameplan">Gameplan</a><a href="#trainer">Spell Trainer</a><a href="#matchups">Matchups</a><a href="#quiz">Quiz</a></div></div></nav>
+
+  <main id="top">
+    <section class="hero"><div class="wrap heroGrid">
+      <div>
+        <span class="eyebrow"><span class="blink"></span> current meta reference // May 2026</span>
+        <h1>Master the Barrel. Split the Swarm. Tilt the Tower.</h1>
+        <p class="lead">A retro command-center for classic Log Bait: force their small spell, punish the cooldown, defend with patience, and win by chip + Rocket discipline.</p>
+        <div class="pillrow"><span class="pill">Your profile: ChaoticStoner // #9QRCYLU0P</span><span class="pill good">Recent log bait core: 17–5 visible sample</span><span class="pill">Classic 3.3 cycle</span></div>
+      </div>
+      <div class="panel">
+        <div class="deck" aria-label="Classic Log Bait deck">
+          <div class="card"><span class="elixir">3</span><span class="icon">🛢️</span><b>Goblin Barrel</b></div>
+          <div class="card"><span class="elixir">3</span><span class="icon">🛡️</span><b>Knight / Evo Knight</b></div>
+          <div class="card"><span class="elixir">1</span><span class="icon">❄️</span><b>Ice Spirit</b></div>
+          <div class="card"><span class="elixir">3</span><span class="icon">👺</span><b>Goblin Gang</b></div>
+          <div class="card"><span class="elixir">6</span><span class="icon">🚀</span><b>Rocket</b></div>
+          <div class="card"><span class="elixir">5</span><span class="icon">🔥</span><b>Inferno Tower</b></div>
+          <div class="card"><span class="elixir">3</span><span class="icon">🏹</span><b>Princess</b></div>
+          <div class="card"><span class="elixir">2</span><span class="icon">🪵</span><b>The Log</b></div>
+        </div>
+      </div>
+    </div></section>
+
+    <section class="section" id="deck"><div class="wrap grid3">
+      <div class="panel"><span class="tag">identity</span><h2>What Log Bait is really doing</h2><p>Log Bait is not “spam Barrel and pray.” It is a control deck wearing a goblin mask. You spend the first minute learning their small spell, building cycle advantage, and forcing awkward answers. Then you turn every wrong spell into tower damage.</p></div>
+      <div class="panel"><span class="tag">your data</span><h2>Why this fits you</h2><p>Live battle-log pull showed your classic list winning hard compared with Hog-hybrid experiments. The clean classic core went <b class="good">14–4</b> in one ordering plus <b class="good">3–1</b> in another, while the Hog/Barrel hybrid went <b class="danger">0–4</b>.</p><div class="meter" aria-label="classic list win rate"><span style="width:77%"></span></div><p><b>Coach call:</b> stop diluting the bait identity. Stay classic unless a specific matchup demands a tech.</p></div>
+      <div class="panel"><span class="tag">meta note</span><h2>May 2026 weather report</h2><p>Search context shows Log Bait still appearing in current RoyaleAPI/deck guides, while May balance discussion hits cards like Evo Drill, Royal Hogs, Evo Snowball, Tesla, Dark Prince, E-Giant, and Giant Skeleton. Translation: keep bait fundamentals sharp, and be ready for splash-heavy midladder chaos.</p></div>
+    </div></section>
+
+    <section class="section" id="gameplan"><div class="wrap">
+      <span class="eyebrow"><span class="blink"></span> arcade playbook</span><h2>The four-phase Log Bait script</h2>
+      <div class="tabs" role="tablist"><button class="chipbtn tab active" data-tab="single">Single Elixir</button><button class="chipbtn tab" data-tab="double">Double Elixir</button><button class="chipbtn tab" data-tab="overtime">Overtime</button><button class="chipbtn tab" data-tab="mistakes">Don’t Throw</button></div>
+      <div class="panel tabpane active" id="single"><div class="playbook">
+        <div class="move"><strong>Opening</strong><p>Safe starts: Princess in back, Ice Spirit bridge, split Goblin Gang, or passive Knight. If you Barrel first, watch their answer like a hawk: Log, Arrows, Snowball, Zap, Barbarian Barrel, Tornado.</p></div>
+        <div class="move"><strong>Information > damage</strong><p>First Barrel is a scout. Second Barrel is a punish. Track their cycle: after they spend Log on Princess or Gang, your Barrel window opens for about four cards.</p></div>
+        <div class="move"><strong>Defensive posture</strong><p>Do not Inferno Tower too early unless the win condition is committed. Knight + Ice Spirit buys absurd time. Princess opposite lane forces attention without overcommitting.</p></div>
+      </div></div>
+      <div class="panel tabpane" id="double"><div class="playbook">
+        <div class="move"><strong>Pressure rhythm</strong><p>Princess at bridge + Barrel in safe spot creates two answers required. If they only have one small spell, something connects.</p></div>
+        <div class="move"><strong>Rocket math</strong><p>Start counting tower HP, but do not Rocket naked if it lets them build a deathball. Rocket troops + tower when possible; pure Rocket cycle only when defense is stable.</p></div>
+        <div class="move"><strong>Out-cycle</strong><p>Classic loop: Barrel → defend cheap → Princess/Gang bait spell → Barrel again. Your deck wins when their hand is always one card too late.</p></div>
+      </div></div>
+      <div class="panel tabpane" id="overtime"><div class="playbook">
+        <div class="move"><strong>One tower plan</strong><p>Pick a lane and stay disciplined. Log Bait loses games by chasing both towers and giving up counterpush value.</p></div>
+        <div class="move"><strong>Rocket lock</strong><p>If two Rockets + Logs close the game, stop improvising. Defend, cycle, Rocket. Become boring. Boring wins trophies.</p></div>
+        <div class="move"><strong>Barrel mixups</strong><p>Use anti-Log, back Barrel, side Barrel, and center Barrel only after you know their spell habits. Random mixups are weaker than informed mixups.</p></div>
+      </div></div>
+      <div class="panel tabpane" id="mistakes"><div class="playbook">
+        <div class="move"><strong class="danger">No Hog hybrid drift</strong><p>Your battle sample says the Hog + Barrel blend got cooked. Hog makes you spend elixir without improving the bait cycle. If you want Hog, play Hog. If you want bait, commit.</p></div>
+        <div class="move"><strong class="danger">No panic Rocket</strong><p>Rocketing a tank without tower value is emergency medicine, not a plan. If you must do it, you probably missed the earlier Inferno/Knight setup.</p></div>
+        <div class="move"><strong class="danger">No dead Princess</strong><p>Princess at bridge into a known Log is not pressure; it is a donation. Bait the spell first or place her where she demands a worse answer.</p></div>
+      </div></div>
+    </div></section>
+
+    <section class="section" id="trainer"><div class="wrap trainer">
+      <div class="panel spellBoard"><span class="tag">interactive trainer</span><h2>Small-spell tracker</h2><p>Tap the spell when your opponent uses it. When it is on cooldown, that is your Barrel window. Use this during reviews to build the habit.</p>
+        <div class="spellRow"><b>The Log</b><span class="status ready" id="s-log">ready</span><button class="tiny" onclick="burn('log',14)">used</button></div>
+        <div class="spellRow"><b>Arrows</b><span class="status ready" id="s-arrows">ready</span><button class="tiny" onclick="burn('arrows',15)">used</button></div>
+        <div class="spellRow"><b>Zap / Snowball</b><span class="status ready" id="s-zap">ready</span><button class="tiny" onclick="burn('zap',12)">used</button></div>
+        <div class="spellRow"><b>Barbarian Barrel</b><span class="status ready" id="s-bbarrel">ready</span><button class="tiny" onclick="burn('bbarrel',14)">used</button></div>
+        <button class="secondary" onclick="recommend()">Coach me now</button><div class="console" id="coach">KRAHNIE_COUCH_COACH.exe loaded...
+Track their small spell. Punish when it is red.</div>
+      </div>
+      <div class="panel"><span class="tag">barrel lab</span><h2>Launch a punish Barrel</h2><p>When their small spell is out of cycle, throw Barrel with intent. Tap launch and watch the goblins go goblin mode.</p><div class="barrel" id="barrel"><div class="barrelSprite">🛢️</div><div class="tower"></div><div class="gobpop">+ CHIP!</div></div><div class="pillrow"><button class="primary" onclick="launchBarrel()">Launch Barrel</button><button onclick="resetSpells()">Reset trainer</button></div><p class="muted">Reference windows are simplified cycle estimates, not exact in-game timers. The real skill is counting the four-card cycle.</p></div>
+    </div></section>
+
+    <section class="section" id="matchups"><div class="wrap">
+      <span class="eyebrow"><span class="blink"></span> matchup map</span><h2>How to think into common enemies</h2>
+      <div class="matchups">
+        <div class="match"><div class="rating good">favored if patient</div><h3>Beatdown / tanks</h3><p>Inferno Tower is sacred. Do not waste it. Pressure opposite lane with Barrel when they invest big in back; Rocket support troops if tower value exists.</p></div>
+        <div class="match"><div class="rating gold">skill matchup</div><h3>Hog cycle</h3><p>Inferno placement + Knight/Ice Spirit cleanup. Princess must create spell tension. Avoid Rocketing Hog unless it also hits tower/support.</p></div>
+        <div class="match"><div class="rating danger">annoying</div><h3>Arrows + splash</h3><p>Your recent losses show Witch/Valk/Arrows pain. Split pressure; do not stack Gang + Princess into one spell/splash answer. Barrel only after Arrows leaves hand.</p></div>
+        <div class="match"><div class="rating gold">counting test</div><h3>Log mirror/control</h3><p>Who tracks spell cycle better wins. Princess value matters. Mix Barrel placements only after they prove autopilot Log timing.</p></div>
+        <div class="match"><div class="rating danger">danger air</div><h3>Lava / Balloon / Freeze</h3><p>Princess placement and Inferno timing are everything. Pressure opposite lane early. Save Ice Spirit for freeze-stall moments when possible.</p></div>
+        <div class="match"><div class="rating good">baitable</div><h3>Swarm bait mirrors</h3><p>Log value is your oxygen. Princess controls lanes. Rocket becomes a closer, not your first answer. Do not let Skeleton Barrel chip for free.</p></div>
+        <div class="match"><div class="rating gold">discipline</div><h3>Mega Knight chaos</h3><p>Knight placement pulls jumps; Inferno deletes if protected. Punish their 7-elixir commitment with Barrel opposite or Princess chip.</p></div>
+        <div class="match"><div class="rating danger">do not feed</div><h3>Witch / Wizard midladder</h3><p>This showed up a lot in your log. Rocket tower + Witch/Wizard when possible. If no tower value, use Princess/Log/Knight spacing instead of panic spells.</p></div>
+      </div>
+    </div></section>
+
+    <section class="section" id="quiz"><div class="wrap grid2">
+      <div class="panel"><span class="tag">skill check</span><h2>Three-second bait quiz</h2><p class="quizQ" id="quizQ">Opponent Logs your Princess at bridge. You have Barrel, Knight, Ice Spirit, Rocket. What now?</p><div class="answers" id="answers"></div><div class="pillrow"><button class="secondary" onclick="nextQuiz()">Next scenario</button></div></div>
+      <div class="panel"><span class="tag">reference card</span><h2>Golden rules</h2><div class="console">1. First Barrel scouts. Second Barrel punishes.
+2. Princess is pressure only if it asks an awkward question.
+3. Count their small spell cycle: used spell → four cards → spell returns.
+4. Defend first, chip second, Rocket last.
+5. Classic bait identity > random hybrid soup.
+6. If Witch/Valk/Arrows show up, split threats and stop stacking value.
+7. In OT, boring Rocket math beats stylish panic.</div></div>
+    </div></section>
+  </main>
+  <footer class="footer"><div class="wrap">Built for Xenos / ChaoticStoner by Krahnie Royale Coach. Data note: player stats came from live API battle-log sample; meta notes came from May 2026 web/RoyaleAPI search snippets where extraction was unavailable.</div></footer>
+<script>
+  const $ = s => document.querySelector(s); const $$ = s => [...document.querySelectorAll(s)];
+  $$('.tab').forEach(t=>t.addEventListener('click',()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); $$('.tabpane').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $('#'+t.dataset.tab).classList.add('active'); }));
+  const timers = {}; function burn(id,sec){ clearInterval(timers[id]); const el=$('#s-'+id); let left=sec; el.className='status notready'; el.textContent='out '+left; timers[id]=setInterval(()=>{ left--; if(left<=0){clearInterval(timers[id]); el.className='status ready'; el.textContent='ready';} else el.textContent='out '+left; },1000); recommend(); }
+  function resetSpells(){ Object.keys(timers).forEach(k=>clearInterval(timers[k])); ['log','arrows','zap','bbarrel'].forEach(id=>{const el=$('#s-'+id); el.className='status ready'; el.textContent='ready'}); $('#coach').textContent='Reset complete. Scout their spell, then punish the cooldown.'; }
+  function recommend(){ const out=['log','arrows','zap','bbarrel'].filter(id=>$('#s-'+id).classList.contains('notready')); const msg = out.length ? `BARREL WINDOW DETECTED: ${out.join(', ').toUpperCase()} unavailable.\nPlay: Barrel now if you can defend the counterpush. Add Princess opposite if they are low on splash.` : 'No tracked spell is out.\nPlay: bait first with Princess/Gang or hold Barrel as scout. Do not donate goblins into a ready Log.'; $('#coach').textContent=msg; }
+  function launchBarrel(){ const b=$('#barrel'); b.classList.remove('launch'); void b.offsetWidth; b.classList.add('launch'); setTimeout(()=>b.classList.remove('launch'),1500); }
+  const quizzes=[
+    {q:'Opponent Logs your Princess at bridge. You have Barrel, Knight, Ice Spirit, Rocket. What now?', a:['Rocket their tower immediately','Goblin Barrel while Log is out of cycle','Cycle Knight in back and forget it'], c:1, why:'Correct: their clean Barrel answer is gone. Throw Barrel unless you cannot defend the counterpush.'},
+    {q:'Golem in back, single elixir. You have Barrel + Princess + Inferno Tower. Best instinct?', a:['Pressure opposite lane, then protect Inferno for the push','Inferno Tower at bridge instantly','Rocket the Golem'], c:0, why:'Make them spend elixir while preserving your tank answer.'},
+    {q:'They have Arrows + Valkyrie and keep deleting your stacked troops. Adjustment?', a:['Stack harder so they panic','Split Princess/Gang pressure and Barrel only after Arrows','Replace Rocket mid-match somehow'], c:1, why:'Do not give splash + spell value. Force separated answers.'},
+    {q:'Overtime: tower is in two Rockets + one Log range. You are even elixir. Plan?', a:['Start creative Barrel placements','Defend cleanly and Rocket-cycle safely','All-in Goblin Gang bridge'], c:1, why:'Once math wins, become boring and close.'}
+  ]; let qi=0; function renderQuiz(){ const x=quizzes[qi]; $('#quizQ').textContent=x.q; const box=$('#answers'); box.innerHTML=''; x.a.forEach((txt,i)=>{ const btn=document.createElement('button'); btn.className='answer'; btn.textContent=txt; btn.onclick=()=>{ $$('.answer').forEach((b,j)=>b.classList.add(j===x.c?'correct':'wrong')); $('#coach').textContent=x.why; }; box.appendChild(btn); }); } function nextQuiz(){ qi=(qi+1)%quizzes.length; renderQuiz(); } renderQuiz();
+</script>
+</body>
+</html>
