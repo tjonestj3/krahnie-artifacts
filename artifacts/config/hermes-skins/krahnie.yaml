@@ -1,0 +1,89 @@
+name: krahnie
+description: Krahnborn agent theme — Salesforce ecosystem growth, crisp whites, blue cloud, and leaf green
+colors:
+  banner_border: '#5AB879'
+  banner_title: '#F7FBFF'
+  banner_accent: '#58BFEA'
+  banner_dim: '#6A7F8F'
+  banner_text: '#EAF7FF'
+  ui_accent: '#58BFEA'
+  ui_label: '#8BD39B'
+  ui_ok: '#5AB879'
+  ui_error: '#FF6B6B'
+  ui_warn: '#F0C45C'
+  prompt: '#EAF7FF'
+  input_rule: '#5AB879'
+  response_border: '#58BFEA'
+  status_bar_bg: '#071426'
+  status_bar_text: '#DCEBFA'
+  status_bar_strong: '#8BD39B'
+  status_bar_dim: '#6A7F8F'
+  status_bar_good: '#5AB879'
+  status_bar_warn: '#F0C45C'
+  status_bar_bad: '#FF9B64'
+  status_bar_critical: '#FF6B6B'
+  session_label: '#8BD39B'
+  session_border: '#58BFEA'
+spinner:
+  waiting_faces:
+  - (🌱)
+  - (☁)
+  - (✦)
+  - (⚙)
+  - (◌)
+  thinking_faces:
+  - (🌱)
+  - (☁)
+  - (⌁)
+  - (✦)
+  - (⚙)
+  thinking_verbs:
+  - cultivating context
+  - mapping the ecosystem
+  - nurturing the org
+  - planting clean structure
+  - aligning clouds
+  - growing the solution
+  - checking the canopy
+  - shaping the delivery path
+  wings:
+  - - ⟪🌱
+    - 🌱⟫
+  - - ⟪☁
+    - ☁⟫
+  - - ⟪✦
+    - ✦⟫
+branding:
+  agent_name: Krahnie Agent
+  welcome: Welcome to Krahnie Agent by Krahnborn! Type your message or /help for commands.
+  goodbye: Keep thriving! 🌱
+  response_label: ' 🌱 Krahnie '
+  prompt_symbol: 🌱
+  help_header: (🌱) Available Commands
+tool_prefix: │
+banner_logo: '[bold #F7FBFF]██╗  ██╗██████╗  █████╗ ██╗  ██╗███╗   ██╗██╗███████╗[/]
+
+  [bold #DCEBFA]██║ ██╔╝██╔══██╗██╔══██╗██║  ██║████╗  ██║██║██╔════╝[/]
+
+  [#58BFEA]█████╔╝ ██████╔╝███████║███████║██╔██╗ ██║██║█████╗  [/]
+
+  [#5AB879]██╔═██╗ ██╔══██╗██╔══██║██╔══██║██║╚██╗██║██║██╔══╝  [/]
+
+  [#8BD39B]██║  ██╗██║  ██║██║  ██║██║  ██║██║ ╚████║██║███████╗[/]
+
+  [#5AB879]╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚══════╝[/]'
+banner_hero: '[#58BFEA]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀☁ Salesforce Ecosystems ☁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#5AB879]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#8BD39B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⠿⠿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#F7FBFF]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⠀K⠀⢻⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#58BFEA]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⠀⠀⠀⣼⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#5AB879]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠿⣶⡿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [#8BD39B]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀🌱 clarity • structure • growth 🌱⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+
+  [dim #6A7F8F]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀cultivating smarter agent delivery⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]'
