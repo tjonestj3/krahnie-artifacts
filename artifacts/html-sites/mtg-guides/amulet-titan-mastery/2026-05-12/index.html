@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#10231b" />
+  <title>Amulet Titan Mastery · Krahnie MTG Coach</title>
+  <meta name="description" content="Krahnie MTG Coach V1 guide for Modern Amulet Titan: engine, mulligans, Titan lines, sideboard plans, and interactive line drills." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07120d;
+      --bg2: #10231b;
+      --panel: rgba(17, 38, 29, .86);
+      --panel2: rgba(28, 61, 45, .72);
+      --line: rgba(194, 255, 196, .18);
+      --ink: #f3ffe4;
+      --muted: #b9d6b0;
+      --green: #83ff8f;
+      --amber: #ffd36b;
+      --blue: #88dcff;
+      --red: #ff806e;
+      --void: #030806;
+      --shadow: 0 24px 80px rgba(0,0,0,.42);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(131,255,143,.18), transparent 34rem),
+        radial-gradient(circle at 92% 12%, rgba(255,211,107,.15), transparent 28rem),
+        radial-gradient(circle at 60% 70%, rgba(136,220,255,.10), transparent 40rem),
+        linear-gradient(180deg, #10231b 0%, #06100c 55%, #020604 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, black, transparent 85%);
+    }
+    a { color: inherit; }
+    .wrap { width: min(1180px, 100%); margin: 0 auto; padding: 18px 18px 70px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0 22px; position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 900; letter-spacing: -.02em; }
+    .brand-mark { width: 38px; height: 38px; display:grid; place-items:center; border: 1px solid rgba(131,255,143,.35); border-radius: 12px; background: linear-gradient(135deg, rgba(131,255,143,.18), rgba(255,211,107,.08)); box-shadow: 0 0 24px rgba(131,255,143,.18); }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .nav a { text-decoration: none; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 9px 11px; border:1px solid rgba(255,255,255,.08); border-radius:999px; background: rgba(0,0,0,.18); }
+    .nav a:hover { color: var(--ink); border-color: rgba(131,255,143,.34); }
+    .hero { display:grid; grid-template-columns: 1.18fr .82fr; gap: 22px; align-items: stretch; padding-top: 12px; }
+    .hero-card, .panel, .drill, .matchup, .source-card { border:1px solid var(--line); background: linear-gradient(180deg, rgba(17,38,29,.92), rgba(6,16,12,.84)); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .hero-card { padding: clamp(24px, 5vw, 58px); position: relative; overflow:hidden; min-height: 560px; }
+    .hero-card::after { content:"PRIME TIME"; position:absolute; right:-24px; bottom: 12px; font-size: clamp(54px, 12vw, 156px); font-weight: 1000; letter-spacing:-.08em; color: rgba(131,255,143,.035); transform: rotate(-5deg); pointer-events:none; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; color: var(--green); background: rgba(131,255,143,.10); border:1px solid rgba(131,255,143,.22); padding: 8px 12px; border-radius:999px; font-size: 12px; text-transform:uppercase; letter-spacing:.12em; font-weight: 900; }
+    h1 { margin: 20px 0 16px; font-size: clamp(54px, 10vw, 118px); line-height:.82; letter-spacing:-.085em; max-width: 850px; text-shadow: 0 6px 0 rgba(0,0,0,.45); }
+    .lede { font-size: clamp(18px, 2.4vw, 25px); line-height: 1.35; color: #d8f4cf; max-width: 720px; margin: 0 0 26px; }
+    .meta-row { display:flex; flex-wrap:wrap; gap: 10px; margin: 28px 0 0; }
+    .chip { padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.22); color: var(--muted); font-weight: 800; font-size: 13px; }
+    .chip b { color: var(--ink); }
+    .hero-side { display:grid; gap: 16px; }
+    .stat { padding: 20px; border-radius: var(--radius); border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.22); }
+    .stat .num { font-size: 42px; line-height: 1; font-weight: 1000; letter-spacing:-.06em; color: var(--amber); }
+    .stat .label { color: var(--muted); font-size: 13px; margin-top: 8px; line-height:1.35; }
+    section { margin-top: 26px; }
+    h2 { font-size: clamp(30px, 5vw, 56px); line-height:.92; letter-spacing:-.06em; margin: 0 0 14px; }
+    h3 { font-size: 19px; margin: 0 0 8px; letter-spacing:-.025em; }
+    p { color: var(--muted); line-height: 1.58; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap: 18px; margin: 44px 0 16px; }
+    .section-head p { margin:0; max-width: 580px; }
+    .grid { display:grid; gap: 14px; }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .panel { padding: 20px; }
+    .panel strong { color: var(--ink); }
+    .card-grid { display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+    .mtg-card { position: relative; min-height: 210px; border-radius: 18px; overflow: hidden; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.28); cursor:pointer; transform: translateZ(0); }
+    .mtg-card img { width:100%; height:100%; object-fit: cover; display:block; opacity: .92; transition: transform .24s ease, opacity .24s ease; }
+    .mtg-card:hover img { transform: scale(1.035); opacity:1; }
+    .mtg-card .cap { position:absolute; inset:auto 0 0; padding: 24px 10px 10px; background: linear-gradient(180deg, transparent, rgba(0,0,0,.88)); font-size: 12px; font-weight: 900; text-shadow:0 2px 8px #000; }
+    .line-map { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .line { padding: 18px; border-radius: 20px; background: rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08); }
+    .line .tag { display:inline-block; margin-bottom: 10px; color: var(--void); background: var(--green); font-weight: 1000; border-radius: 999px; padding: 5px 9px; font-size: 11px; letter-spacing:.08em; text-transform:uppercase; }
+    .steps { margin: 12px 0 0; padding-left: 18px; color: #dff7d6; }
+    .steps li { margin: 8px 0; }
+    .drill { padding: 20px; }
+    .hand { display:flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .hand span { padding: 8px 10px; border-radius: 12px; background: rgba(0,0,0,.27); border:1px solid rgba(255,255,255,.10); color: #e7ffdf; font-size: 13px; font-weight: 800; }
+    .choices { display:grid; gap: 10px; margin-top: 14px; }
+    button.choice, .small-btn { color: var(--ink); text-align:left; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); border-radius: 16px; padding: 13px 14px; font-weight: 850; cursor:pointer; transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+    button.choice:hover, .small-btn:hover { transform: translateY(-1px); border-color: rgba(131,255,143,.34); background: rgba(131,255,143,.08); }
+    .answer { display:none; margin-top: 14px; padding: 14px; border-radius: 16px; border:1px solid rgba(131,255,143,.20); background: rgba(131,255,143,.08); color: #dfffe1; }
+    .answer.show { display:block; }
+    .matchup { padding: 18px; }
+    .matchup .plan { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .inout { padding: 12px; border-radius: 16px; background: rgba(0,0,0,.20); border: 1px solid rgba(255,255,255,.08); }
+    .inout b { display:block; color: var(--amber); margin-bottom: 6px; }
+    .warning { border-color: rgba(255,128,110,.26); background: rgba(255,128,110,.08); }
+    .modal { position: fixed; inset: 0; z-index: 80; display:none; place-items:center; background: rgba(0,0,0,.70); padding: 18px; }
+    .modal.show { display:grid; }
+    .modal-card { width:min(920px, 100%); display:grid; grid-template-columns: 320px 1fr; gap: 18px; padding: 18px; background: #0a1711; border:1px solid rgba(131,255,143,.28); border-radius: 28px; box-shadow: 0 30px 110px rgba(0,0,0,.7); }
+    .modal-card img { width:100%; border-radius: 18px; }
+    .modal-copy { padding: 8px; }
+    .close { float:right; border:none; border-radius:999px; width:42px; height:42px; background: rgba(255,255,255,.10); color: var(--ink); font-size: 24px; cursor:pointer; }
+    .source-row { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .source-card { padding: 16px; box-shadow: none; }
+    .source-card a { color: var(--blue); font-weight: 900; }
+    footer { margin: 44px 0 0; color: #8fb28a; font-size: 13px; text-align:center; }
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .card-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .grid.cols-3, .grid.cols-2, .line-map, .source-row { grid-template-columns: 1fr; }
+      .modal-card { grid-template-columns: 1fr; max-height: 92vh; overflow:auto; }
+      .modal-card img { max-width: 320px; margin:auto; }
+    }
+    @media (max-width: 620px) {
+      .wrap { padding-inline: 12px; }
+      .topbar { align-items:flex-start; position:relative; }
+      .nav { display:none; }
+      .hero-card { min-height: 0; padding: 24px; }
+      .card-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .mtg-card { min-height: 190px; }
+      .matchup .plan { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition:none !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="topbar">
+      <a href="../../../../../index.html" class="brand"><span class="brand-mark">🃏</span><span>Krahnie MTG Coach</span></a>
+      <div class="nav">
+        <a href="#engine">Engine</a><a href="#lines">Titan Lines</a><a href="#mulligans">Mulligans</a><a href="#sideboard">Sideboard</a><a href="#drills">Drills</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-card">
+        <span class="eyebrow">🌋 Modern · Amulet Titan V1</span>
+        <h1>Prime Time Online.</h1>
+        <p class="lede">A Krahnie command center for the deck that turns lands into spells, Titans into toolboxes, and one tiny artifact into a whole mana engine.</p>
+        <div class="meta-row">
+          <span class="chip"><b>Plan A:</b> Amulet + bounce lands → Titan</span>
+          <span class="chip"><b>Plan B:</b> Saga constructs + toolbox</span>
+          <span class="chip"><b>Plan C:</b> Dryad + Valakut inevitability</span>
+          <span class="chip"><b>V1:</b> guide + line trainer + matchup matrix</span>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div class="stat"><div class="num">1</div><div class="label">Amulet of Vigor can convert tapped bounce lands into explosive mana, creating the deck's most unfair starts.</div></div>
+        <div class="stat"><div class="num">2</div><div class="label">Primeval Titan finds two lands on entry and attack, so every Titan trigger is a tactical branch point.</div></div>
+        <div class="stat"><div class="num">3</div><div class="label">Your default discipline: sequence lands cleanly, know the tutor tree, and do not keep hands that only look powerful.</div></div>
+      </aside>
+    </header>
+
+    <section id="engine">
+      <div class="section-head">
+        <div><span class="eyebrow">Engine Room</span><h2>The deck is a land-combo toolbox.</h2></div>
+        <p>Amulet Titan is not just “cast Primeval Titan.” It is a sequencing deck: every land drop, bounce trigger, Saga chapter, and transmute line changes the available branches.</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="panel"><h3>Mana Engine</h3><p><strong>Amulet of Vigor</strong> turns tapped lands into immediate mana. Bounce lands like <strong>Simic Growth Chamber</strong> effectively become rituals when Amulet is active.</p></div>
+        <div class="panel"><h3>Tutor Engine</h3><p><strong>Primeval Titan</strong> finds whichever lands the board asks for: haste, double strike, Saga grind, Valakut kills, Boseiju interaction, or Bojuka Bog graveyard hate.</p></div>
+        <div class="panel"><h3>Redundant Threats</h3><p><strong>Urza's Saga</strong> finds Amulet and makes constructs, while <strong>Dryad</strong> unlocks Valakut and fixes the land maze into a kill engine.</p></div>
+      </div>
+
+      <div class="card-grid" aria-label="Core Amulet Titan cards">
+        <div class="mtg-card" data-card="Amulet of Vigor"><img alt="Amulet of Vigor" src="https://cards.scryfall.io/normal/front/9/9/997bc933-ac30-477b-a4e1-5333b796a99d.jpg?1562292191"><div class="cap">Amulet of Vigor</div></div>
+        <div class="mtg-card" data-card="Primeval Titan"><img alt="Primeval Titan" src="https://cards.scryfall.io/normal/front/6/d/6d5537da-112e-4679-a113-b5d7ce32a66b.jpg?1562850064"><div class="cap">Primeval Titan</div></div>
+        <div class="mtg-card" data-card="Urza's Saga"><img alt="Urza's Saga" src="https://cards.scryfall.io/normal/front/c/1/c1e0f201-42cb-46a1-901a-65bb4fc18f6c.jpg?1667318301"><div class="cap">Urza's Saga</div></div>
+        <div class="mtg-card" data-card="Dryad of the Ilysian Grove"><img alt="Dryad of the Ilysian Grove" src="https://cards.scryfall.io/normal/front/4/3/43be1363-7e73-4862-b45f-07f490ab46be.jpg?1690004795"><div class="cap">Dryad</div></div>
+        <div class="mtg-card" data-card="Tolaria West"><img alt="Tolaria West" src="https://cards.scryfall.io/normal/front/b/0/b005eef6-75f3-454f-a42b-d851bc84ac4e.jpg?1619399546"><div class="cap">Tolaria West</div></div>
+        <div class="mtg-card" data-card="Boseiju, Who Endures"><img alt="Boseiju, Who Endures" src="https://cards.scryfall.io/normal/front/2/1/2135ac5a-187b-4dc9-8f82-34e8d1603416.jpg?1654568912"><div class="cap">Boseiju</div></div>
+      </div>
+    </section>
+
+    <section id="lines">
+      <div class="section-head">
+        <div><span class="eyebrow">Tutor Trees</span><h2>Titan triggers are decision points.</h2></div>
+        <p>V1 lines are intentionally archetype-level, not a locked 75. Once you give Krahnie your exact list, this becomes a personalized line map.</p>
+      </div>
+      <div class="line-map">
+        <div class="line"><span class="tag">Haste pressure</span><h3>Stronghold Titan</h3><p>Use when you need immediate combat damage or planeswalker pressure.</p><ol class="steps"><li>Titan finds <strong>Slayers' Stronghold</strong> plus a red/white source or bounce-land support.</li><li>Grant haste/vigilance to attack immediately.</li><li>Attack trigger finds the next branch: Sunhome kill, Valakut setup, or Saga grind.</li></ol></div>
+        <div class="line"><span class="tag">One-shot ceiling</span><h3>Sunhome Double Strike</h3><p>Use when Titan can connect and mana supports the activation.</p><ol class="steps"><li>Find or assemble <strong>Sunhome</strong> plus colored mana.</li><li>Give Titan double strike.</li><li>Attack trigger chains more lands before second-strike damage.</li></ol></div>
+        <div class="line"><span class="tag">Inevitability</span><h3>Dryad + Valakut</h3><p>Use when the game is slower, board is clogged, or combat is risky.</p><ol class="steps"><li>Resolve <strong>Dryad of the Ilysian Grove</strong>.</li><li>Titan finds <strong>Valakut</strong> plus land drops.</li><li>Every Mountain-typed land becomes direct damage.</li></ol></div>
+        <div class="line"><span class="tag">Toolbox</span><h3>Tolaria West</h3><p>Use when the answer matters more than speed.</p><ol class="steps"><li>Transmute for a zero-mana card or key land package depending on list.</li><li>Common searches include Pact access, utility lands, or matchup bullets.</li><li>Sequence carefully: transmute is sorcery-speed and mana-intensive.</li></ol></div>
+      </div>
+    </section>
+
+    <section id="mulligans">
+      <div class="section-head">
+        <div><span class="eyebrow">Opening Hands</span><h2>Keep engines, not fantasies.</h2></div>
+        <p>The Amulet trap is keeping a hand with famous cards but no functional sequence. Ask: what am I doing turns one, two, and three?</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="panel"><h3>Snap-lean keep</h3><p>Amulet, bounce land, green source, Grazer/Scout-style acceleration, and payoff. The hand has velocity and a clear first three turns.</p></div>
+        <div class="panel"><h3>Context keep</h3><p>Saga-heavy hands that find Amulet, make constructs, or buy time. Better on the play or when interaction is light.</p></div>
+        <div class="panel warning"><h3>Trap hand</h3><p>Titan + expensive lands + no acceleration. It looks powerful, but Modern will punish a hand that starts playing Magic on turn four.</p></div>
+      </div>
+    </section>
+
+    <section id="sideboard">
+      <div class="section-head">
+        <div><span class="eyebrow">Sideboard Matrix</span><h2>Plans, not piles.</h2></div>
+        <p>Use this V1 as a starting map. Final ins/outs should be tied to your exact 75 and the current local meta.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="matchup"><h3>Boros / Energy Aggro</h3><p>Respect speed and cheap disruption. Preserve life total, trim slow grind, and keep hands that actually stabilize.</p><div class="plan"><div class="inout"><b>Bring in</b> cheap removal, extra blockers, lifegain or sweepers if your 75 has them.</div><div class="inout"><b>Trim</b> slow tutor bullets and clunky top-end that does not affect the board.</div></div></div>
+        <div class="matchup"><h3>Murktide / Blue Tempo</h3><p>Fight over Titan with Cavern, Saga pressure, and patient sequencing. Do not walk your only payoff into obvious permission if you can build another axis.</p><div class="plan"><div class="inout"><b>Bring in</b> Cavern plans, Veil-style protection if available, threat density.</div><div class="inout"><b>Trim</b> low-impact bullets and overly slow Valakut-only lines.</div></div></div>
+        <div class="matchup"><h3>Yawgmoth / Creature Combo</h3><p>Race with fast Titan, but know when Bojuka Bog or interaction matters. Your land toolbox gives you weird angles.</p><div class="plan"><div class="inout"><b>Bring in</b> graveyard hate, removal, Needle-style effects if present.</div><div class="inout"><b>Trim</b> slow grind cards and redundant late-game pieces.</div></div></div>
+        <div class="matchup"><h3>Living End / Graveyard Cascade</h3><p>Your job is to apply pressure while keeping graveyard interaction accessible. Bog lines and Boseiju/Otawara-style interaction matter.</p><div class="plan"><div class="inout"><b>Bring in</b> graveyard hate, anti-cascade tools if your sideboard has them.</div><div class="inout"><b>Trim</b> creature-heavy slow pieces that make their Living End better.</div></div></div>
+      </div>
+    </section>
+
+    <section id="drills">
+      <div class="section-head">
+        <div><span class="eyebrow">Lines Lab</span><h2>Train the Prime Time reflex.</h2></div>
+        <p>Click a line. These are simple V1 drills; the next version can score you and load random hands from your exact 75.</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="drill" data-drill="1"><h3>Hand 1: The Engine</h3><div class="hand"><span>Amulet</span><span>Simic Growth Chamber</span><span>Forest</span><span>Arboreal Grazer</span><span>Primeval Titan</span><span>Tolaria West</span><span>Boseiju</span></div><div class="choices"><button class="choice" data-correct="true">Keep: clear acceleration plus payoff.</button><button class="choice">Mulligan: too many lands.</button></div><div class="answer">Correct line: this is the kind of hand you register Amulet Titan to play. Map your first turns before autopiloting the bounce trigger.</div></div>
+        <div class="drill" data-drill="2"><h3>Hand 2: The Famous Trap</h3><div class="hand"><span>Primeval Titan</span><span>Primeval Titan</span><span>Valakut</span><span>Boseiju</span><span>Cavern</span><span>Vesuva</span><span>Sunhome</span></div><div class="choices"><button class="choice">Keep: double Titan is powerful.</button><button class="choice" data-correct="true">Mulligan: no engine, no acceleration.</button></div><div class="answer">Correct: famous cards are not a plan. This hand is mostly lands that do not cast your deck on time.</div></div>
+        <div class="drill" data-drill="3"><h3>Board: Titan Resolved</h3><div class="hand"><span>Titan in play</span><span>Dryad in play</span><span>Opponent at 12</span><span>Land drop available</span></div><div class="choices"><button class="choice" data-correct="true">Look for Valakut math before combat.</button><button class="choice">Always get Stronghold + Sunhome.</button></div><div class="answer">Correct: with Dryad, Valakut turns land drops into reach. Combat kills are flashy, but damage math may be cleaner and safer.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div><span class="eyebrow">Research Notes</span><h2>What powered V1.</h2></div>
+        <p>V1 combines Scryfall card data with web research pointers for current Modern Amulet Titan decklists and sideboard guides.</p>
+      </div>
+      <div class="source-row">
+        <div class="source-card"><h3>Scryfall API</h3><p>Card images, oracle text, card links, and legality data. This should be the permanent card-data backbone.</p><a href="https://scryfall.com/docs/api">API docs</a></div>
+        <div class="source-card"><h3>Current lists</h3><p>MTGGoldfish search results showed active Amulet Titan lists in May 2026, including recent Modern events sourced from Melee/MTGO.</p><a href="https://www.mtggoldfish.com/archetype/amulet-titan">MTGGoldfish archetype</a></div>
+        <div class="source-card"><h3>Sideboard guides</h3><p>Postboard, Draftsim, SCG-style articles, and current tournament pages are best used as research inputs, then personalized to your exact 75.</p><a href="https://www.postboard.gg/archetype/modern/amulet-titan">Postboard archetype</a></div>
+      </div>
+    </section>
+
+    <footer>Built by Krahnie · MTG Coach V1 · Next: paste your exact 75 or Moxfield link and this becomes personalized.</footer>
+  </main>
+
+  <div class="modal" id="cardModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <img id="modalImg" alt="Selected Magic card" src="" />
+      <div class="modal-copy"><button class="close" id="closeModal" aria-label="Close">×</button><h2 id="modalTitle">Card</h2><p id="modalText"></p><p><a id="modalLink" href="#" target="_blank" rel="noreferrer">Open on Scryfall</a></p></div>
+    </div>
+  </div>
+
+  <script>
+    const cardData = {
+      "Amulet of Vigor": { text: "Whenever a permanent you control enters tapped, untap it. The namesake engine: bounce lands become rituals and Saga can become a combo piece.", link: "https://scryfall.com/card/wwk/121/amulet-of-vigor?utm_source=api" },
+      "Primeval Titan": { text: "Searches two lands on entry and attack. In this deck, that means mana, haste, double strike, graveyard hate, Valakut damage, or Saga pressure.", link: "https://scryfall.com/card/ima/183/primeval-titan?utm_source=api" },
+      "Urza's Saga": { text: "Threat plus tutor. Finds Amulet while also making constructs, giving the deck a non-Titan axis.", link: "https://scryfall.com/card/mh2/259/urzas-saga?utm_source=api" },
+      "Dryad of the Ilysian Grove": { text: "Extra land drops and every land is every basic type. This unlocks Valakut kills and fixes awkward land hands.", link: "https://scryfall.com/card/cmm/891/dryad-of-the-ilysian-grove?utm_source=api" },
+      "Tolaria West": { text: "Transmute turns a land slot into a tutor branch. Slow, but powerful when the game asks for a specific zero-mana card or utility land plan.", link: "https://scryfall.com/card/tsr/286/tolaria-west?utm_source=api" },
+      "Boseiju, Who Endures": { text: "Main-deckable interaction from a land slot. Answers hate pieces, artifacts, enchantments, and nonbasic lands.", link: "https://scryfall.com/card/neo/266/boseiju-who-endures?utm_source=api" }
+    };
+    const modal = document.getElementById('cardModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const modalLink = document.getElementById('modalLink');
+    document.querySelectorAll('.mtg-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const name = card.dataset.card;
+        const data = cardData[name] || { text: 'Core Amulet Titan card.', link: '#' };
+        modalImg.src = card.querySelector('img').src;
+        modalTitle.textContent = name;
+        modalText.textContent = data.text;
+        modalLink.href = data.link;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+      });
+    });
+    function closeModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.querySelectorAll('.choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const drill = btn.closest('.drill');
+        const answer = drill.querySelector('.answer');
+        drill.querySelectorAll('.choice').forEach(b => b.style.borderColor = 'rgba(255,255,255,.12)');
+        btn.style.borderColor = btn.dataset.correct ? 'rgba(131,255,143,.75)' : 'rgba(255,128,110,.75)';
+        answer.classList.add('show');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ BAD_PARTS = {"prompts", "__pycache__"}
 LABELS = {
     "prototypes": "Playable Prototypes",
     "game-dev-research": "Game Dev Research HTML Prototypes",
+    "mtg-guides": "MTG Deck Guides",
     "html-sites": "HTML Sites",
     "reports": "Reports",
     "comics": "Comics",
@@ -28,10 +29,22 @@ def is_game_dev_research_prototype(path: Path) -> bool:
     )
 
 
+def is_mtg_guide(path: Path) -> bool:
+    rel_parts = path.relative_to(ROOT).parts if path.is_relative_to(ROOT) else path.parts
+    return "html-sites" in rel_parts and "mtg-guides" in rel_parts and path.suffix.lower() in {".html", ".htm"}
+
+
 def titleize(path: Path) -> str:
     stem = path.stem if path.suffix else path.name
     if path.name.lower() == "index.html" and len(path.parts) > 1:
-        stem = path.parent.name
+        # Dated mini-sites live at <site>/<YYYY-MM-DD>/index.html; use the
+        # site folder name for dashboard cards instead of the date.
+        parent = path.parent.name
+        parts = parent.split("-")
+        if len(parts) == 3 and all(part.isdigit() for part in parts):
+            stem = path.parent.parent.name
+        else:
+            stem = parent
     if is_game_dev_research_prototype(path):
         parts = stem.split("-", 3)
         date = "-".join(parts[:3]) if len(parts) == 4 and all(part.isdigit() for part in parts[:3]) else ""
@@ -47,6 +60,8 @@ def titleize(path: Path) -> str:
 
 def icon(path: Path) -> str:
     s = path.suffix.lower()
+    if is_mtg_guide(path):
+        return "🃏"
     if s in {".html", ".htm"}:
         if "prototypes" in path.parts:
             return "🎮"
@@ -95,11 +110,13 @@ for p in files:
     rel = p.relative_to(ROOT)
     if is_game_dev_research_prototype(p):
         section = "game-dev-research"
+    elif is_mtg_guide(p):
+        section = "mtg-guides"
     else:
         section = rel.parts[1] if len(rel.parts) > 1 else "other"
     cards_by_section.setdefault(section, []).append(p)
 
-featured = cards_by_section.get("prototypes", [])[:4] + cards_by_section.get("game-dev-research", [])[:4]
+featured = cards_by_section.get("mtg-guides", [])[:2] + cards_by_section.get("prototypes", [])[:3] + cards_by_section.get("game-dev-research", [])[:3]
 if len(featured) < 8:
     featured += [p for p in files if p not in featured][: 8 - len(featured)]
 
@@ -120,7 +137,7 @@ def card_html(p: Path) -> str:
 
 featured_html = "\n".join(card_html(p) for p in featured) or '<p class="empty">No artifacts yet.</p>'
 sections_html = []
-for section in ["prototypes", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
+for section in ["mtg-guides", "prototypes", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
