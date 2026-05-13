@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#0b1020" /><title>Krahnie Chess Coach — Rapid Review Example</title>
+<style>
+:root{color-scheme:dark;--bg:#080b13;--ink:#f8f2dc;--muted:#aeb8d0;--gold:#ffd166;--blue:#6ee7ff;--green:#8cff9b;--red:#ff5f7a;--violet:#a78bfa;--orange:#ff9f43;--line:rgba(255,255,255,.12);--shadow:0 24px 80px rgba(0,0,0,.45)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 10% -10%,#253b75 0 25rem,transparent 42rem),radial-gradient(circle at 92% 8%,#5f244b 0 18rem,transparent 38rem),linear-gradient(180deg,#080b13,#0d111d 62%,#05070d);color:var(--ink);min-height:100vh;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(#000,transparent 72%)}
+a{color:inherit}.wrap{width:min(1180px,100%);margin:auto;padding:28px 18px 60px;position:relative}.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:center;min-height:580px}.badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(110,231,255,.32);background:rgba(110,231,255,.09);color:var(--blue);border-radius:999px;padding:8px 12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:12px}h1{font-size:clamp(48px,9vw,116px);line-height:.82;margin:18px 0 12px;letter-spacing:-.075em;text-transform:uppercase;text-shadow:0 4px 0 #000,0 0 36px rgba(110,231,255,.25)}.lede{font-size:clamp(18px,2.2vw,24px);line-height:1.35;color:#dce6ff;max-width:720px}.coach-rule{margin-top:18px;padding:18px;border:1px solid rgba(255,209,102,.28);border-radius:24px;background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(167,139,250,.10));box-shadow:var(--shadow)}.coach-rule b{color:var(--gold)}
+.board-shell{position:relative;filter:drop-shadow(0 28px 60px rgba(0,0,0,.5))}.board{display:grid;grid-template-columns:repeat(8,1fr);width:min(520px,100%);aspect-ratio:1;border:10px solid #0a0f1d;border-radius:24px;overflow:hidden;background:#111;margin:auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}.sq{display:grid;place-items:center;font-size:clamp(24px,5vw,48px);font-family:"Apple Symbols","Segoe UI Symbol",serif;position:relative}.light{background:#f0d9b5;color:#1b2337}.dark{background:#5c6b8a;color:#fff6e0}.sq.hot:after{content:"";position:absolute;inset:10%;border:3px solid var(--red);border-radius:50%;box-shadow:0 0 18px var(--red)}.float-card{position:absolute;right:4%;bottom:-20px;width:min(330px,82%);padding:16px;border-radius:20px;background:rgba(17,24,39,.92);border:1px solid var(--line);backdrop-filter:blur(12px)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 28px}.metric{padding:18px;border:1px solid var(--line);border-radius:22px;background:rgba(23,32,50,.74);box-shadow:0 12px 34px rgba(0,0,0,.24)}.metric span{display:block;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.metric b{display:block;font-size:34px;margin-top:6px}.metric small{color:#cdd6ee}section{margin:34px 0}h2{font-size:clamp(28px,4vw,48px);letter-spacing:-.045em;margin:0 0 14px}.section-lede{color:var(--muted);margin-top:-6px;max-width:760px;line-height:1.55}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{border:1px solid var(--line);background:rgba(17,24,39,.72);border-radius:28px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)}.barline{display:grid;gap:10px;margin-top:12px}.barrow{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;color:#dce6ff}.track{height:13px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.fill{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),var(--violet));width:var(--w)}.fill.red{background:linear-gradient(90deg,var(--red),var(--orange))}.fill.gold{background:linear-gradient(90deg,var(--gold),var(--green))}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.game-card{padding:16px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(23,32,50,.92),rgba(12,17,29,.92));min-height:174px;position:relative;overflow:hidden}.game-card:before{content:"";position:absolute;inset:auto -20% -35% auto;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.05)}.game-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.platform,.result{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;border-radius:999px;padding:5px 8px}.platform{background:rgba(110,231,255,.11);color:var(--blue)}.result{background:rgba(255,255,255,.08)}.win .result{color:var(--green)}.loss .result{color:var(--red)}.game-card h3{font-size:20px;margin:16px 0 4px}.game-card p{color:var(--muted);margin:0 0 14px}.mini-bars{height:14px;display:flex;gap:4px;margin:12px 0}.mini-bars span{display:block;width:var(--w);height:100%;border-radius:999px}.bad{background:var(--red)}.warn{background:var(--orange)}.soft{background:var(--blue)}.counts{color:#ced7ef;font-size:13px}.moments{display:grid;gap:10px}.moment{width:100%;text-align:left;display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:18px;border:1px solid var(--line);background:rgba(23,32,50,.82);color:var(--ink);cursor:pointer}.moment:hover,.moment.active{border-color:rgba(110,231,255,.7);box-shadow:0 0 0 3px rgba(110,231,255,.08)}.rank{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:#0b1020;color:var(--gold);font-weight:950}.moment em{display:block;color:var(--muted);font-style:normal;margin-top:3px}.moment strong{color:var(--red);white-space:nowrap}.fen-lab{display:grid;grid-template-columns:420px 1fr;gap:18px;align-items:start}.small-board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border-radius:18px;overflow:hidden;border:8px solid #0b1020}.small-board .sq{font-size:31px}.position-note h3{font-size:28px;margin:0 0 8px}.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 10px;background:rgba(255,255,255,.06);color:#dfe7fb}.footer{margin-top:42px;color:#8e9bb7;text-align:center;font-size:13px}
+@media(max-width:900px){.hero,.split,.fen-lab{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.games{grid-template-columns:1fr 1fr}.board{width:min(460px,100%)}}@media(max-width:620px){.wrap{padding:18px 12px 42px}.hero{min-height:auto}.metrics,.games{grid-template-columns:1fr}.moment{grid-template-columns:40px 1fr}.moment strong{grid-column:2}.small-board .sq{font-size:22px}.barrow{grid-template-columns:92px 1fr 42px}}
+@media(prefers-reduced-motion:no-preference){.board-shell{animation:rise .8s ease both}.metric,.panel,.game-card{animation:fade .7s ease both}@keyframes rise{from{opacity:0;transform:translateY(18px) rotateX(8deg)}to{opacity:1;transform:none}}@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}}
+</style></head><body><main class="wrap">
+<section class="hero"><div><span class="badge">♟ Krahnie Chess Coach · Rapid Review Example</span><h1>Dangerous, but swingy.</h1><p class="lede">A polished artifact for reviewing tjonestj's rapid games with Krahnie: public Lichess + Chess.com games, quick Stockfish triage, human coaching themes, and a reusable drill loop.</p><div class="coach-rule"><b>Next-session rule:</b> Every move after move 10 gets a 5-second blunder check: “What is their best check or capture if I do this?”</div></div><div class="board-shell" aria-label="Decorative chess board"><div class="board" id="heroBoard"></div><div class="float-card"><b>Coach verdict</b><br/>Good aggression + real tactical eye. The rating jump comes from catching the opponent’s forcing reply before sending the flashy move.</div></div></section>
+<section class="metrics" aria-label="Rapid review metrics"><div class="metric"><span>Rapid games</span><b>12</b><small>6 Lichess + 6 Chess.com</small></div><div class="metric"><span>Blunders</span><b>8</b><small>mostly tactical/endgame swings</small></div><div class="metric"><span>Mistakes</span><b>16</b><small>candidate-move discipline</small></div><div class="metric"><span>Hotspot</span><b>43</b><small>middlegame issues</small></div></section>
+<section class="split"><article class="panel"><h2>What the games say</h2><p class="section-lede">You create threats and play actively. The leak is not fear — it is one-move tactical blind spots after an active idea.</p><div class="barline"><div class="barrow"><span>Middlegame</span><div class="track"><span class="fill red" style="--w:100%"></span></div><b>43</b></div><div class="barrow"><span>Endgame</span><div class="track"><span class="fill gold" style="--w:80%"></span></div><b>10</b></div><div class="barrow"><span>Opening</span><div class="track"><span class="fill" style="--w:60%"></span></div><b>6</b></div></div></article><article class="panel"><h2>Training loop</h2><p class="section-lede">Before playing: review 5 positions, guess the move, reveal Stockfish, then classify the miss.</p><div class="pillrow"><span class="pill">Checks</span><span class="pill">Captures</span><span class="pill">Threats</span><span class="pill">Their reply</span><span class="pill">Only then: move</span></div></article></section>
+<section><h2>Game cards</h2><p class="section-lede">A scan of the reviewed rapid sample. Click Lichess game titles to open the source game.</p><div class="games">
+        <article class="game-card loss">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Loss</span></div>
+          <h3><a href="https://lichess.org/bKm9JatY" target="_blank" rel="noopener">vs NITIN_JAIN</a></h3>
+          <p>2026.04.22 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:26px" class="bad"></span><span style="--w:8px" class="warn"></span><span style="--w:18px" class="soft"></span></div>
+          <div class="counts"><b>1</b> blunders · <b>0</b> mistakes · <b>1</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Win</span></div>
+          <h3><a href="https://lichess.org/4WOQIFYu" target="_blank" rel="noopener">vs Ali44cbk</a></h3>
+          <p>2026.04.22 · played as White</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:26px" class="bad"></span><span style="--w:36px" class="warn"></span><span style="--w:58px" class="soft"></span></div>
+          <div class="counts"><b>1</b> blunders · <b>2</b> mistakes · <b>5</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Win</span></div>
+          <h3><a href="https://lichess.org/dcfYumtm" target="_blank" rel="noopener">vs Strider06</a></h3>
+          <p>2026.04.12 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:8px" class="warn"></span><span style="--w:8px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>0</b> mistakes · <b>0</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Win</span></div>
+          <h3><a href="https://lichess.org/YgaieAf7" target="_blank" rel="noopener">vs Guzman_Armando77</a></h3>
+          <p>2026.04.10 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:44px" class="bad"></span><span style="--w:36px" class="warn"></span><span style="--w:58px" class="soft"></span></div>
+          <div class="counts"><b>2</b> blunders · <b>2</b> mistakes · <b>5</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Win</span></div>
+          <h3><a href="https://lichess.org/F5ZIhHK8" target="_blank" rel="noopener">vs RosBul</a></h3>
+          <p>2026.04.10 · played as White</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:8px" class="warn"></span><span style="--w:8px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>0</b> mistakes · <b>0</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card loss">
+          <div class="game-top"><span class="platform">Lichess</span><span class="result">Loss</span></div>
+          <h3><a href="https://lichess.org/niYJZ4lk" target="_blank" rel="noopener">vs Najdorf8</a></h3>
+          <p>2026.04.10 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:26px" class="bad"></span><span style="--w:36px" class="warn"></span><span style="--w:18px" class="soft"></span></div>
+          <div class="counts"><b>1</b> blunders · <b>2</b> mistakes · <b>1</b> inaccuracies</div>
+        </article>
+        <article class="game-card loss">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Loss</span></div>
+          <h3><span>vs joel433</span></h3>
+          <p>2026.04.08 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:26px" class="bad"></span><span style="--w:22px" class="warn"></span><span style="--w:78px" class="soft"></span></div>
+          <div class="counts"><b>1</b> blunders · <b>1</b> mistakes · <b>7</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Win</span></div>
+          <h3><span>vs Fignting-Lion</span></h3>
+          <p>2026.04.08 · played as White</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:8px" class="warn"></span><span style="--w:28px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>0</b> mistakes · <b>2</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card loss">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Loss</span></div>
+          <h3><span>vs MonyTiles</span></h3>
+          <p>2026.04.08 · played as White</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:44px" class="bad"></span><span style="--w:64px" class="warn"></span><span style="--w:88px" class="soft"></span></div>
+          <div class="counts"><b>2</b> blunders · <b>4</b> mistakes · <b>8</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Win</span></div>
+          <h3><span>vs rabehmjd</span></h3>
+          <p>2026.04.22 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:36px" class="warn"></span><span style="--w:18px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>2</b> mistakes · <b>1</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card loss">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Loss</span></div>
+          <h3><span>vs HRDSTL</span></h3>
+          <p>2026.04.22 · played as Black</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:36px" class="warn"></span><span style="--w:38px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>2</b> mistakes · <b>3</b> inaccuracies</div>
+        </article>
+
+        <article class="game-card win">
+          <div class="game-top"><span class="platform">Chess.com</span><span class="result">Win</span></div>
+          <h3><span>vs GalilCohen</span></h3>
+          <p>2026.04.23 · played as White</p>
+          <div class="mini-bars" aria-label="issue counts"><span style="--w:8px" class="bad"></span><span style="--w:22px" class="warn"></span><span style="--w:28px" class="soft"></span></div>
+          <div class="counts"><b>0</b> blunders · <b>1</b> mistakes · <b>2</b> inaccuracies</div>
+        </article></div></section>
+<section><h2>Top coachable moments</h2><p class="section-lede">Click a row to load the FEN. These are examples for “go through my games with Krahnie” review sessions.</p><div class="fen-lab"><div class="moments">
+    <button class="moment" data-fen="7r/2p1r3/p1Qb2np/1p1P4/2p2nk1/6N1/PP5P/5K2 w - - 2 41" data-title="Chess.com vs MonyTiles" data-best="Nh1" data-played="Qxa6" data-move="41">
+      <span class="rank">#1</span>
+      <span><b>Chess.com vs MonyTiles</b><em>Move 41: played Qxa6; better Nh1</em></span>
+      <strong>decisive mate swing</strong>
+    </button>
+    <button class="moment" data-fen="8/8/3Kp3/4Pk2/5P1p/8/7P/2B5 w - - 0 49" data-title="Lichess vs Ali44cbk" data-best="h3" data-played="h3" data-move="49">
+      <span class="rank">#2</span>
+      <span><b>Lichess vs Ali44cbk</b><em>Move 49: played h3; better h3</em></span>
+      <strong>~6551 cp</strong>
+    </button>
+    <button class="moment" data-fen="rnb4r/pp3kbp/3ppqp1/1N6/4Q3/2N5/PPP2PPP/R1B1K2R b KQ - 4 11" data-title="Lichess vs Najdorf8" data-best="d5" data-played="Ke7" data-move="11">
+      <span class="rank">#3</span>
+      <span><b>Lichess vs Najdorf8</b><em>Move 11: played Ke7; better d5</em></span>
+      <strong>~694 cp</strong>
+    </button>
+    <button class="moment" data-fen="rn1q1k1r/pp2pbb1/6p1/2p5/5N2/5Q2/PPP2PPP/R1B1K2R b KQ - 4 13" data-title="Lichess vs NITIN_JAIN" data-best="Qd6" data-played="Nc6" data-move="13">
+      <span class="rank">#4</span>
+      <span><b>Lichess vs NITIN_JAIN</b><em>Move 13: played Nc6; better Qd6</em></span>
+      <strong>~634 cp</strong>
+    </button>
+    <button class="moment" data-fen="8/8/8/8/7N/1P2p1p1/3b4/5K1k b - - 3 50" data-title="Lichess vs Guzman_Armando77" data-best="Bb4" data-played="Kh2" data-move="50">
+      <span class="rank">#5</span>
+      <span><b>Lichess vs Guzman_Armando77</b><em>Move 50: played Kh2; better Bb4</em></span>
+      <strong>~576 cp</strong>
+    </button>
+    <button class="moment" data-fen="8/8/8/8/1b5N/1P2p1p1/4K3/7k b - - 1 49" data-title="Lichess vs Guzman_Armando77" data-best="Be7" data-played="Bd2" data-move="49">
+      <span class="rank">#6</span>
+      <span><b>Lichess vs Guzman_Armando77</b><em>Move 49: played Bd2; better Be7</em></span>
+      <strong>~533 cp</strong>
+    </button>
+    <button class="moment" data-fen="8/1p1r4/p6p/6p1/5kP1/2P4P/PP2RPK1/8 b - - 2 42" data-title="Chess.com vs joel433" data-best="h5" data-played="Rd6" data-move="42">
+      <span class="rank">#7</span>
+      <span><b>Chess.com vs joel433</b><em>Move 42: played Rd6; better h5</em></span>
+      <strong>~386 cp</strong>
+    </button>
+    <button class="moment" data-fen="r2q1knr/2p5/p2bRpnp/1p1P4/2p4Q/2N3P1/PP3PBP/4R1K1 w - - 1 20" data-title="Chess.com vs MonyTiles" data-best="Qh5" data-played="Re8+" data-move="20">
+      <span class="rank">#8</span>
+      <span><b>Chess.com vs MonyTiles</b><em>Move 20: played Re8+; better Qh5</em></span>
+      <strong>~303 cp</strong>
+    </button></div><div class="panel position-note"><div class="small-board" id="fenBoard"></div><h3 id="fenTitle">Select a moment</h3><p id="fenText">The board will show the position before the selected move. Use it as a pause-and-guess drill before checking the engine suggestion.</p><div class="pillrow"><span class="pill" id="playedPill">Played: —</span><span class="pill" id="bestPill">Better: —</span></div></div></div></section>
+<section class="panel"><h2>The reusable Krahnie review format</h2><p class="section-lede">For future sessions: fetch recent rapid games → run Stockfish triage → identify 3–5 human themes → save this kind of visual page as a coaching artifact. No engine-line soup, just useful pattern recognition.</p></section><p class="footer">Generated 2026-05-12 · Public-game review artifact · Stockfish quick pass, not deep correspondence analysis.</p>
+</main><script>
+const pieceMap={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚',P:'♙',R:'♖',N:'♘',B:'♗',Q:'♕',K:'♔'};
+function emptyBoard(el, hotSquares=[]){el.innerHTML='';for(let r=0;r<8;r++){for(let c=0;c<8;c++){const s=document.createElement('div');s.className='sq '+(((r+c)%2)?'dark':'light'); if(hotSquares.includes(r+','+c)) s.classList.add('hot'); el.appendChild(s);}}}
+function renderFen(el, fen){emptyBoard(el); const board=fen.split(' ')[0].split('/'); let idx=0; for(const row of board){for(const ch of row){if(/\d/.test(ch)){idx += Number(ch)}else{el.children[idx].textContent=pieceMap[ch]||ch; idx++}}}}
+function renderHero(){const el=document.getElementById('heroBoard'); renderFen(el,'r2q1knr/2p5/p2bRpnp/1p1P4/2p4Q/2N3P1/PP3PBP/4R1K1 w - - 1 20'); [28,36,44].forEach(i=>el.children[i]?.classList.add('hot'));}
+renderHero();
+const moments=[...document.querySelectorAll('.moment')];
+function selectMoment(btn){moments.forEach(m=>m.classList.remove('active')); btn.classList.add('active'); renderFen(document.getElementById('fenBoard'), btn.dataset.fen); document.getElementById('fenTitle').textContent=btn.dataset.title; document.getElementById('fenText').textContent=`Move ${btn.dataset.move}: pause here, find candidate moves, then compare your choice to the coach note.`; document.getElementById('playedPill').textContent='Played: '+btn.dataset.played; document.getElementById('bestPill').textContent='Better: '+btn.dataset.best;}
+moments.forEach(btn=>btn.addEventListener('click',()=>selectMoment(btn))); if(moments[0]) selectMoment(moments[0]);
+</script></body></html>
