@@ -21,7 +21,7 @@
     .api-list{display:grid;gap:10px}.api{padding:13px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.api b{color:#fff}.tag{display:inline-flex;margin:3px 5px 0 0;padding:4px 7px;border-radius:999px;background:rgba(10,200,255,.1);border:1px solid rgba(10,200,255,.18);color:#a8edff;font-size:12px;font-weight:800}
     .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}.stat{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#06101d;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.stat b{display:block;margin-top:4px;color:#fff;font-size:20px}
     .matchgrid{display:grid;gap:10px}.match{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.match img,.miniChamp{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1)}.result{font-weight:950}.win{color:var(--green)}.loss{color:var(--red)}.kda{color:#fff;font-weight:900}.small{font-size:12px;color:var(--muted)}
-    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
+    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.promptDetails{margin-top:2px}.promptDetails summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(10,200,255,.24);background:#07111f;border-radius:16px;padding:13px 14px;cursor:pointer;color:#fff;font-weight:950}.promptDetails summary::-webkit-details-marker{display:none}.promptDetails summary:after{content:'Show prompt';color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.promptDetails[open] summary{margin-bottom:12px}.promptDetails[open] summary:after{content:'Hide prompt'}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
   </style>
 </head>
 <body>
@@ -48,8 +48,11 @@
 
       <section>
         <h2>Copy-ready AI coach prompt</h2>
-        <p class="muted">Paste this into ChatGPT/Claude when you want another AI to review your Riot data without giving it the API key.</p>
-        <div class="output" id="promptOut"></div>
+        <p class="muted">Collapsed by default so profile scans stay readable. Open it when you want to paste your Riot snapshot into ChatGPT/Claude without giving it the API key.</p>
+        <details class="promptDetails" id="promptDetails">
+          <summary>Coach prompt drawer</summary>
+          <div class="output" id="promptOut"></div>
+        </details>
       </section>
     </div>
 
