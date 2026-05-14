@@ -184,6 +184,41 @@
       const data = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`).then(r=>r.json());
       champions = Object.values(data.data).sort((a,b)=>a.name.localeCompare(b.name)); championByKey={}; championById={}; champions.forEach(c=>{championByKey[c.key]=c; championById[c.id]=c;}); renderChamps();
     }
+    function niceFieldName(name){ return String(name||'').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/TT$/,'').replace(/AP/g,'AP').replace(/AD/g,'AD').replace(/MR/g,'MR').trim(); }
+    function formatValues(vals, maxRank=5, field=''){
+      const arr=(Array.isArray(vals)?vals:[]).filter(v=>Number.isFinite(Number(v))).slice(0, maxRank || 5);
+      if(!arr.length) return '—';
+      const isRatio=/ratio|coef|percent|amp/i.test(field) && arr.every(v=>Math.abs(Number(v))<=5);
+      const cleaned=arr.map(v=>{ const n=Number(v); return isRatio ? `${Math.round(n*100)}%` : (Number.isInteger(n)?String(n):String(Math.round(n*100)/100)); });
+      return [...new Set(cleaned)].length===1 ? cleaned[0] : cleaned.join(' / ');
+    }
+    function iconToken(path){ return String(path||'').split('/').pop().replace(/\.(png|dds)$/i,'').toLowerCase(); }
+    function binSpellEntries(bin){ return Object.values(bin||{}).map(v=>v?.mSpell).filter(sp=>sp && (sp.DataValues || sp.mSpellCalculations)); }
+    function findBinSpell(binEntries, spell, index){ const token=iconToken(spell.abilityIconPath); return binEntries.find(sp => (sp.mImgIconName||[]).some(x=>iconToken(x)===token)) || binEntries[index] || null; }
+    function formulaSummary(calc, dataMap){
+      const parts=(calc?.mFormulaParts||[]).map(p=>niceFieldName(p.mDataValue||p.mStat||p.__type||'')).filter(Boolean);
+      return parts.length ? parts.join(' + ') : '';
+    }
+    function renderAbilityNumbers(spell, binSpell){
+      const maxRank=spell.maxLevel || binSpell?.maxLevel || 5;
+      const rows=[];
+      rows.push(['Cooldown', formatValues(spell.cooldownCoefficients || [], maxRank)]);
+      rows.push(['Cost', formatValues(spell.costCoefficients || [], maxRank)]);
+      if(spell.range?.length) rows.push(['Range', formatValues(spell.range, maxRank)]);
+      const dataValues=(binSpell?.DataValues||[]).filter(d=>d?.name && Array.isArray(d.values));
+      dataValues.forEach(d=>rows.push([niceFieldName(d.name), formatValues(d.values, maxRank, d.name)]));
+      const dataMap=Object.fromEntries(dataValues.map(d=>[d.name,d.values]));
+      const calcRows=Object.entries(binSpell?.mSpellCalculations||{}).map(([name,calc])=>`<span class="tag">${niceFieldName(name)}: ${plain(formulaSummary(calc,dataMap)||'formula')}</span>`).join('');
+      return `<div class="detailgrid">${rows.filter(([,v])=>v&&v!=='—').map(([k,v])=>`<div class="detail"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>${calcRows?`<p class="small"><b>Formula labels:</b> ${calcRows}</p>`:''}`;
+    }
+    async function loadCDragonChampion(c){
+      try{
+        const meta = await fetch(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champions/${encodeURIComponent(c.key)}.json`).then(r=>r.ok?r.json():Promise.reject(new Error(r.status)));
+        const alias=(meta.alias||c.id).toLowerCase();
+        const bin = await fetch(`https://raw.communitydragon.org/latest/game/data/characters/${alias}/${alias}.bin.json`).then(r=>r.ok?r.json():Promise.reject(new Error(r.status)));
+        return {meta, binEntries:binSpellEntries(bin)};
+      }catch(e){ return null; }
+    }
     function renderChamps(){
       const q=$('champSearch').value.toLowerCase();
       $('champs').innerHTML = champions.filter(c => (c.name+' '+c.tags.join(' ')).toLowerCase().includes(q)).map(c => `<button class="champ" type="button" data-champ="${esc(c.id)}"><img loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${esc(c.id)}_0.jpg" alt="${esc(c.name)}"><div><b>${esc(c.name)}</b><span class="small">${esc(c.title)}<br>${esc(c.tags.join(' / '))} · click for kit</span></div></button>`).join('');
@@ -200,7 +235,14 @@
           championDetails[champId] = data.data[champId];
         }
         const c = championDetails[champId];
-        const spells = (c.spells||[]).map((s,i)=>{ const effectRows=(s.effect||[]).map((e,idx)=>Array.isArray(e)&&e.length?`<span class="tag">Effect ${idx}: ${plain(e.join(' / '))}</span>`:'').join(''); return `<div class="spell"><b>${['Q','W','E','R'][i]} — ${plain(s.name)}</b><br><span class="tag">Cooldown: ${plain((s.cooldownBurn||s.cooldown||'—').toString())}s</span><span class="tag">Cost: ${plain(s.costBurn||'—')}</span><span class="tag">Range: ${plain(s.rangeBurn||'—')}</span><span class="tag">Max rank: ${s.maxrank||'—'}</span><p>${plain(s.description)}</p><p class="small"><b>Tooltip/scaling:</b> ${plain(s.tooltip||'No tooltip data.')}</p><div>${effectRows}</div></div>`; }).join('');
+        const cdragon = await loadCDragonChampion(c);
+        const cdragonSpells = cdragon?.meta?.spells || [];
+        const spells = (c.spells||[]).map((s,i)=>{
+          const cdSpell = cdragonSpells[i] || {};
+          const binSpell = cdragon ? findBinSpell(cdragon.binEntries, cdSpell, i) : null;
+          const numbers = cdragon ? renderAbilityNumbers(cdSpell, binSpell) : `<div class="detailgrid"><div class="detail"><span>Cooldown</span><b>${plain((s.cooldownBurn||s.cooldown||'—').toString())}s</b></div><div class="detail"><span>Cost</span><b>${plain(s.costBurn||'—')}</b></div><div class="detail"><span>Range</span><b>${plain(s.rangeBurn||'—')}</b></div><div class="detail"><span>Max rank</span><b>${s.maxrank||'—'}</b></div></div>`;
+          return `<div class="spell"><b>${['Q','W','E','R'][i]} — ${plain(s.name)}</b>${numbers}<p>${plain(cdSpell.dynamicDescription || s.description)}</p><p class="small"><b>Note:</b> ability modifiers come from CommunityDragon game-data when available; no raw Data Dragon effect arrays shown.</p></div>`;
+        }).join('');
         $('champModalContent').innerHTML = `<div class="modalHero" style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${esc(champId)}_0.jpg')"><div class="modalTitle"><h2 id="champModalTitle">${plain(c.name)}</h2><p class="muted">${plain(c.title)}</p><span class="tag">${plain((c.tags||[]).join(' / '))}</span></div></div><div class="modalBody champInfo"><p>${plain(c.lore || c.blurb)}</p><div class="detailgrid"><div class="detail"><span>Resource</span><b>${plain(c.partype || '—')}</b></div><div class="detail"><span>Attack range</span><b>${c.stats?.attackrange ?? '—'}</b></div><div class="detail"><span>Move speed</span><b>${c.stats?.movespeed ?? '—'}</b></div><div class="detail"><span>Difficulty</span><b>${c.info?.difficulty ?? '—'}</b></div><div class="detail"><span>Attack damage</span><b>${c.stats?.attackdamage ?? '—'} + ${c.stats?.attackdamageperlevel ?? '—'}/lvl</b></div><div class="detail"><span>HP</span><b>${c.stats?.hp ?? '—'} + ${c.stats?.hpperlevel ?? '—'}/lvl</b></div><div class="detail"><span>Armor</span><b>${c.stats?.armor ?? '—'} + ${c.stats?.armorperlevel ?? '—'}/lvl</b></div><div class="detail"><span>MR</span><b>${c.stats?.spellblock ?? '—'} + ${c.stats?.spellblockperlevel ?? '—'}/lvl</b></div><div class="detail"><span>Attack speed</span><b>${c.stats?.attackspeed ?? '—'} + ${c.stats?.attackspeedperlevel ?? '—'}%/lvl</b></div><div class="detail"><span>Mana</span><b>${c.stats?.mp ?? '—'} + ${c.stats?.mpperlevel ?? '—'}/lvl</b></div></div><div class="spell"><b>Passive — ${plain(c.passive?.name || 'Unknown')}</b><br>${plain(c.passive?.description || '')}</div>${spells}</div>`;
       }catch(e){ $('champModalContent').innerHTML += `<div class="modalBody"><p class="bad">Could not load champion kit: ${plain(e.message||e)}</p></div>`; }
     }
