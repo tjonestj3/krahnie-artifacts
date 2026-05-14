@@ -42,7 +42,7 @@
         <label>Region / platform</label><select id="region"><option value="americas|na1">NA — americas / na1</option><option value="europe|euw1">EUW — europe / euw1</option><option value="europe|eun1">EUNE — europe / eun1</option><option value="asia|kr">KR — asia / kr</option><option value="asia|jp1">JP — asia / jp1</option></select>
         <label>Role focus</label><select id="role"><option>Mid</option><option>Jungle</option><option>Top</option><option>ADC</option><option>Support</option><option>Fill / unknown</option></select>
         <label>Goal / question</label><textarea id="question">What do I need in the next 100 LP to win more League of Legends games in Gold?</textarea>
-        <div class="buttonrow"><button id="save">Save local profile</button><button id="loadLive">Pull Riot data</button><button class="secondary" id="copyPrompt">Copy coach prompt</button><button class="secondary" id="clearKey">Clear key</button></div>
+        <div class="buttonrow"><button id="save">Save local profile</button><button id="loadLive">Pull Riot data</button><button class="secondary" id="comparePool">Compare to sample player pool</button><button class="secondary" id="copyPrompt">Copy coach prompt</button><button class="secondary" id="clearKey">Clear key</button></div>
         <div class="status" id="profileStatus"></div>
       </section>
 
@@ -64,7 +64,7 @@
       </div>
       <div class="grid two">
         <div><h3 style="margin-top:16px">Recent ranked games</h3><div class="matchgrid" id="matches"><p class="muted">Click “Pull Riot data” to load recent games.</p></div></div>
-        <div><h3 style="margin-top:16px">Last 10 averages vs coach benchmarks</h3><div class="api-list" id="benchmarks"><p class="muted">Pull Riot data to compare CS/min, deaths, KP, vision, and damage against practical Gold-climb targets.</p></div><h3 style="margin-top:16px">Champion mastery / rotation</h3><div class="api-list" id="mastery"><p class="muted">Mastery and free rotation show here.</p></div></div>
+        <div><h3 style="margin-top:16px">Last 10 averages vs sample pool</h3><div class="api-list" id="benchmarks"><p class="muted">Pull Riot data to compare CS/min, deaths, KP, vision, and damage against practical targets. Use “Compare to sample player pool” to build a tiny real Riot sample from nearby ranked ladder players.</p></div><h3 style="margin-top:16px">Champion mastery / rotation</h3><div class="api-list" id="mastery"><p class="muted">Mastery and free rotation show here.</p></div></div>
       </div>
     </section>
 
@@ -143,6 +143,7 @@
         rankContext: ranked ? `${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP (${ranked.wins}W-${ranked.losses}L)` : 'No solo queue entry returned',
         recentRankedPattern: {games: matches.length, wins, losses: matches.length-wins, winrate: pct(wins, matches.length), avgDeaths, champions},
         benchmarkAverages,
+        samplePoolComparison: scan.samplePool || 'Not loaded. Use the sample pool button to compare against a tiny real Riot sample.',
         recentGameDetails: matches.map((m,i) => ({
           game: i+1,
           champion:m.champion,
@@ -194,6 +195,48 @@
       }catch(e){ box.innerHTML += `<p class="bad">Could not load champion kit: ${plain(e.message||e)}</p>`; }
     }
 
+    function participantStatsFromMatch(match, puuid){
+      const info=match.info||{};
+      const me=(info.participants||[]).find(p=>p.puuid===puuid)||{};
+      const myTeam=(info.participants||[]).filter(p=>p.teamId===me.teamId);
+      const teamKills=myTeam.reduce((a,p)=>a+(p.kills||0),0);
+      const mins=Math.max((info.gameDuration||0)/60, 1);
+      const teams=info.teams||[];
+      const myTeamObj=teams.find(t=>t.teamId===me.teamId)?.objectives||{};
+      const enemyTeamObj=teams.find(t=>t.teamId!==me.teamId)?.objectives||{};
+      const objectiveHint=`Towers ${myTeamObj.tower?.kills??'—'}-${enemyTeamObj.tower?.kills??'—'}, dragons ${myTeamObj.dragon?.kills??'—'}-${enemyTeamObj.dragon?.kills??'—'}, barons ${myTeamObj.baron?.kills??'—'}-${enemyTeamObj.baron?.kills??'—'}`;
+      const items=[0,1,2,3,4,5,6].map(i=>me[`item${i}`]).filter(Boolean);
+      const cs=(me.totalMinionsKilled||0)+(me.neutralMinionsKilled||0);
+      return {
+        matchId:match.metadata?.matchId,
+        duration:`${Math.round(mins)}m`,
+        gameDurationSeconds:info.gameDuration,
+        champion:me.championName,
+        role:me.teamPosition||me.individualPosition,
+        lane:me.lane,
+        win:me.win,
+        kills:me.kills,
+        deaths:me.deaths,
+        assists:me.assists,
+        killParticipation:teamKills ? `${Math.round(((me.kills||0)+(me.assists||0))/teamKills*100)}%` : '—',
+        cs,
+        csPerMinute:(cs/mins).toFixed(1),
+        goldEarned:me.goldEarned,
+        damageToChampions:me.totalDamageDealtToChampions,
+        damagePerMinute:Math.round((me.totalDamageDealtToChampions||0)/mins),
+        damageTaken:me.totalDamageTaken,
+        visionScore:me.visionScore,
+        visionPerMinute:Number(((me.visionScore||0)/mins).toFixed(2)),
+        wardsPlaced:me.wardsPlaced,
+        controlWards:me.detectorWardsPlaced,
+        summonerSpells:`${me.summoner1Id||'—'} / ${me.summoner2Id||'—'}`,
+        largestKillingSpree:me.largestKillingSpree,
+        firstBloodKill:me.firstBloodKill,
+        objectiveHint,
+        items
+      };
+    }
+
     async function pullLive(){
       const key=$('apiKey').value.trim(); if(!key){ $('profileStatus').innerHTML='<span class="bad">Paste your Riot API key locally first.</span>'; return; }
       const {gameName, tagLine}=parseRiotId(); const {routing, platform}=selectedRegions(); $('profileStatus').innerHTML='<span class="warn">Calling Riot APIs…</span>';
@@ -208,45 +251,7 @@
           api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?queue=420&start=0&count=10`, key)
         ]);
         const rawMatches = await Promise.all(ids.slice(0,10).map(id => api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/${id}`, key)));
-        const matches = rawMatches.map(match => {
-          const info=match.info||{};
-          const me=(info.participants||[]).find(p=>p.puuid===puuid)||{};
-          const myTeam=(info.participants||[]).filter(p=>p.teamId===me.teamId);
-          const teamKills=myTeam.reduce((a,p)=>a+(p.kills||0),0);
-          const mins=Math.max((info.gameDuration||0)/60, 1);
-          const teams=info.teams||[];
-          const myTeamObj=teams.find(t=>t.teamId===me.teamId)?.objectives||{};
-          const enemyTeamObj=teams.find(t=>t.teamId!==me.teamId)?.objectives||{};
-          const objectiveHint=`Towers ${myTeamObj.tower?.kills??'—'}-${enemyTeamObj.tower?.kills??'—'}, dragons ${myTeamObj.dragon?.kills??'—'}-${enemyTeamObj.dragon?.kills??'—'}, barons ${myTeamObj.baron?.kills??'—'}-${enemyTeamObj.baron?.kills??'—'}`;
-          const items=[0,1,2,3,4,5,6].map(i=>me[`item${i}`]).filter(Boolean);
-          const cs=(me.totalMinionsKilled||0)+(me.neutralMinionsKilled||0);
-          return {
-            matchId:match.metadata?.matchId,
-            duration:`${Math.round(mins)}m`,
-            gameDurationSeconds:info.gameDuration,
-            champion:me.championName,
-            role:me.teamPosition||me.individualPosition,
-            lane:me.lane,
-            win:me.win,
-            kills:me.kills,
-            deaths:me.deaths,
-            assists:me.assists,
-            killParticipation:teamKills ? `${Math.round(((me.kills||0)+(me.assists||0))/teamKills*100)}%` : '—',
-            cs,
-            csPerMinute:(cs/mins).toFixed(1),
-            goldEarned:me.goldEarned,
-            damageToChampions:me.totalDamageDealtToChampions,
-            damageTaken:me.totalDamageTaken,
-            visionScore:me.visionScore,
-            wardsPlaced:me.wardsPlaced,
-            controlWards:me.detectorWardsPlaced,
-            summonerSpells:`${me.summoner1Id||'—'} / ${me.summoner2Id||'—'}`,
-            largestKillingSpree:me.largestKillingSpree,
-            firstBloodKill:me.firstBloodKill,
-            objectiveHint,
-            items
-          };
-        });
+        const matches = rawMatches.map(match => participantStatsFromMatch(match, puuid));
         latestScan={routing, platform, account, summoner, leagueEntries, mastery, rotation, matches}; renderLive(); renderPrompt(); localStorage.setItem('krahnieLolLastScan', JSON.stringify(latestScan)); $('profileStatus').innerHTML='<span class="ok">Loaded Riot profile + recent ranked games. Prompt upgraded.</span>';
       }catch(e){ $('profileStatus').innerHTML=`<span class="bad">Riot pull failed:</span> ${String(e.message||e).slice(0,320)}`; }
     }
@@ -262,11 +267,65 @@
       ];
       $('benchmarks').innerHTML = `<div class="api"><b>Primary role sample: ${esc(role)}</b><br><span class="muted">These are coach benchmarks for Gold-climb review, not official Riot aggregate elo stats.</span></div>` + metrics.map(m=>{ const verdict=cmp(m.value,m.target,m.better); return `<div class="api"><b>${m.label}</b><br><span class="tag ${verdict.cls}">Last 10: ${Number.isFinite(m.value)?m.fmt(m.value):'—'}</span><span class="tag">Target: ${m.fmt(m.target)}</span><span class="tag ${verdict.cls}">${verdict.text}</span></div>`; }).join('');
     }
+    function summarizeMetrics(matches){
+      return {
+        games: matches.length,
+        csPerMinute: avg(matches,m=>Number(m.csPerMinute)),
+        deaths: avg(matches,m=>m.deaths),
+        killParticipation: avg(matches,m=>metricNum(m.killParticipation)),
+        visionPerMinute: avg(matches,m=>m.visionPerMinute ?? (m.visionScore||0)/Math.max((m.gameDurationSeconds||0)/60,1)),
+        damagePerMinute: avg(matches,m=>m.damagePerMinute ?? (m.damageToChampions||0)/Math.max((m.gameDurationSeconds||0)/60,1))
+      };
+    }
+    function renderSamplePoolComparison(sample){
+      if(!latestScan) return;
+      const mine=summarizeMetrics(latestScan.matches||[]), pool=sample.metrics;
+      const rows=[
+        ['CS / min','csPerMinute',v=>v.toFixed(1),true],
+        ['Deaths / game','deaths',v=>v.toFixed(1),false],
+        ['Kill participation','killParticipation',v=>`${Math.round(v)}%`,true],
+        ['Vision / min','visionPerMinute',v=>v.toFixed(2),true],
+        ['Damage / min','damagePerMinute',v=>Math.round(v).toLocaleString(),true]
+      ];
+      const cards = rows.map(([label,key,fmt,higher])=>{ const my=mine[key], other=pool[key]; const delta=Number.isFinite(my)&&Number.isFinite(other) ? my-other : NaN; const ahead=Number.isFinite(delta) ? (higher ? delta>=0 : delta<=0) : false; return `<div class="api"><b>${label}</b><br><span class="tag">You: ${Number.isFinite(my)?fmt(my):'—'}</span><span class="tag">Pool: ${Number.isFinite(other)?fmt(other):'—'}</span><span class="tag ${ahead?'ok':'warn'}">Δ ${Number.isFinite(delta)?(delta>0?'+':'')+fmt(delta):'—'}</span></div>`; }).join('');
+      $('benchmarks').innerHTML = `<div class="api"><b>Real sample pool comparison</b><br><span class="muted">Sample: ${sample.players} players / ${sample.games} ranked games from ${esc(sample.tier)} ${esc(sample.rank)} ${esc(sample.platform.toUpperCase())}. Tiny Riot API sample; useful directionally, not official meta.</span></div>${cards}<details class="api"><summary><b>Sample players</b></summary><p class="small">${sample.names.map(esc).join(', ') || 'Riot IDs unavailable'}</p></details>`;
+      latestScan.samplePool = sample;
+      localStorage.setItem('krahnieLolLastScan', JSON.stringify(latestScan));
+      renderPrompt();
+    }
+    async function compareSamplePool(){
+      const key=$('apiKey').value.trim(); if(!key){ $('profileStatus').innerHTML='<span class="bad">Paste your Riot API key locally first.</span>'; return; }
+      if(!latestScan?.account?.puuid){ $('profileStatus').innerHTML='<span class="bad">Pull your Riot profile first, then compare to a sample pool.</span>'; return; }
+      const {routing, platform}=selectedRegions();
+      const ranked=latestScan.leagueEntries?.find(e=>e.queueType==='RANKED_SOLO_5x5');
+      const tier=(ranked?.tier||'GOLD').toUpperCase(); const rank=ranked?.rank||'IV';
+      $('profileStatus').innerHTML='<span class="warn">Building tiny sample pool from Riot ladder + Match-V5… this may take a moment and uses several API calls.</span>';
+      try{
+        const entries = await api(`https://${platform}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/${tier}/${rank}?page=1`, key);
+        const shuffled = entries.filter(e=>e.puuid!==latestScan.account.puuid).sort(()=>Math.random()-.5).slice(0,5);
+        const sampleMatches=[]; const names=[];
+        for(const e of shuffled){
+          let puuid=e.puuid;
+          if(!puuid && e.summonerId){ const summ=await api(`https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/${encodeURIComponent(e.summonerId)}`, key); puuid=summ.puuid; }
+          if(!puuid) continue;
+          try{ const acct=await api(`https://${routing}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${encodeURIComponent(puuid)}`, key); names.push(`${acct.gameName}#${acct.tagLine}`); }catch{}
+          const ids = await api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?queue=420&start=0&count=2`, key);
+          for(const id of ids.slice(0,2)){
+            const match = await api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/${id}`, key);
+            sampleMatches.push(participantStatsFromMatch(match, puuid));
+          }
+        }
+        if(!sampleMatches.length) throw new Error('No sample matches returned from Riot. Try again or choose another region/rank.');
+        const sample={platform,routing,tier,rank,players:shuffled.length,games:sampleMatches.length,names,metrics:summarizeMetrics(sampleMatches)};
+        renderSamplePoolComparison(sample);
+        $('profileStatus').innerHTML='<span class="ok">Sample pool comparison loaded from real Riot match data.</span>';
+      }catch(e){ $('profileStatus').innerHTML=`<span class="bad">Sample pool failed:</span> ${String(e.message||e).slice(0,320)}`; }
+    }
     function renderLive(){
       const s=latestScan; if(!s) return; const ranked=s.leagueEntries.find(e=>e.queueType==='RANKED_SOLO_5x5'); const wins=s.matches.filter(m=>m.win).length; const avgDeaths=s.matches.length?(s.matches.reduce((a,m)=>a+(m.deaths||0),0)/s.matches.length).toFixed(1):'—';
       $('stats').innerHTML=`<div class="stat"><small>Riot ID</small><b>${s.account.gameName}#${s.account.tagLine}</b></div><div class="stat"><small>Rank</small><b>${ranked?`${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP`:'No solo entry'}</b></div><div class="stat"><small>Recent winrate</small><b>${wins}-${s.matches.length-wins} / ${pct(wins,s.matches.length)}</b></div><div class="stat"><small>Avg deaths</small><b>${avgDeaths}</b></div>`;
       $('matches').innerHTML=s.matches.map((m,i)=>`<details class="matchCard"><summary><article class="match"><img src="${champImgByName(m.champion)}" alt="${m.champion}"><div><div><b>${i+1}. ${m.champion}</b> <span class="small">${m.role||'Role?'} · ${m.duration||'—'} · click for details</span></div><div class="small">CS ${m.cs??'—'}${m.csPerMinute?` (${m.csPerMinute}/min)`:''} · KP ${m.killParticipation||'—'} · Vision ${m.visionScore??'—'} · Damage ${m.damageToChampions??'—'}</div></div><div><div class="result ${m.win?'win':'loss'}">${m.win?'WIN':'LOSS'}</div><div class="kda">${m.kills}/${m.deaths}/${m.assists}</div></div></article></summary><div class="matchDetails"><div>${m.objectiveHint||'Objective info unavailable'} · Match ${m.matchId||'—'}</div><div class="detailgrid"><div class="detail"><span>Gold</span><b>${m.goldEarned??'—'}</b></div><div class="detail"><span>Damage taken</span><b>${m.damageTaken??'—'}</b></div><div class="detail"><span>Control wards</span><b>${m.controlWards??'—'}</b></div><div class="detail"><span>Spree / FB</span><b>${m.largestKillingSpree??'—'} / ${m.firstBloodKill?'yes':'no'}</b></div></div><div class="small" style="margin-top:8px">Items: ${(m.items||[]).join(', ') || 'not loaded'} · Summoner spells: ${m.summonerSpells||'—'}</div></div></details>`).join('');
-      renderBenchmarks(s);
+      if(s.samplePool) renderSamplePoolComparison(s.samplePool); else renderBenchmarks(s);
       const free = (s.rotation?.freeChampionIds||[]).slice(0,8).map(id=>champName(id)).join(', ');
       $('mastery').innerHTML = `<div class="api"><b>Top mastery</b><br>${s.mastery.slice(0,6).map(m=>`<span class="tag">${champName(m.championId)} · L${m.championLevel} · ${m.championPoints.toLocaleString()}</span>`).join('')}</div><div class="api"><b>Free rotation</b><br><span class="muted">${free}</span></div>`;
     }
@@ -276,7 +335,7 @@
     $('copyPrompt').onclick=copyCoachPrompt;
     $('copyPromptInline').onclick=copyCoachPrompt;
     $('clearKey').onclick=()=>{ $('apiKey').value=''; const profile=JSON.parse(localStorage.getItem('krahnieLolProfile')||'{}'); delete profile.apiKey; localStorage.setItem('krahnieLolProfile',JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="warn">Local API key cleared.</span>';};
-    $('loadLive').onclick=pullLive; ['riotId','region','role','question'].forEach(id=>$(id).addEventListener('input',renderPrompt)); $('champSearch').addEventListener('input',renderChamps);
+    $('loadLive').onclick=pullLive; $('comparePool').onclick=compareSamplePool; ['riotId','region','role','question'].forEach(id=>$(id).addEventListener('input',renderPrompt)); $('champSearch').addEventListener('input',renderChamps);
     try{ latestScan=JSON.parse(localStorage.getItem('krahnieLolLastScan')||'null'); if(latestScan) renderLive(); }catch{} renderPrompt(); loadDDragon().catch(e=>{$('patch').textContent='unavailable'; $('champs').innerHTML='<p class="bad">Could not load Data Dragon.</p>';});
   </script>
 </body>
