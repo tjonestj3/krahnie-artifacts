@@ -21,7 +21,7 @@
     .api-list{display:grid;gap:10px}.api{padding:13px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.api b{color:#fff}.tag{display:inline-flex;margin:3px 5px 0 0;padding:4px 7px;border-radius:999px;background:rgba(10,200,255,.1);border:1px solid rgba(10,200,255,.18);color:#a8edff;font-size:12px;font-weight:800}
     .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}.stat{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#06101d;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.stat b{display:block;margin-top:4px;color:#fff;font-size:20px}
     .matchgrid{display:grid;gap:10px}.match{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.matchCard{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(7,17,31,.72);overflow:hidden}.matchCard summary{list-style:none;cursor:pointer}.matchCard summary::-webkit-details-marker{display:none}.matchCard[open]{border-color:rgba(10,200,255,.32);box-shadow:0 0 0 1px rgba(10,200,255,.08)}.matchDetails{padding:0 12px 12px 82px;color:var(--muted);font-size:13px}.detailgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}@media(min-width:760px){.detailgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}.detail{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#06101d;padding:8px}.detail b{display:block;color:#fff}.match img,.miniChamp{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1)}.result{font-weight:950}.win{color:var(--green)}.loss{color:var(--red)}.kda{color:#fff;font-weight:900}.small{font-size:12px;color:var(--muted)}
-    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.promptDetails{margin-top:2px}.promptDetails summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(10,200,255,.24);background:#07111f;border-radius:16px;padding:13px 14px;cursor:pointer;color:#fff;font-weight:950}.promptDetails summary::-webkit-details-marker{display:none}.promptDetails summary:after{content:'Show prompt';color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.promptDetails[open] summary{margin-bottom:12px}.promptDetails[open] summary:after{content:'Hide prompt'}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
+    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:10px;max-height:520px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ[open]{border-color:rgba(10,200,255,.34);box-shadow:0 0 0 1px rgba(10,200,255,.08)}.champ summary{list-style:none;cursor:pointer}.champ summary::-webkit-details-marker{display:none}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.champInfo{border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:12px;line-height:1.45}.champInfo .spell{margin-top:8px;padding:8px;border-radius:12px;background:#06101d;border:1px solid rgba(255,255,255,.07)}.champInfo .spell b{color:#fff}.promptDetails{margin-top:2px}.promptDetails summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(10,200,255,.24);background:#07111f;border-radius:16px;padding:13px 14px;cursor:pointer;color:#fff;font-weight:950}.promptDetails summary::-webkit-details-marker{display:none}.promptDetails summary:after{content:'Show prompt';color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.promptDetails[open] summary{margin-bottom:12px}.promptDetails[open] summary:after{content:'Hide prompt'}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
   </style>
 </head>
 <body>
@@ -64,7 +64,7 @@
       </div>
       <div class="grid two">
         <div><h3 style="margin-top:16px">Recent ranked games</h3><div class="matchgrid" id="matches"><p class="muted">Click “Pull Riot data” to load recent games.</p></div></div>
-        <div><h3 style="margin-top:16px">Champion mastery / rotation</h3><div class="api-list" id="mastery"><p class="muted">Mastery and free rotation show here.</p></div></div>
+        <div><h3 style="margin-top:16px">Last 10 averages vs coach benchmarks</h3><div class="api-list" id="benchmarks"><p class="muted">Pull Riot data to compare CS/min, deaths, KP, vision, and damage against practical Gold-climb targets.</p></div><h3 style="margin-top:16px">Champion mastery / rotation</h3><div class="api-list" id="mastery"><p class="muted">Mastery and free rotation show here.</p></div></div>
       </div>
     </section>
 
@@ -93,17 +93,31 @@
   <script>
     const $ = id => document.getElementById(id);
     const routingMap = {na1:'americas', br1:'americas', la1:'americas', la2:'americas', oc1:'americas', euw1:'europe', eun1:'europe', tr1:'europe', ru:'europe', kr:'asia', jp1:'asia', ph2:'sea', sg2:'sea', th2:'sea', tw2:'sea', vn2:'sea'};
-    let champions=[], championByKey={}, championById={}, version='', latestScan=null;
+    let champions=[], championByKey={}, championById={}, championDetails={}, version='', latestScan=null;
     const state = JSON.parse(localStorage.getItem('krahnieLolProfile') || '{}');
     for (const id of ['apiKey','riotId','region','role','question']) if (state[id]) $(id).value = state[id];
 
     function parseRiotId(){ const raw=$('riotId').value.trim(); const [gameName, tagLine='NA1'] = raw.split('#'); return {gameName:gameName.trim(), tagLine:tagLine.trim().toUpperCase()}; }
+    function esc(v){ return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+    function plain(v){ return esc(String(v ?? '').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()); }
     function selectedRegions(){ const [routing, platform] = $('region').value.split('|'); return {routing, platform}; }
     function api(url, key){ const sep = url.includes('?') ? '&' : '?'; return fetch(`${url}${sep}api_key=${encodeURIComponent(key)}`).then(async r => { if(!r.ok) throw new Error(`${r.status} ${await r.text()}`); return r.json(); }); }
     function champName(id){ return championByKey[String(id)]?.name || `Champion ${id}`; }
     function champImgByName(name){ const c = champions.find(x => x.name === name || x.id === name); return c ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${c.image.full}` : ''; }
     function champImgById(id){ const c = championByKey[String(id)]; return c ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${c.image.full}` : ''; }
     function pct(n,d){ return d ? `${Math.round(n/d*100)}%` : '—'; }
+    const benchmarkTargets = {
+      TOP:{csPerMinute:6.5,deaths:5.5,killParticipation:45,visionPerMinute:.55,damagePerMinute:550},
+      JUNGLE:{csPerMinute:5.4,deaths:5.0,killParticipation:60,visionPerMinute:.75,damagePerMinute:450},
+      MIDDLE:{csPerMinute:6.7,deaths:5.0,killParticipation:55,visionPerMinute:.60,damagePerMinute:650},
+      BOTTOM:{csPerMinute:7.0,deaths:5.0,killParticipation:55,visionPerMinute:.50,damagePerMinute:650},
+      UTILITY:{csPerMinute:1.3,deaths:5.8,killParticipation:65,visionPerMinute:1.8,damagePerMinute:250},
+      DEFAULT:{csPerMinute:6.2,deaths:5.2,killParticipation:55,visionPerMinute:.65,damagePerMinute:550}
+    };
+    function avg(arr, fn){ const vals=arr.map(fn).filter(v=>Number.isFinite(v)); return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : NaN; }
+    function roleTarget(matches){ const counts={}; matches.forEach(m=>{ const r=m.role||'DEFAULT'; counts[r]=(counts[r]||0)+1; }); const role=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'DEFAULT'; return {role, target: benchmarkTargets[role] || benchmarkTargets.DEFAULT}; }
+    function cmp(value, target, higherIsBetter=true){ if(!Number.isFinite(value)) return {text:'—', cls:'warn'}; const good = higherIsBetter ? value >= target : value <= target; const close = higherIsBetter ? value >= target*.9 : value <= target*1.15; return {text: good?'on track': close?'close':'focus', cls: good?'ok':close?'warn':'bad'}; }
+    function metricNum(v){ return Number(String(v??'').replace('%','')); }
 
     function summarizeScan(scan){
       if(!scan) return 'No live Riot match data loaded yet.';
@@ -113,11 +127,22 @@
       const deaths = matches.reduce((a,m)=>a+(m.deaths||0),0);
       const avgDeaths = matches.length ? (deaths/matches.length).toFixed(1) : '—';
       const ranked = scan.leagueEntries?.find(e=>e.queueType==='RANKED_SOLO_5x5');
+      const {role, target}=roleTarget(matches);
+      const benchmarkAverages = {
+        primaryRole: role,
+        csPerMinute: Number(avg(matches,m=>Number(m.csPerMinute)).toFixed(1)),
+        deathsPerGame: Number(avg(matches,m=>m.deaths).toFixed(1)),
+        killParticipation: `${Math.round(avg(matches,m=>metricNum(m.killParticipation)))}%`,
+        visionPerMinute: Number(avg(matches,m=>(m.visionScore||0)/Math.max((m.gameDurationSeconds||0)/60,1)).toFixed(2)),
+        damagePerMinute: Number(avg(matches,m=>(m.damageToChampions||0)/Math.max((m.gameDurationSeconds||0)/60,1)).toFixed(0)),
+        coachBenchmarks: target
+      };
       return JSON.stringify({
         coachingFocus: 'Recent ranked games only. Prioritize repeated gameplay leaks over account trivia.',
         player: `${scan.account.gameName}#${scan.account.tagLine}`,
         rankContext: ranked ? `${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP (${ranked.wins}W-${ranked.losses}L)` : 'No solo queue entry returned',
         recentRankedPattern: {games: matches.length, wins, losses: matches.length-wins, winrate: pct(wins, matches.length), avgDeaths, champions},
+        benchmarkAverages,
         recentGameDetails: matches.map((m,i) => ({
           game: i+1,
           champion:m.champion,
@@ -151,7 +176,23 @@
       const data = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`).then(r=>r.json());
       champions = Object.values(data.data).sort((a,b)=>a.name.localeCompare(b.name)); championByKey={}; championById={}; champions.forEach(c=>{championByKey[c.key]=c; championById[c.id]=c;}); renderChamps();
     }
-    function renderChamps(){ const q=$('champSearch').value.toLowerCase(); $('champs').innerHTML = champions.filter(c => (c.name+' '+c.tags.join(' ')).toLowerCase().includes(q)).map(c => `<article class="champ"><img loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${c.id}_0.jpg" alt="${c.name}"><div><b>${c.name}</b><span class="small">${c.title}<br>${c.tags.join(' / ')}</span></div></article>`).join(''); }
+    function renderChamps(){
+      const q=$('champSearch').value.toLowerCase();
+      $('champs').innerHTML = champions.filter(c => (c.name+' '+c.tags.join(' ')).toLowerCase().includes(q)).map(c => `<details class="champ" data-champ="${esc(c.id)}" ontoggle="if(this.open) loadChampionDetails(this, '${esc(c.id)}')"><summary><img loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${esc(c.id)}_0.jpg" alt="${esc(c.name)}"><div><b>${esc(c.name)}</b><span class="small">${esc(c.title)}<br>${esc(c.tags.join(' / '))} · click for kit</span></div></summary><div class="champInfo" id="champInfo-${esc(c.id)}"><p>${plain(c.blurb)}</p><div class="detailgrid"><div class="detail"><span>Attack</span><b>${c.info.attack}</b></div><div class="detail"><span>Defense</span><b>${c.info.defense}</b></div><div class="detail"><span>Magic</span><b>${c.info.magic}</b></div><div class="detail"><span>Difficulty</span><b>${c.info.difficulty}</b></div></div><p class="small">Loading full kit when opened…</p></div></details>`).join('');
+    }
+    async function loadChampionDetails(el, champId){
+      const box = $(`champInfo-${champId}`); if(!box || box.dataset.loaded) return;
+      try{
+        if(!championDetails[champId]){
+          const data = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${champId}.json`).then(r=>r.json());
+          championDetails[champId] = data.data[champId];
+        }
+        const c = championDetails[champId];
+        const spells = (c.spells||[]).map((s,i)=>`<div class="spell"><b>${['Q','W','E','R'][i]} — ${plain(s.name)}</b><br>${plain(s.description)}</div>`).join('');
+        box.dataset.loaded='1';
+        box.innerHTML = `<p>${plain(c.lore || c.blurb)}</p><div class="detailgrid"><div class="detail"><span>Tags</span><b>${plain((c.tags||[]).join(' / '))}</b></div><div class="detail"><span>Resource</span><b>${plain(c.partype || '—')}</b></div><div class="detail"><span>Attack range</span><b>${c.stats?.attackrange ?? '—'}</b></div><div class="detail"><span>Move speed</span><b>${c.stats?.movespeed ?? '—'}</b></div></div><div class="spell"><b>Passive — ${plain(c.passive?.name || 'Unknown')}</b><br>${plain(c.passive?.description || '')}</div>${spells}`;
+      }catch(e){ box.innerHTML += `<p class="bad">Could not load champion kit: ${plain(e.message||e)}</p>`; }
+    }
 
     async function pullLive(){
       const key=$('apiKey').value.trim(); if(!key){ $('profileStatus').innerHTML='<span class="bad">Paste your Riot API key locally first.</span>'; return; }
@@ -209,10 +250,23 @@
         latestScan={routing, platform, account, summoner, leagueEntries, mastery, rotation, matches}; renderLive(); renderPrompt(); localStorage.setItem('krahnieLolLastScan', JSON.stringify(latestScan)); $('profileStatus').innerHTML='<span class="ok">Loaded Riot profile + recent ranked games. Prompt upgraded.</span>';
       }catch(e){ $('profileStatus').innerHTML=`<span class="bad">Riot pull failed:</span> ${String(e.message||e).slice(0,320)}`; }
     }
+    function renderBenchmarks(s){
+      const matches=s.matches||[]; if(!matches.length){ $('benchmarks').innerHTML='<p class="muted">No ranked games loaded yet.</p>'; return; }
+      const {role,target}=roleTarget(matches);
+      const metrics=[
+        {label:'CS / min', value:avg(matches,m=>Number(m.csPerMinute)), target:target.csPerMinute, better:true, fmt:v=>v.toFixed(1)},
+        {label:'Deaths / game', value:avg(matches,m=>m.deaths), target:target.deaths, better:false, fmt:v=>v.toFixed(1)},
+        {label:'Kill participation', value:avg(matches,m=>metricNum(m.killParticipation)), target:target.killParticipation, better:true, fmt:v=>`${Math.round(v)}%`},
+        {label:'Vision / min', value:avg(matches,m=>(m.visionScore||0)/Math.max((m.gameDurationSeconds||0)/60,1)), target:target.visionPerMinute, better:true, fmt:v=>v.toFixed(2)},
+        {label:'Damage / min', value:avg(matches,m=>(m.damageToChampions||0)/Math.max((m.gameDurationSeconds||0)/60,1)), target:target.damagePerMinute, better:true, fmt:v=>Math.round(v).toLocaleString()}
+      ];
+      $('benchmarks').innerHTML = `<div class="api"><b>Primary role sample: ${esc(role)}</b><br><span class="muted">These are coach benchmarks for Gold-climb review, not official Riot aggregate elo stats.</span></div>` + metrics.map(m=>{ const verdict=cmp(m.value,m.target,m.better); return `<div class="api"><b>${m.label}</b><br><span class="tag ${verdict.cls}">Last 10: ${Number.isFinite(m.value)?m.fmt(m.value):'—'}</span><span class="tag">Target: ${m.fmt(m.target)}</span><span class="tag ${verdict.cls}">${verdict.text}</span></div>`; }).join('');
+    }
     function renderLive(){
       const s=latestScan; if(!s) return; const ranked=s.leagueEntries.find(e=>e.queueType==='RANKED_SOLO_5x5'); const wins=s.matches.filter(m=>m.win).length; const avgDeaths=s.matches.length?(s.matches.reduce((a,m)=>a+(m.deaths||0),0)/s.matches.length).toFixed(1):'—';
       $('stats').innerHTML=`<div class="stat"><small>Riot ID</small><b>${s.account.gameName}#${s.account.tagLine}</b></div><div class="stat"><small>Rank</small><b>${ranked?`${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP`:'No solo entry'}</b></div><div class="stat"><small>Recent winrate</small><b>${wins}-${s.matches.length-wins} / ${pct(wins,s.matches.length)}</b></div><div class="stat"><small>Avg deaths</small><b>${avgDeaths}</b></div>`;
       $('matches').innerHTML=s.matches.map((m,i)=>`<details class="matchCard"><summary><article class="match"><img src="${champImgByName(m.champion)}" alt="${m.champion}"><div><div><b>${i+1}. ${m.champion}</b> <span class="small">${m.role||'Role?'} · ${m.duration||'—'} · click for details</span></div><div class="small">CS ${m.cs??'—'}${m.csPerMinute?` (${m.csPerMinute}/min)`:''} · KP ${m.killParticipation||'—'} · Vision ${m.visionScore??'—'} · Damage ${m.damageToChampions??'—'}</div></div><div><div class="result ${m.win?'win':'loss'}">${m.win?'WIN':'LOSS'}</div><div class="kda">${m.kills}/${m.deaths}/${m.assists}</div></div></article></summary><div class="matchDetails"><div>${m.objectiveHint||'Objective info unavailable'} · Match ${m.matchId||'—'}</div><div class="detailgrid"><div class="detail"><span>Gold</span><b>${m.goldEarned??'—'}</b></div><div class="detail"><span>Damage taken</span><b>${m.damageTaken??'—'}</b></div><div class="detail"><span>Control wards</span><b>${m.controlWards??'—'}</b></div><div class="detail"><span>Spree / FB</span><b>${m.largestKillingSpree??'—'} / ${m.firstBloodKill?'yes':'no'}</b></div></div><div class="small" style="margin-top:8px">Items: ${(m.items||[]).join(', ') || 'not loaded'} · Summoner spells: ${m.summonerSpells||'—'}</div></div></details>`).join('');
+      renderBenchmarks(s);
       const free = (s.rotation?.freeChampionIds||[]).slice(0,8).map(id=>champName(id)).join(', ');
       $('mastery').innerHTML = `<div class="api"><b>Top mastery</b><br>${s.mastery.slice(0,6).map(m=>`<span class="tag">${champName(m.championId)} · L${m.championLevel} · ${m.championPoints.toLocaleString()}</span>`).join('')}</div><div class="api"><b>Free rotation</b><br><span class="muted">${free}</span></div>`;
     }
