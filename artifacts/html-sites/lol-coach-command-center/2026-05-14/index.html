@@ -51,6 +51,7 @@
         <p class="muted">Collapsed by default so profile scans stay readable. Open it when you want to paste your Riot snapshot into ChatGPT/Claude without giving it the API key.</p>
         <details class="promptDetails" id="promptDetails">
           <summary>Coach prompt drawer</summary>
+          <div class="buttonrow" style="margin:0 0 12px"><button class="secondary" id="copyPromptInline">Copy prompt</button></div>
           <div class="output" id="promptOut"></div>
         </details>
       </section>
@@ -217,7 +218,9 @@
     }
 
     $('save').onclick=()=>{const profile={}; ['apiKey','riotId','region','role','question'].forEach(id=>profile[id]=$(id).value); localStorage.setItem('krahnieLolProfile',JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="ok">Saved locally in this browser.</span>'; renderPrompt();};
-    $('copyPrompt').onclick=async()=>{await navigator.clipboard.writeText(promptText()); $('profileStatus').innerHTML='<span class="ok">Copied upgraded coach prompt.</span>';};
+    async function copyCoachPrompt(){await navigator.clipboard.writeText(promptText()); $('profileStatus').innerHTML='<span class="ok">Copied upgraded coach prompt.</span>';}
+    $('copyPrompt').onclick=copyCoachPrompt;
+    $('copyPromptInline').onclick=copyCoachPrompt;
     $('clearKey').onclick=()=>{ $('apiKey').value=''; const profile=JSON.parse(localStorage.getItem('krahnieLolProfile')||'{}'); delete profile.apiKey; localStorage.setItem('krahnieLolProfile',JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="warn">Local API key cleared.</span>';};
     $('loadLive').onclick=pullLive; ['riotId','region','role','question'].forEach(id=>$(id).addEventListener('input',renderPrompt)); $('champSearch').addEventListener('input',renderChamps);
     try{ latestScan=JSON.parse(localStorage.getItem('krahnieLolLastScan')||'null'); if(latestScan) renderLive(); }catch{} renderPrompt(); loadDDragon().catch(e=>{$('patch').textContent='unavailable'; $('champs').innerHTML='<p class="bad">Could not load Data Dragon.</p>';});
