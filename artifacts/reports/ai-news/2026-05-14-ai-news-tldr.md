@@ -1,0 +1,13 @@
+# Morning AI TL;DR — 2026-05-14
+
+- **Claude Code capacity got a practical boost** — Anthropic said at Code w/ Claude SF that Claude Code rate limits doubled and Claude Opus API limits increased, useful for teams hitting agentic-coding throughput ceilings ([Claude](https://claude.com/blog/code-w-claude-sf-2026-sf)).
+- **Google previewed Android’s next AI-native surface area** — The Android Show introduced “Gemini Intelligence,” proactive Android features, and Googlebook/AI-laptop concepts, signaling more OS-level Gemini hooks for app builders ([Google](https://blog.google/products-and-platforms/platforms/android/android-show-io-edition-2026/), [TechCrunch](https://techcrunch.com/2026/05/12/everything-google-announced-at-its-android-show-from-googlebooks-to-vibe-coded-widgets/)).
+- **Notion is positioning the workspace as an agent hub** — Its new developer platform connects AI agents, external data, and custom code directly into workspaces, a relevant pattern for enterprise ops and CRM-adjacent workflows ([TechCrunch](https://techcrunch.com/2026/05/13/notion-just-turned-its-workspace-into-a-hub-for-ai-agents/)).
+- **GitHub is giving orgs more Copilot cost telemetry before billing changes** — April reports are available to prepare for usage-based billing, helping teams model AI-credit consumption by user/model/workflow before June 1 ([GitHub Changelog](https://github.blog/changelog/2026-05-12-april-reports-are-now-available-to-prepare-for-usage-based-billing/)).
+- **NVIDIA and Corning are shoring up AI data-center supply chains** — A multiyear partnership will expand U.S. manufacturing of optical connectivity for AI infrastructure, a bottleneck area for large GPU clusters ([NVIDIA Newsroom](https://nvidianews.nvidia.com/news)).
+- **Google Cloud and SAP are pushing open agent collaboration into enterprise apps** — At SAP Sapphire, Google highlighted SAP Business AI Platform integrations and agentic workflows, relevant to builders connecting ERP/CRM/data workflows ([Google Cloud](https://cloud.google.com/blog/products/sap-google-cloud/sap-sapphire-2026-the-future-of-google-cloud-ai-agents/)).
+- **OpenAI’s cyber-focused model is getting regulated-access traction** — CNBC reports OpenAI will give the EU limited preview access to GPT-5.5-Cyber, pointing to more government-vetted model deployments for security use cases ([CNBC](https://www.cnbc.com/2026/05/11/openai-eu-cyber-model-anthropic-mythos-gpt.html)).
+
+**Worth watching:** Agent platforms are shifting from demos to governance, billing, and integration plumbing; builders should prioritize observability, spend controls, and permission boundaries as first-class product features.
+
+**Artifact:** /home/tjonestj3/.hermes/hermes-agent/outputs/ai-news/2026-05-14-ai-news-tldr.md
