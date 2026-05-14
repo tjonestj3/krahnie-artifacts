@@ -6,36 +6,22 @@
   <meta name="theme-color" content="#07111f" />
   <title>Krahnie LoL Coach Command Center</title>
   <style>
-    :root{
-      color-scheme:dark;
-      --bg:#07111f; --panel:#0d1b2d; --panel2:#101f35; --ink:#f7ecd3; --muted:#9fb2ce;
-      --gold:#c89b3c; --gold2:#f0d48a; --blue:#0ac8ff; --violet:#785aee; --red:#ff4d6d; --green:#35e0a1;
-      --line:rgba(240,212,138,.22); --shadow:0 24px 80px rgba(0,0,0,.45);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:
-      radial-gradient(circle at 15% 5%,rgba(10,200,255,.22),transparent 26rem),
-      radial-gradient(circle at 86% 0%,rgba(120,90,238,.22),transparent 28rem),
-      linear-gradient(180deg,#07111f 0%,#02060d 100%);color:var(--ink);}
-    a{color:var(--blue)}
-    .wrap{width:min(1180px,100%);margin:auto;padding:22px 16px 44px}
+    :root{color-scheme:dark;--bg:#07111f;--panel:#0d1b2d;--panel2:#101f35;--ink:#f7ecd3;--muted:#9fb2ce;--gold:#c89b3c;--gold2:#f0d48a;--blue:#0ac8ff;--violet:#785aee;--red:#ff4d6d;--green:#35e0a1;--line:rgba(240,212,138,.22);--shadow:0 24px 80px rgba(0,0,0,.45)}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 15% 5%,rgba(10,200,255,.22),transparent 26rem),radial-gradient(circle at 86% 0%,rgba(120,90,238,.22),transparent 28rem),linear-gradient(180deg,#07111f 0%,#02060d 100%);color:var(--ink)}
+    a{color:var(--blue)} .wrap{width:min(1240px,100%);margin:auto;padding:22px 16px 44px}
     header{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:30px;padding:26px;background:linear-gradient(135deg,rgba(13,27,45,.92),rgba(12,17,30,.72));box-shadow:var(--shadow)}
     header:after{content:"";position:absolute;inset:auto -90px -110px auto;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(200,155,60,.34),transparent 65%);pointer-events:none}
     .eyebrow{display:inline-flex;gap:9px;align-items:center;border:1px solid rgba(10,200,255,.28);background:rgba(10,200,255,.09);color:#9be8ff;border-radius:999px;padding:8px 12px;font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,8vw,90px);line-height:.9;margin:18px 0 10px;letter-spacing:-.06em;text-wrap:balance;text-shadow:0 2px 0 #000}
-    .lede{max-width:760px;color:var(--muted);font-size:clamp(16px,2.3vw,20px);line-height:1.55;margin:0}
-    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.pill{border:1px solid var(--line);background:#08131f;border-radius:999px;color:var(--gold2);padding:10px 13px;font-weight:800;font-size:13px}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}@media(min-width:880px){.grid.two{grid-template-columns:1.05fr .95fr}.grid.three{grid-template-columns:repeat(3,1fr)}}
-    section,.card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(16,31,53,.88),rgba(7,17,31,.88));box-shadow:0 12px 42px rgba(0,0,0,.28)}
-    section{padding:18px} h2{margin:0 0 12px;color:var(--gold2);font-size:22px} h3{margin:0 0 8px;color:#fff;font-size:16px}.muted{color:var(--muted)}
-    label{display:block;color:var(--gold2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;margin:12px 0 6px}
-    input,select,textarea,button{font:inherit} input,select,textarea{width:100%;border:1px solid rgba(159,178,206,.3);background:#07111f;color:var(--ink);border-radius:14px;padding:12px 13px;outline:none} textarea{min-height:92px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,200,255,.12)}
-    button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--gold),#f0d48a);color:#111827;font-weight:950;padding:12px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(200,155,60,.22)} button.secondary{background:#12233a;color:var(--ink);border:1px solid rgba(10,200,255,.28);box-shadow:none}.buttonrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,8vw,90px);line-height:.9;margin:18px 0 10px;letter-spacing:-.06em;text-wrap:balance;text-shadow:0 2px 0 #000}.lede{max-width:790px;color:var(--muted);font-size:clamp(16px,2.3vw,20px);line-height:1.55;margin:0}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.pill{border:1px solid var(--line);background:#08131f;border-radius:999px;color:var(--gold2);padding:10px 13px;font-weight:800;font-size:13px}.pill.good{color:var(--green);border-color:rgba(53,224,161,.35)}.pill.bad{color:var(--red);border-color:rgba(255,77,109,.35)}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}@media(min-width:920px){.grid.two{grid-template-columns:1.05fr .95fr}.grid.three{grid-template-columns:repeat(3,1fr)}}
+    section,.card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(16,31,53,.88),rgba(7,17,31,.88));box-shadow:0 12px 42px rgba(0,0,0,.28)} section{padding:18px} h2{margin:0 0 12px;color:var(--gold2);font-size:22px} h3{margin:0 0 8px;color:#fff;font-size:16px}.muted{color:var(--muted)}
+    label{display:block;color:var(--gold2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;margin:12px 0 6px} input,select,textarea,button{font:inherit} input,select,textarea{width:100%;border:1px solid rgba(159,178,206,.3);background:#07111f;color:var(--ink);border-radius:14px;padding:12px 13px;outline:none} textarea{min-height:170px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,200,255,.12)}
+    button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--gold),#f0d48a);color:#111827;font-weight:950;padding:12px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(200,155,60,.22);min-height:44px} button.secondary{background:#12233a;color:var(--ink);border:1px solid rgba(10,200,255,.28);box-shadow:none}.buttonrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .api-list{display:grid;gap:10px}.api{padding:13px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.api b{color:#fff}.tag{display:inline-flex;margin:3px 5px 0 0;padding:4px 7px;border-radius:999px;background:rgba(10,200,255,.1);border:1px solid rgba(10,200,255,.18);color:#a8edff;font-size:12px;font-weight:800}
-    .flow{display:grid;gap:10px}.step{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:18px;background:rgba(200,155,60,.08);border:1px solid rgba(200,155,60,.16)}.num{display:grid;place-items:center;min-width:30px;height:30px;border-radius:10px;background:rgba(200,155,60,.18);color:var(--gold2);font-weight:950}
-    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.small{font-size:12px;color:var(--muted)}
-    .output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:130px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)}
-    footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}.stat{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#06101d;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.stat b{display:block;margin-top:4px;color:#fff;font-size:20px}
+    .matchgrid{display:grid;gap:10px}.match{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.match img,.miniChamp{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1)}.result{font-weight:950}.win{color:var(--green)}.loss{color:var(--red)}.kda{color:#fff;font-weight:900}.small{font-size:12px;color:var(--muted)}
+    .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
   </style>
 </head>
 <body>
@@ -43,91 +29,140 @@
     <header>
       <span class="eyebrow">⚔️ Krahnie LoL Arms Module</span>
       <h1>League Coach<br/>Command Center</h1>
-      <p class="lede">A static-site ready control panel for Riot IDs, match review prompts, current patch data, and the backend blueprint Krahnie needs to coach your climb from Gold to the next 100 LP.</p>
-      <div class="actions"><span class="pill">Current Data Dragon patch: <b id="patch">loading…</b></span><span class="pill">Static-safe now</span><span class="pill">Riot API proxy required for live match history</span></div>
+      <p class="lede">A static-site cockpit for Riot IDs, live Riot API pulls, recent ranked review, champion rotation, and copy-ready coaching prompts for Krahnie, ChatGPT, Claude, or any other AI coach.</p>
+      <div class="actions"><span class="pill">Data Dragon patch: <b id="patch">loading…</b></span><span class="pill good">Browser JS can call Riot with your local key</span><span class="pill bad">Never paste a key into a public repo</span></div>
     </header>
 
     <div class="grid two">
       <section>
         <h2>Summoner cockpit</h2>
-        <p class="muted">Enter a Riot ID. This page stores it locally and drafts the exact Krahnie coaching request. Live ranked/match pulls need a small secret-key proxy because GitHub Pages can’t safely hold a Riot API key.</p>
-        <label>Riot Game Name</label><input id="gameName" placeholder="Xenocide" />
-        <label>Tagline</label><input id="tagLine" placeholder="NA1" />
-        <label>Region / Routing</label><select id="region"><option value="americas|na1">NA — americas / na1</option><option value="europe|euw1">EUW — europe / euw1</option><option value="europe|eun1">EUNE — europe / eun1</option><option value="asia|kr">KR — asia / kr</option><option value="asia|jp1">JP — asia / jp1</option></select>
-        <label>Role focus</label><select id="role"><option>Jungle</option><option>Top</option><option>Mid</option><option>ADC</option><option>Support</option><option>Fill / unknown</option></select>
+        <p class="muted">Your API key stays in this browser’s localStorage and is only sent to Riot as an <code>api_key</code> query parameter. This static page does not contain or publish your key.</p>
+        <label>Riot API key <span class="small">local browser only</span></label><input id="apiKey" type="password" autocomplete="off" placeholder="RGAPI-…" />
+        <label>Riot ID</label><input id="riotId" value="OakIey#NA1" />
+        <label>Region / platform</label><select id="region"><option value="americas|na1">NA — americas / na1</option><option value="europe|euw1">EUW — europe / euw1</option><option value="europe|eun1">EUNE — europe / eun1</option><option value="asia|kr">KR — asia / kr</option><option value="asia|jp1">JP — asia / jp1</option></select>
+        <label>Role focus</label><select id="role"><option>Mid</option><option>Jungle</option><option>Top</option><option>ADC</option><option>Support</option><option>Fill / unknown</option></select>
         <label>Goal / question</label><textarea id="question">What do I need in the next 100 LP to win more League of Legends games in Gold?</textarea>
-        <div class="buttonrow"><button id="save">Save profile</button><button class="secondary" id="copyPrompt">Copy Krahnie prompt</button></div>
+        <div class="buttonrow"><button id="save">Save local profile</button><button id="loadLive">Pull Riot data</button><button class="secondary" id="copyPrompt">Copy coach prompt</button><button class="secondary" id="clearKey">Clear key</button></div>
         <div class="status" id="profileStatus"></div>
       </section>
 
       <section>
-        <h2>Krahnie coaching prompt</h2>
+        <h2>Copy-ready AI coach prompt</h2>
+        <p class="muted">Paste this into ChatGPT/Claude when you want another AI to review your Riot data without giving it the API key.</p>
         <div class="output" id="promptOut"></div>
       </section>
     </div>
+
+    <section style="margin-top:16px">
+      <h2>Live profile scan</h2>
+      <div class="stats" id="stats">
+        <div class="stat"><small>Riot ID</small><b>OakIey#NA1</b></div><div class="stat"><small>Rank</small><b>Not loaded</b></div><div class="stat"><small>Recent winrate</small><b>—</b></div><div class="stat"><small>Top pattern</small><b>—</b></div>
+      </div>
+      <div class="grid two">
+        <div><h3 style="margin-top:16px">Recent ranked games</h3><div class="matchgrid" id="matches"><p class="muted">Click “Pull Riot data” to load recent games.</p></div></div>
+        <div><h3 style="margin-top:16px">Champion mastery / rotation</h3><div class="api-list" id="mastery"><p class="muted">Mastery and free rotation show here.</p></div></div>
+      </div>
+    </section>
 
     <div class="grid two">
       <section>
         <h2>Available LoL data arms</h2>
         <div class="api-list">
-          <div class="api"><b>Riot Account-V1</b><br><span class="muted">Riot ID → PUUID lookup. Start here for GameName#TagLine.</span><br><span class="tag">official</span><span class="tag">needs API key</span></div>
-          <div class="api"><b>Match-V5</b><br><span class="muted">Recent match IDs and full timelines: champ, lane, build, CS, vision, deaths, objectives, damage, team comps.</span><br><span class="tag">official</span><span class="tag">best for coaching</span></div>
-          <div class="api"><b>League-V4</b><br><span class="muted">Ranked tier/division/LP/wins/losses by encrypted summoner ID.</span><br><span class="tag">official</span></div>
-          <div class="api"><b>Champion Mastery-V4</b><br><span class="muted">Comfort picks and mastery totals for champ-pool recommendations.</span><br><span class="tag">official</span></div>
-          <div class="api"><b>Spectator-V5</b><br><span class="muted">Current live game: teammates/enemies, bans, summoner spells, queue.</span><br><span class="tag">official</span><span class="tag">pre-game scout</span></div>
-          <div class="api"><b>Data Dragon + CommunityDragon</b><br><span class="muted">No-key patch assets, champion/item/rune text, images, ability data. Great for this static page.</span><br><span class="tag">public assets</span><span class="tag">no secret</span></div>
-          <div class="api"><b>Meta statistics</b><br><span class="muted">Riot does not publish aggregated win/pick/build meta. We can compute it from match samples or use human-readable public tier pages with attribution where allowed.</span><br><span class="tag">computed</span><span class="tag">policy-sensitive</span></div>
+          <div class="api"><b>Account-V1</b><br><span class="muted">Riot ID → PUUID. Required for modern match/profile flows.</span><br><span class="tag">official</span></div>
+          <div class="api"><b>Match-V5</b><br><span class="muted">Recent match IDs and full match details/timelines for coaching.</span><br><span class="tag">official</span><span class="tag">primary review source</span></div>
+          <div class="api"><b>League-V4 by PUUID</b><br><span class="muted">Ranked queue entries. Current Summoner-V4 responses may omit encrypted IDs, so PUUID endpoints are safer.</span><br><span class="tag">official</span></div>
+          <div class="api"><b>Champion-Mastery-V4</b><br><span class="muted">Comfort picks and old habits/pool identity.</span><br><span class="tag">official</span></div>
+          <div class="api"><b>Spectator-V5</b><br><span class="muted">Current game scout when you’re in-game.</span><br><span class="tag">official</span></div>
+          <div class="api"><b>Data Dragon</b><br><span class="muted">Patch data, champion images, and ids. No key required.</span><br><span class="tag">public assets</span></div>
         </div>
       </section>
       <section>
-        <h2>How Krahnie should coach the next 100 LP</h2>
-        <div class="flow">
-          <div class="step"><div class="num">1</div><div><b>Pull ranked identity</b><br><span class="muted">Riot ID → PUUID → summoner/league entries, current rank, LP trend.</span></div></div>
-          <div class="step"><div class="num">2</div><div><b>Review last 10–20 solo queue games</b><br><span class="muted">Detect role, champ pool, deaths before objectives, CS@10/15, vision, tempo, item/rune mismatch.</span></div></div>
-          <div class="step"><div class="num">3</div><div><b>Build Gold-specific win plan</b><br><span class="muted">One champion pool rule, one laning/jungle habit, one objective timer habit, one review drill.</span></div></div>
-          <div class="step"><div class="num">4</div><div><b>Live match scout</b><br><span class="muted">If Spectator-V5 sees you in champ select/in game: matchup warnings, win condition, first 8-minute plan.</span></div></div>
-        </div>
+        <h2>Current patch champion atlas</h2>
+        <input id="champSearch" placeholder="Filter champions…" />
+        <div class="champgrid" id="champs" style="margin-top:12px"></div>
       </section>
     </div>
 
-    <section style="margin-top:16px">
-      <h2>Current patch champion atlas <span class="small">(Data Dragon, no key)</span></h2>
-      <input id="champSearch" placeholder="Filter champions…" />
-      <div class="champgrid" id="champs" style="margin-top:12px"></div>
-    </section>
-
-    <footer>Built for tjonestj3/krahnie-artifacts. Riot API data requires compliance with Riot Developer policies and a private backend/proxy — never ship the API key in GitHub Pages JavaScript.</footer>
+    <footer>Built for tjonestj3/krahnie-artifacts. Riot data belongs behind a local key or private proxy; this page intentionally ships with no secrets.</footer>
   </main>
 
   <script>
     const $ = id => document.getElementById(id);
+    const routingMap = {na1:'americas', br1:'americas', la1:'americas', la2:'americas', oc1:'americas', euw1:'europe', eun1:'europe', tr1:'europe', ru:'europe', kr:'asia', jp1:'asia', ph2:'sea', sg2:'sea', th2:'sea', tw2:'sea', vn2:'sea'};
+    let champions=[], championByKey={}, championById={}, version='', latestScan=null;
     const state = JSON.parse(localStorage.getItem('krahnieLolProfile') || '{}');
-    for (const id of ['gameName','tagLine','region','role','question']) if (state[id]) $(id).value = state[id];
+    for (const id of ['apiKey','riotId','region','role','question']) if (state[id]) $(id).value = state[id];
+
+    function parseRiotId(){ const raw=$('riotId').value.trim(); const [gameName, tagLine='NA1'] = raw.split('#'); return {gameName:gameName.trim(), tagLine:tagLine.trim().toUpperCase()}; }
+    function selectedRegions(){ const [routing, platform] = $('region').value.split('|'); return {routing, platform}; }
+    function api(url, key){ const sep = url.includes('?') ? '&' : '?'; return fetch(`${url}${sep}api_key=${encodeURIComponent(key)}`).then(async r => { if(!r.ok) throw new Error(`${r.status} ${await r.text()}`); return r.json(); }); }
+    function champName(id){ return championByKey[String(id)]?.name || `Champion ${id}`; }
+    function champImgByName(name){ const c = champions.find(x => x.name === name || x.id === name); return c ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${c.image.full}` : ''; }
+    function champImgById(id){ const c = championByKey[String(id)]; return c ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${c.image.full}` : ''; }
+    function pct(n,d){ return d ? `${Math.round(n/d*100)}%` : '—'; }
+
+    function summarizeScan(scan){
+      if(!scan) return 'No live Riot data loaded yet.';
+      const wins = scan.matches.filter(m=>m.win).length;
+      const champs = [...new Set(scan.matches.map(m=>m.champion).filter(Boolean))];
+      const deaths = scan.matches.reduce((a,m)=>a+(m.deaths||0),0);
+      const avgDeaths = scan.matches.length ? (deaths/scan.matches.length).toFixed(1) : '—';
+      const ranked = scan.leagueEntries?.find(e=>e.queueType==='RANKED_SOLO_5x5');
+      return JSON.stringify({
+        riotId: `${scan.account.gameName}#${scan.account.tagLine}`,
+        platform: scan.platform, routing: scan.routing,
+        summonerLevel: scan.summoner?.summonerLevel,
+        soloQueue: ranked ? `${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP (${ranked.wins}W-${ranked.losses}L)` : 'No solo queue entry returned',
+        recentRanked: {games: scan.matches.length, wins, losses: scan.matches.length-wins, winrate: pct(wins, scan.matches.length), avgDeaths, champions},
+        recentMatches: scan.matches.map(m => ({champion:m.champion, role:m.role, win:m.win, kda:`${m.kills}/${m.deaths}/${m.assists}`, cs:m.cs, visionScore:m.visionScore, goldEarned:m.goldEarned, damageToChampions:m.damageToChampions})),
+        topMastery: (scan.mastery||[]).slice(0,5).map(m => ({champion: champName(m.championId), level:m.championLevel, points:m.championPoints}))
+      }, null, 2);
+    }
+
     function promptText(){
-      const [routing, platform] = $('region').value.split('|');
-      return `Krahnie LoL Coach request\nRiot ID: ${$('gameName').value || '[game name]'}#${$('tagLine').value || '[tag]'}\nRegion: routing=${routing}, platform=${platform}\nRole focus: ${$('role').value}\nQuestion: ${$('question').value}\n\nPlease pull: Account-V1 PUUID, League-V4 ranked entries, Champion-Mastery-V4 top champs, Match-V5 last 10 ranked solo queue matches + timelines, and Spectator-V5 if currently in game. Then coach me like a Gold player trying to gain the next 100 LP: 3 highest-leverage habits, champ/build/rune notes, death/objective pattern, and a one-session practice plan.`;
+      const {routing, platform}=selectedRegions(); const {gameName, tagLine}=parseRiotId();
+      return `You are a practical League of Legends solo queue coach. Coach me like a ${$('role').value} player trying to gain the next 100 LP, not like a generic esports analyst.\n\nPlayer: ${gameName || '[GameName]'}#${tagLine || '[TAG]'}\nRegion: ${platform} / ${routing}\nGoal: ${$('question').value}\n\nUse the Riot data below. Do not ask for my API key. Infer patterns from the data, label uncertainty, and avoid generic advice.\n\nReturn exactly this format:\n1. NEXT 100 LP WIN PLAN: 3 bullets only.\n2. BIGGEST LEAK: one specific behavior to stop doing.\n3. CHAMPION POOL RULE: what to lock/avoid for 5 games.\n4. GAME PLAN: first 8 minutes, midgame objective rule, late-game teamfight rule.\n5. REVIEW DRILL: what timestamps/events to review after each game.\n6. FIVE-GAME SCORECARD: measurable targets.\n\nRiot data snapshot:\n${summarizeScan(latestScan)}`;
     }
     function renderPrompt(){ $('promptOut').textContent = promptText(); }
-    ['gameName','tagLine','region','role','question'].forEach(id => $(id).addEventListener('input', renderPrompt));
-    $('save').onclick = () => { const profile={}; ['gameName','tagLine','region','role','question'].forEach(id=>profile[id]=$(id).value); localStorage.setItem('krahnieLolProfile', JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="ok">Saved locally.</span> Next step: wire a Riot API proxy or ask Krahnie in chat with this Riot ID.'; renderPrompt(); };
-    $('copyPrompt').onclick = async () => { await navigator.clipboard.writeText(promptText()); $('profileStatus').innerHTML='<span class="ok">Copied prompt.</span>'; };
-    renderPrompt();
 
-    let champions=[]; let version='';
     async function loadDDragon(){
+      const versions = await fetch('https://ddragon.leagueoflegends.com/api/versions.json').then(r=>r.json()); version = versions[0]; $('patch').textContent = version;
+      const data = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`).then(r=>r.json());
+      champions = Object.values(data.data).sort((a,b)=>a.name.localeCompare(b.name)); championByKey={}; championById={}; champions.forEach(c=>{championByKey[c.key]=c; championById[c.id]=c;}); renderChamps();
+    }
+    function renderChamps(){ const q=$('champSearch').value.toLowerCase(); $('champs').innerHTML = champions.filter(c => (c.name+' '+c.tags.join(' ')).toLowerCase().includes(q)).map(c => `<article class="champ"><img loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${c.id}_0.jpg" alt="${c.name}"><div><b>${c.name}</b><span class="small">${c.title}<br>${c.tags.join(' / ')}</span></div></article>`).join(''); }
+
+    async function pullLive(){
+      const key=$('apiKey').value.trim(); if(!key){ $('profileStatus').innerHTML='<span class="bad">Paste your Riot API key locally first.</span>'; return; }
+      const {gameName, tagLine}=parseRiotId(); const {routing, platform}=selectedRegions(); $('profileStatus').innerHTML='<span class="warn">Calling Riot APIs…</span>';
       try{
-        const versions = await fetch('https://ddragon.leagueoflegends.com/api/versions.json').then(r=>r.json());
-        version = versions[0]; $('patch').textContent = version;
-        const data = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`).then(r=>r.json());
-        champions = Object.values(data.data).sort((a,b)=>a.name.localeCompare(b.name));
-        renderChamps();
-      }catch(e){ $('patch').textContent='unavailable'; $('champs').innerHTML='<p class="bad">Could not load Data Dragon from this browser.</p>'; }
+        const account = await api(`https://${routing}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, key);
+        const puuid = account.puuid;
+        const [summoner, leagueEntries, mastery, rotation, ids] = await Promise.all([
+          api(`https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`, key),
+          api(`https://${platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${encodeURIComponent(puuid)}`, key),
+          api(`https://${platform}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(puuid)}/top`, key),
+          api(`https://${platform}.api.riotgames.com/lol/platform/v3/champion-rotations`, key),
+          api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?queue=420&start=0&count=10`, key)
+        ]);
+        const rawMatches = await Promise.all(ids.slice(0,10).map(id => api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/${id}`, key)));
+        const matches = rawMatches.map(match => { const info=match.info||{}; const me=(info.participants||[]).find(p=>p.puuid===puuid)||{}; return {matchId:match.metadata?.matchId, gameDurationSeconds:info.gameDuration, champion:me.championName, role:me.teamPosition||me.individualPosition, win:me.win, kills:me.kills, deaths:me.deaths, assists:me.assists, cs:(me.totalMinionsKilled||0)+(me.neutralMinionsKilled||0), goldEarned:me.goldEarned, damageToChampions:me.totalDamageDealtToChampions, visionScore:me.visionScore}; });
+        latestScan={routing, platform, account, summoner, leagueEntries, mastery, rotation, matches}; renderLive(); renderPrompt(); localStorage.setItem('krahnieLolLastScan', JSON.stringify(latestScan)); $('profileStatus').innerHTML='<span class="ok">Loaded Riot profile + recent ranked games. Prompt upgraded.</span>';
+      }catch(e){ $('profileStatus').innerHTML=`<span class="bad">Riot pull failed:</span> ${String(e.message||e).slice(0,320)}`; }
     }
-    function renderChamps(){
-      const q = $('champSearch').value.toLowerCase();
-      $('champs').innerHTML = champions.filter(c => (c.name+' '+c.tags.join(' ')).toLowerCase().includes(q)).map(c => `<article class="champ"><img loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${c.id}_0.jpg" alt="${c.name}"><div><b>${c.name}</b><span class="small">${c.title}<br>${c.tags.join(' / ')}</span></div></article>`).join('');
+    function renderLive(){
+      const s=latestScan; if(!s) return; const ranked=s.leagueEntries.find(e=>e.queueType==='RANKED_SOLO_5x5'); const wins=s.matches.filter(m=>m.win).length; const avgDeaths=s.matches.length?(s.matches.reduce((a,m)=>a+(m.deaths||0),0)/s.matches.length).toFixed(1):'—';
+      $('stats').innerHTML=`<div class="stat"><small>Riot ID</small><b>${s.account.gameName}#${s.account.tagLine}</b></div><div class="stat"><small>Rank</small><b>${ranked?`${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP`:'No solo entry'}</b></div><div class="stat"><small>Recent winrate</small><b>${wins}-${s.matches.length-wins} / ${pct(wins,s.matches.length)}</b></div><div class="stat"><small>Avg deaths</small><b>${avgDeaths}</b></div>`;
+      $('matches').innerHTML=s.matches.map(m=>`<article class="match"><img src="${champImgByName(m.champion)}" alt="${m.champion}"><div><div><b>${m.champion}</b> <span class="small">${m.role||'Role?'}</span></div><div class="small">CS ${m.cs??'—'} · Vision ${m.visionScore??'—'} · Damage ${m.damageToChampions??'—'}</div></div><div><div class="result ${m.win?'win':'loss'}">${m.win?'WIN':'LOSS'}</div><div class="kda">${m.kills}/${m.deaths}/${m.assists}</div></div></article>`).join('');
+      const free = (s.rotation?.freeChampionIds||[]).slice(0,8).map(id=>champName(id)).join(', ');
+      $('mastery').innerHTML = `<div class="api"><b>Top mastery</b><br>${s.mastery.slice(0,6).map(m=>`<span class="tag">${champName(m.championId)} · L${m.championLevel} · ${m.championPoints.toLocaleString()}</span>`).join('')}</div><div class="api"><b>Free rotation</b><br><span class="muted">${free}</span></div>`;
     }
-    $('champSearch').addEventListener('input', renderChamps); loadDDragon();
+
+    $('save').onclick=()=>{const profile={}; ['apiKey','riotId','region','role','question'].forEach(id=>profile[id]=$(id).value); localStorage.setItem('krahnieLolProfile',JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="ok">Saved locally in this browser.</span>'; renderPrompt();};
+    $('copyPrompt').onclick=async()=>{await navigator.clipboard.writeText(promptText()); $('profileStatus').innerHTML='<span class="ok">Copied upgraded coach prompt.</span>';};
+    $('clearKey').onclick=()=>{ $('apiKey').value=''; const profile=JSON.parse(localStorage.getItem('krahnieLolProfile')||'{}'); delete profile.apiKey; localStorage.setItem('krahnieLolProfile',JSON.stringify(profile)); $('profileStatus').innerHTML='<span class="warn">Local API key cleared.</span>';};
+    $('loadLive').onclick=pullLive; ['riotId','region','role','question'].forEach(id=>$(id).addEventListener('input',renderPrompt)); $('champSearch').addEventListener('input',renderChamps);
+    try{ latestScan=JSON.parse(localStorage.getItem('krahnieLolLastScan')||'null'); if(latestScan) renderLive(); }catch{} renderPrompt(); loadDDragon().catch(e=>{$('patch').textContent='unavailable'; $('champs').innerHTML='<p class="bad">Could not load Data Dragon.</p>';});
   </script>
 </body>
 </html>
