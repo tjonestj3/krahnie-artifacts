@@ -20,7 +20,7 @@
     button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--gold),#f0d48a);color:#111827;font-weight:950;padding:12px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(200,155,60,.22);min-height:44px} button.secondary{background:#12233a;color:var(--ink);border:1px solid rgba(10,200,255,.28);box-shadow:none}.buttonrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .api-list{display:grid;gap:10px}.api{padding:13px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.api b{color:#fff}.tag{display:inline-flex;margin:3px 5px 0 0;padding:4px 7px;border-radius:999px;background:rgba(10,200,255,.1);border:1px solid rgba(10,200,255,.18);color:#a8edff;font-size:12px;font-weight:800}
     .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}.stat{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#06101d;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.stat b{display:block;margin-top:4px;color:#fff;font-size:20px}
-    .matchgrid{display:grid;gap:10px}.match{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.match img,.miniChamp{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1)}.result{font-weight:950}.win{color:var(--green)}.loss{color:var(--red)}.kda{color:#fff;font-weight:900}.small{font-size:12px;color:var(--muted)}
+    .matchgrid{display:grid;gap:10px}.match{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(7,17,31,.72);border:1px solid rgba(255,255,255,.08)}.matchCard{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(7,17,31,.72);overflow:hidden}.matchCard summary{list-style:none;cursor:pointer}.matchCard summary::-webkit-details-marker{display:none}.matchCard[open]{border-color:rgba(10,200,255,.32);box-shadow:0 0 0 1px rgba(10,200,255,.08)}.matchDetails{padding:0 12px 12px 82px;color:var(--muted);font-size:13px}.detailgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}@media(min-width:760px){.detailgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}.detail{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#06101d;padding:8px}.detail b{display:block;color:#fff}.match img,.miniChamp{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1)}.result{font-weight:950}.win{color:var(--green)}.loss{color:var(--red)}.kda{color:#fff;font-weight:900}.small{font-size:12px;color:var(--muted)}
     .champgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;max-height:420px;overflow:auto;padding-right:4px}.champ{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:#07111f}.champ img{width:100%;aspect-ratio:1.78;object-fit:cover;display:block}.champ div{padding:9px}.champ b{display:block}.promptDetails{margin-top:2px}.promptDetails summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(10,200,255,.24);background:#07111f;border-radius:16px;padding:13px 14px;cursor:pointer;color:#fff;font-weight:950}.promptDetails summary::-webkit-details-marker{display:none}.promptDetails summary:after{content:'Show prompt';color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.promptDetails[open] summary{margin-bottom:12px}.promptDetails[open] summary:after{content:'Hide prompt'}.output{white-space:pre-wrap;background:#06101d;border:1px solid rgba(10,200,255,.18);border-radius:18px;padding:14px;color:#dcecff;line-height:1.45;min-height:180px}.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--green)}.warn{color:var(--gold2)}.bad{color:var(--red)} code{color:#c7f4ff}.hide{display:none!important} footer{color:#7d8ca5;text-align:center;margin:28px 0 0;font-size:13px}
   </style>
 </head>
@@ -105,26 +105,43 @@
     function pct(n,d){ return d ? `${Math.round(n/d*100)}%` : '—'; }
 
     function summarizeScan(scan){
-      if(!scan) return 'No live Riot data loaded yet.';
-      const wins = scan.matches.filter(m=>m.win).length;
-      const champs = [...new Set(scan.matches.map(m=>m.champion).filter(Boolean))];
-      const deaths = scan.matches.reduce((a,m)=>a+(m.deaths||0),0);
-      const avgDeaths = scan.matches.length ? (deaths/scan.matches.length).toFixed(1) : '—';
+      if(!scan) return 'No live Riot match data loaded yet.';
+      const matches = scan.matches || [];
+      const wins = matches.filter(m=>m.win).length;
+      const champs = [...new Set(matches.map(m=>m.champion).filter(Boolean))];
+      const deaths = matches.reduce((a,m)=>a+(m.deaths||0),0);
+      const avgDeaths = matches.length ? (deaths/matches.length).toFixed(1) : '—';
       const ranked = scan.leagueEntries?.find(e=>e.queueType==='RANKED_SOLO_5x5');
       return JSON.stringify({
-        riotId: `${scan.account.gameName}#${scan.account.tagLine}`,
-        platform: scan.platform, routing: scan.routing,
-        summonerLevel: scan.summoner?.summonerLevel,
-        soloQueue: ranked ? `${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP (${ranked.wins}W-${ranked.losses}L)` : 'No solo queue entry returned',
-        recentRanked: {games: scan.matches.length, wins, losses: scan.matches.length-wins, winrate: pct(wins, scan.matches.length), avgDeaths, champions},
-        recentMatches: scan.matches.map(m => ({champion:m.champion, role:m.role, win:m.win, kda:`${m.kills}/${m.deaths}/${m.assists}`, cs:m.cs, visionScore:m.visionScore, goldEarned:m.goldEarned, damageToChampions:m.damageToChampions})),
-        topMastery: (scan.mastery||[]).slice(0,5).map(m => ({champion: champName(m.championId), level:m.championLevel, points:m.championPoints}))
+        coachingFocus: 'Recent ranked games only. Prioritize repeated gameplay leaks over account trivia.',
+        player: `${scan.account.gameName}#${scan.account.tagLine}`,
+        rankContext: ranked ? `${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP (${ranked.wins}W-${ranked.losses}L)` : 'No solo queue entry returned',
+        recentRankedPattern: {games: matches.length, wins, losses: matches.length-wins, winrate: pct(wins, matches.length), avgDeaths, champions},
+        recentGameDetails: matches.map((m,i) => ({
+          game: i+1,
+          champion:m.champion,
+          role:m.role,
+          result:m.win?'WIN':'LOSS',
+          duration:m.duration,
+          kda:`${m.kills}/${m.deaths}/${m.assists}`,
+          killParticipation:m.killParticipation,
+          cs:m.cs,
+          csPerMinute:m.csPerMinute,
+          visionScore:m.visionScore,
+          controlWards:m.controlWards,
+          goldEarned:m.goldEarned,
+          damageToChampions:m.damageToChampions,
+          damageTaken:m.damageTaken,
+          objectiveHint:m.objectiveHint,
+          items:m.items
+        })),
+        reviewRequest: 'Find the 1-2 biggest repeatable leaks, then give a five-game drill and scorecard.'
       }, null, 2);
     }
 
     function promptText(){
       const {routing, platform}=selectedRegions(); const {gameName, tagLine}=parseRiotId();
-      return `You are a practical League of Legends solo queue coach. Coach me like a ${$('role').value} player trying to gain the next 100 LP, not like a generic esports analyst.\n\nPlayer: ${gameName || '[GameName]'}#${tagLine || '[TAG]'}\nRegion: ${platform} / ${routing}\nGoal: ${$('question').value}\n\nUse the Riot data below. Do not ask for my API key. Infer patterns from the data, label uncertainty, and avoid generic advice.\n\nReturn exactly this format:\n1. NEXT 100 LP WIN PLAN: 3 bullets only.\n2. BIGGEST LEAK: one specific behavior to stop doing.\n3. CHAMPION POOL RULE: what to lock/avoid for 5 games.\n4. GAME PLAN: first 8 minutes, midgame objective rule, late-game teamfight rule.\n5. REVIEW DRILL: what timestamps/events to review after each game.\n6. FIVE-GAME SCORECARD: measurable targets.\n\nRiot data snapshot:\n${summarizeScan(latestScan)}`;
+      return `You are a practical League of Legends solo queue coach. Coach me like a ${$('role').value} player trying to gain the next 100 LP, not like a generic esports analyst.\n\nPlayer: ${gameName || '[GameName]'}#${tagLine || '[TAG]'}\nRegion: ${platform} / ${routing}\nGoal: ${$('question').value}\n\nUse the recent ranked match details below. Do not ask for my API key. Do not over-focus on account level/mastery; infer patterns from the recent games, label uncertainty, and avoid generic advice.\n\nReturn exactly this format:\n1. NEXT 100 LP WIN PLAN: 3 bullets only.\n2. BIGGEST REPEATING LEAK: one specific behavior to stop doing, backed by match evidence.\n3. CHAMPION / ROLE RULE: what to lock or avoid for the next 5 games.\n4. GAME PLAN: first 8 minutes, midgame objective rule, late-game teamfight rule.\n5. REVIEW DRILL: what timestamps/events to review after each game.\n6. FIVE-GAME SCORECARD: measurable targets for deaths, CS/min, KP, vision/objectives.\n\nRecent match-review snapshot:\n${summarizeScan(latestScan)}`;
     }
     function renderPrompt(){ $('promptOut').textContent = promptText(); }
 
@@ -149,14 +166,52 @@
           api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?queue=420&start=0&count=10`, key)
         ]);
         const rawMatches = await Promise.all(ids.slice(0,10).map(id => api(`https://${routing}.api.riotgames.com/lol/match/v5/matches/${id}`, key)));
-        const matches = rawMatches.map(match => { const info=match.info||{}; const me=(info.participants||[]).find(p=>p.puuid===puuid)||{}; return {matchId:match.metadata?.matchId, gameDurationSeconds:info.gameDuration, champion:me.championName, role:me.teamPosition||me.individualPosition, win:me.win, kills:me.kills, deaths:me.deaths, assists:me.assists, cs:(me.totalMinionsKilled||0)+(me.neutralMinionsKilled||0), goldEarned:me.goldEarned, damageToChampions:me.totalDamageDealtToChampions, visionScore:me.visionScore}; });
+        const matches = rawMatches.map(match => {
+          const info=match.info||{};
+          const me=(info.participants||[]).find(p=>p.puuid===puuid)||{};
+          const myTeam=(info.participants||[]).filter(p=>p.teamId===me.teamId);
+          const teamKills=myTeam.reduce((a,p)=>a+(p.kills||0),0);
+          const mins=Math.max((info.gameDuration||0)/60, 1);
+          const teams=info.teams||[];
+          const myTeamObj=teams.find(t=>t.teamId===me.teamId)?.objectives||{};
+          const enemyTeamObj=teams.find(t=>t.teamId!==me.teamId)?.objectives||{};
+          const objectiveHint=`Towers ${myTeamObj.tower?.kills??'—'}-${enemyTeamObj.tower?.kills??'—'}, dragons ${myTeamObj.dragon?.kills??'—'}-${enemyTeamObj.dragon?.kills??'—'}, barons ${myTeamObj.baron?.kills??'—'}-${enemyTeamObj.baron?.kills??'—'}`;
+          const items=[0,1,2,3,4,5,6].map(i=>me[`item${i}`]).filter(Boolean);
+          const cs=(me.totalMinionsKilled||0)+(me.neutralMinionsKilled||0);
+          return {
+            matchId:match.metadata?.matchId,
+            duration:`${Math.round(mins)}m`,
+            gameDurationSeconds:info.gameDuration,
+            champion:me.championName,
+            role:me.teamPosition||me.individualPosition,
+            lane:me.lane,
+            win:me.win,
+            kills:me.kills,
+            deaths:me.deaths,
+            assists:me.assists,
+            killParticipation:teamKills ? `${Math.round(((me.kills||0)+(me.assists||0))/teamKills*100)}%` : '—',
+            cs,
+            csPerMinute:(cs/mins).toFixed(1),
+            goldEarned:me.goldEarned,
+            damageToChampions:me.totalDamageDealtToChampions,
+            damageTaken:me.totalDamageTaken,
+            visionScore:me.visionScore,
+            wardsPlaced:me.wardsPlaced,
+            controlWards:me.detectorWardsPlaced,
+            summonerSpells:`${me.summoner1Id||'—'} / ${me.summoner2Id||'—'}`,
+            largestKillingSpree:me.largestKillingSpree,
+            firstBloodKill:me.firstBloodKill,
+            objectiveHint,
+            items
+          };
+        });
         latestScan={routing, platform, account, summoner, leagueEntries, mastery, rotation, matches}; renderLive(); renderPrompt(); localStorage.setItem('krahnieLolLastScan', JSON.stringify(latestScan)); $('profileStatus').innerHTML='<span class="ok">Loaded Riot profile + recent ranked games. Prompt upgraded.</span>';
       }catch(e){ $('profileStatus').innerHTML=`<span class="bad">Riot pull failed:</span> ${String(e.message||e).slice(0,320)}`; }
     }
     function renderLive(){
       const s=latestScan; if(!s) return; const ranked=s.leagueEntries.find(e=>e.queueType==='RANKED_SOLO_5x5'); const wins=s.matches.filter(m=>m.win).length; const avgDeaths=s.matches.length?(s.matches.reduce((a,m)=>a+(m.deaths||0),0)/s.matches.length).toFixed(1):'—';
       $('stats').innerHTML=`<div class="stat"><small>Riot ID</small><b>${s.account.gameName}#${s.account.tagLine}</b></div><div class="stat"><small>Rank</small><b>${ranked?`${ranked.tier} ${ranked.rank} ${ranked.leaguePoints} LP`:'No solo entry'}</b></div><div class="stat"><small>Recent winrate</small><b>${wins}-${s.matches.length-wins} / ${pct(wins,s.matches.length)}</b></div><div class="stat"><small>Avg deaths</small><b>${avgDeaths}</b></div>`;
-      $('matches').innerHTML=s.matches.map(m=>`<article class="match"><img src="${champImgByName(m.champion)}" alt="${m.champion}"><div><div><b>${m.champion}</b> <span class="small">${m.role||'Role?'}</span></div><div class="small">CS ${m.cs??'—'} · Vision ${m.visionScore??'—'} · Damage ${m.damageToChampions??'—'}</div></div><div><div class="result ${m.win?'win':'loss'}">${m.win?'WIN':'LOSS'}</div><div class="kda">${m.kills}/${m.deaths}/${m.assists}</div></div></article>`).join('');
+      $('matches').innerHTML=s.matches.map((m,i)=>`<details class="matchCard"><summary><article class="match"><img src="${champImgByName(m.champion)}" alt="${m.champion}"><div><div><b>${i+1}. ${m.champion}</b> <span class="small">${m.role||'Role?'} · ${m.duration||'—'} · click for details</span></div><div class="small">CS ${m.cs??'—'}${m.csPerMinute?` (${m.csPerMinute}/min)`:''} · KP ${m.killParticipation||'—'} · Vision ${m.visionScore??'—'} · Damage ${m.damageToChampions??'—'}</div></div><div><div class="result ${m.win?'win':'loss'}">${m.win?'WIN':'LOSS'}</div><div class="kda">${m.kills}/${m.deaths}/${m.assists}</div></div></article></summary><div class="matchDetails"><div>${m.objectiveHint||'Objective info unavailable'} · Match ${m.matchId||'—'}</div><div class="detailgrid"><div class="detail"><span>Gold</span><b>${m.goldEarned??'—'}</b></div><div class="detail"><span>Damage taken</span><b>${m.damageTaken??'—'}</b></div><div class="detail"><span>Control wards</span><b>${m.controlWards??'—'}</b></div><div class="detail"><span>Spree / FB</span><b>${m.largestKillingSpree??'—'} / ${m.firstBloodKill?'yes':'no'}</b></div></div><div class="small" style="margin-top:8px">Items: ${(m.items||[]).join(', ') || 'not loaded'} · Summoner spells: ${m.summonerSpells||'—'}</div></div></details>`).join('');
       const free = (s.rotation?.freeChampionIds||[]).slice(0,8).map(id=>champName(id)).join(', ');
       $('mastery').innerHTML = `<div class="api"><b>Top mastery</b><br>${s.mastery.slice(0,6).map(m=>`<span class="tag">${champName(m.championId)} · L${m.championLevel} · ${m.championPoints.toLocaleString()}</span>`).join('')}</div><div class="api"><b>Free rotation</b><br><span class="muted">${free}</span></div>`;
     }
