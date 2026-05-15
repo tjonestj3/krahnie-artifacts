@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-05-15 Prototype Vision — Neon Duel: Mage vs Fighter</title>
+<style>
+  :root{--bg:#09051a;--ink:#f8f3ff;--cyan:#35f6ff;--pink:#ff3df2;--gold:#ffd24a;--green:#62ff8e;--red:#ff4f6d;--violet:#8b5cff;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 30% 10%,#24115c 0,#09051a 42%,#03020a 100%);color:var(--ink);font-family:Courier New,monospace;line-height:1.45;overflow-x:hidden}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35;z-index:9}
+  .wrap{max-width:1120px;margin:auto;padding:28px}.panel{border:3px solid var(--cyan);background:rgba(7,8,28,.82);box-shadow:0 0 22px rgba(53,246,255,.45),inset 0 0 30px rgba(255,61,242,.12);border-radius:18px;padding:22px;margin:18px 0}.hero{text-align:center;border-color:var(--pink);position:relative;overflow:hidden}.kicker{color:var(--gold);letter-spacing:.22em;text-transform:uppercase}.title{font-size:clamp(36px,7vw,82px);margin:10px 0;text-shadow:4px 4px 0 #000,0 0 18px var(--pink),0 0 30px var(--cyan)}.vision{font-size:20px;color:#d8fff8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{padding:16px;border:2px solid rgba(255,255,255,.18);background:linear-gradient(135deg,rgba(255,61,242,.16),rgba(53,246,255,.09));border-radius:14px;min-height:150px}.card b{color:var(--gold)}.tag{display:inline-block;margin:4px 4px 0 0;padding:2px 7px;border:1px solid var(--cyan);color:var(--cyan);font-size:12px;border-radius:999px}.arena{position:relative;height:430px;background:linear-gradient(#130831,#08051a);border:4px solid #fff;border-radius:16px;overflow:hidden;box-shadow:inset 0 -80px 70px rgba(255,61,242,.12)}.floor{position:absolute;left:4%;right:4%;bottom:45px;height:34px;background:repeating-linear-gradient(90deg,#2b154d 0 22px,#3e1c6f 22px 44px);border:3px solid var(--gold);box-shadow:0 0 15px var(--gold)}.plat{position:absolute;height:18px;background:#1b7f92;border:2px solid var(--cyan);box-shadow:0 0 14px var(--cyan)}.p1{left:13%;top:168px;width:190px}.p2{right:13%;top:130px;width:160px}.cover{position:absolute;bottom:79px;left:48%;width:48px;height:70px;background:#331d5e;border:3px solid #bda8ff}.mage,.fighter{position:absolute;bottom:82px;width:58px;height:92px}.mage{left:18%;filter:drop-shadow(0 0 14px var(--cyan))}.fighter{right:18%;filter:drop-shadow(0 0 14px var(--red))}.head{width:32px;height:32px;margin:0 auto;background:var(--ink);border:3px solid #000}.body{width:44px;height:52px;margin:auto;border:3px solid #000}.mage .body{background:linear-gradient(var(--cyan),var(--violet))}.fighter .body{background:linear-gradient(var(--red),#5a1522)}.hat{width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:36px solid var(--pink);margin:auto}.sword{position:absolute;right:-30px;top:38px;width:58px;height:8px;background:var(--gold);transform:rotate(-22deg);box-shadow:0 0 12px var(--gold)}.orb{position:absolute;left:35%;bottom:150px;width:34px;height:34px;border-radius:50%;background:var(--cyan);box-shadow:0 0 22px 8px var(--cyan)}.slash{position:absolute;right:32%;bottom:140px;width:80px;height:80px;border:8px solid transparent;border-left-color:var(--red);border-radius:50%;transform:rotate(30deg);filter:drop-shadow(0 0 14px var(--red))}.particle{position:absolute;width:8px;height:8px;background:var(--pink);box-shadow:0 0 10px var(--pink);animation:float 3s infinite alternate}.particle:nth-child(1){left:31%;top:40%;}.particle:nth-child(2){left:59%;top:35%;background:var(--gold)}.particle:nth-child(3){left:47%;top:58%;background:var(--green)}@keyframes float{to{transform:translateY(-22px) translateX(14px)}}.ui{position:absolute;left:25px;right:25px;top:22px;display:flex;gap:20px;justify-content:space-between}.bar{width:42%;height:24px;border:2px solid #fff;background:#111}.bar span{display:block;height:100%}.magebar span{width:68%;background:linear-gradient(90deg,var(--cyan),var(--pink))}.fightbar span{width:74%;background:linear-gradient(90deg,var(--red),var(--gold))}.meter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:var(--green);text-shadow:0 0 12px var(--green)}h2{color:var(--cyan);text-shadow:0 0 12px var(--cyan)}ul{padding-left:22px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:720px){.cols{grid-template-columns:1fr}.arena{height:360px}.mage{left:8%}.fighter{right:8%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="panel hero">
+    <div class="kicker">Daily Krahnie-adjacent arcade spark · May 15, 2026</div>
+    <h1 class="title">SPELLCLASH: IRON & ARCANA</h1>
+    <p class="vision">A retro 2D PvP duel where a fragile, screen-control mage and a fearless close-range fighter trade reads, parries, bursts, and tiny moments of absurd arcade magic.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Today's inspiration signals</h2>
+    <div class="grid">
+      <div class="card"><b>Mad King Redemption</b><br>Fresh Early Access pixel-art roguelite brawler coverage emphasizes readable melee chaos, co-op, and launch-trailer momentum.<br><span class="tag">pixel brawler</span><span class="tag">hit impact</span><span class="tag">EA marketing</span></div>
+      <div class="card"><b>Mage Arena</b><br>Voice-cast PvP wizard duels keep proving that one memorable input gimmick can carry chaotic clips and social sharing.<br><span class="tag">spell identity</span><span class="tag">PvP chaos</span></div>
+      <div class="card"><b>Combo Devils</b><br>A small-team fighter pitching traditional + platform-fighter DNA with co-op roguelite content suggests a low-pressure onboarding lane beside sweaty versus.<br><span class="tag">hybrid fighter</span><span class="tag">casual bridge</span></div>
+      <div class="card"><b>World Heroes Perfect rollback news</b><br>Even classic arcade fighters are being reintroduced around rollback, practice features, and modern competitive expectations.<br><span class="tag">rollback</span><span class="tag">training tools</span></div>
+      <div class="card"><b>Steam Next Fest June 2026</b><br>The official event is near; a focused demo with GIF-able duels, readable VFX, and fast rematches is the wishlist engine.<br><span class="tag">demo funnel</span><span class="tag">community</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Prototype arena sketch</h2>
+    <div class="arena" aria-label="CSS arena sketch: mage, fighter, projectile, platforms, cover, UI bars">
+      <div class="ui"><div class="bar magebar"><span></span></div><div class="bar fightbar"><span></span></div></div>
+      <i class="particle"></i><i class="particle"></i><i class="particle"></i>
+      <div class="plat p1"></div><div class="plat p2"></div><div class="cover"></div><div class="orb"></div><div class="slash"></div>
+      <div class="mage"><div class="hat"></div><div class="head"></div><div class="body"></div></div>
+      <div class="fighter"><div class="head"></div><div class="body"></div><div class="sword"></div></div>
+      <div class="floor"></div><div class="meter">MANA SURGE READY · GUARD CRACK WARNING</div>
+    </div>
+  </section>
+
+  <section class="panel cols">
+    <div>
+      <h2>Mechanic of the day: Reflect Window Duel</h2>
+      <p><b>Controls:</b> Mage: Cast / Blink / Ward. Fighter: Slash / Dash / Parry.</p>
+      <p><b>Rules:</b> Mage firebolt travels slowly and owns space. Fighter parry has a 10-frame perfect window that reflects it as a fast gold bolt; late parry becomes chip block and pushes fighter back.</p>
+      <p><b>Win condition:</b> Best of 5 stocks, 60-second rounds, instant rematch.</p>
+      <p><b>Test:</b> Can both players understand “perfect reflect vs safe block” from color, hitstop, sound, and knockback without tutorial text?</p>
+    </div>
+    <div>
+      <h2>Juice checklist</h2>
+      <ul>
+        <li>Palette-flash characters cyan/gold/red on cast, perfect parry, guard crack.</li>
+        <li>8-frame hitstop on reflect; 3-frame rumble/screen nudge on blocked spell.</li>
+        <li>Projectile trail uses chunky 2x2 pixels, never same hue as health UI.</li>
+        <li>Round start callout: “READ THE HAND, NOT THE HAT!”</li>
+        <li>Training toggle: show parry window ghost boxes and rollback ping badge.</li>
+        <li>Clip-bait end screen: spell reflected distance, parry timing, rematch button pulsing.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+</body>
+</html>
