@@ -9,6 +9,7 @@ VIEW_EXTS = {".html", ".htm", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", 
 BAD_PARTS = {"prompts", "__pycache__"}
 LABELS = {
     "prototypes": "Playable Prototypes",
+    "inspo": "Inspiration Lab",
     "game-dev-research": "Game Dev Research HTML Prototypes",
     "mtg-guides": "MTG Deck Guides",
     "html-sites": "HTML Sites",
@@ -22,7 +23,7 @@ LABELS = {
 def is_game_dev_research_prototype(path: Path) -> bool:
     rel_parts = path.relative_to(ROOT).parts if path.is_relative_to(ROOT) else path.parts
     return (
-        "reports" in rel_parts
+        ("reports" in rel_parts or "inspo" in rel_parts)
         and "indie-pvp-retro-inspo" in rel_parts
         and path.suffix.lower() in {".html", ".htm"}
         and "prototype" in path.name.lower()
@@ -108,7 +109,9 @@ files.sort(key=sort_key)
 cards_by_section = {}
 for p in files:
     rel = p.relative_to(ROOT)
-    if is_game_dev_research_prototype(p):
+    if "inspo" in rel.parts:
+        section = "inspo"
+    elif is_game_dev_research_prototype(p):
         section = "game-dev-research"
     elif is_mtg_guide(p):
         section = "mtg-guides"
@@ -116,7 +119,7 @@ for p in files:
         section = rel.parts[1] if len(rel.parts) > 1 else "other"
     cards_by_section.setdefault(section, []).append(p)
 
-featured = cards_by_section.get("mtg-guides", [])[:2] + cards_by_section.get("prototypes", [])[:3] + cards_by_section.get("game-dev-research", [])[:3]
+featured = cards_by_section.get("mtg-guides", [])[:2] + cards_by_section.get("prototypes", [])[:3] + cards_by_section.get("inspo", [])[:2] + cards_by_section.get("game-dev-research", [])[:1]
 if len(featured) < 8:
     featured += [p for p in files if p not in featured][: 8 - len(featured)]
 
@@ -137,7 +140,7 @@ def card_html(p: Path) -> str:
 
 featured_html = "\n".join(card_html(p) for p in featured) or '<p class="empty">No artifacts yet.</p>'
 sections_html = []
-for section in ["mtg-guides", "prototypes", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
+for section in ["mtg-guides", "prototypes", "inspo", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue

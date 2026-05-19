@@ -7,9 +7,10 @@ OUT_DIR="$HERMES_AGENT_DIR/outputs"
 COMIC_DIR="$HERMES_AGENT_DIR/comic"
 WIKI_NOTE="$HOME/agent-krahn-sdk-build/docs/system-wiki/14-krahnie-process-orchestrator.md"
 XENOS_ROYALE_WEB="$HOME/game-lab/projects/xenos-royale-prototype/export/web"
+SPELL_DUEL_WEB="$HOME/game-lab/projects/spell-duel/export/web"
 
 cd "$REPO_DIR"
-mkdir -p artifacts/html-sites artifacts/reports artifacts/comics artifacts/media artifacts/docs
+mkdir -p artifacts/html-sites artifacts/reports artifacts/inspo/game-dev artifacts/comics artifacts/media artifacts/docs
 
 copy_dir_if_exists() {
   local src="$1"
@@ -41,11 +42,11 @@ if [ -d "$OUT_DIR/ai-news" ]; then
   echo "synced ai-news reports"
 fi
 
-# Daily indie/PvP prototype HTML reports.
+# Daily indie/PvP prototype inspiration HTML reports.
 if [ -d "$OUT_DIR/indie-pvp-retro-inspo" ]; then
-  mkdir -p artifacts/reports/indie-pvp-retro-inspo
-  rsync -a --delete "$OUT_DIR/indie-pvp-retro-inspo"/ "artifacts/reports/indie-pvp-retro-inspo"/
-  echo "synced indie-pvp-retro-inspo reports"
+  mkdir -p artifacts/inspo/game-dev/indie-pvp-retro-inspo
+  rsync -a --delete "$OUT_DIR/indie-pvp-retro-inspo"/ "artifacts/inspo/game-dev/indie-pvp-retro-inspo"/
+  echo "synced indie-pvp-retro-inspo inspiration reports"
 fi
 
 # Generated comics.
@@ -53,6 +54,7 @@ copy_dir_if_exists "$COMIC_DIR" "artifacts/comics"
 
 # Playable browser prototypes / web exports.
 copy_dir_if_exists "$XENOS_ROYALE_WEB" "artifacts/prototypes/xenos-royale-prototype"
+copy_dir_if_exists "$SPELL_DUEL_WEB" "artifacts/prototypes/spell-duel"
 
 # Media and source scripts from outputs root. Keep folders above in their semantic homes.
 if [ -d "$OUT_DIR" ]; then
