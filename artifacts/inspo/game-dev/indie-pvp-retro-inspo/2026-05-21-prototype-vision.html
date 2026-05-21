@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-05-21 Prototype Vision — Neon Duel: Mage vs Fighter</title>
+<style>
+  :root{
+    --bg:#090712; --ink:#f7e9ff; --muted:#a99cc7; --mage:#7df7ff; --mage2:#b05cff;
+    --fighter:#ffd35c; --fighter2:#ff596f; --acid:#9dff6a; --panel:#171128; --line:#3a275f;
+  }
+  *{box-sizing:border-box} body{margin:0;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:radial-gradient(circle at 30% 0%,#261346,transparent 42%),linear-gradient(180deg,#080611,#12081e 60%,#06030c);min-height:100vh;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35;z-index:9}
+  body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 90px #000;border-radius:18px;z-index:10}
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 18px 60px}.hero{border:3px solid var(--line);background:linear-gradient(135deg,rgba(125,247,255,.10),rgba(255,89,111,.08)),#100b20;padding:24px;box-shadow:0 0 0 4px #080611,0 0 34px rgba(176,92,255,.35);position:relative;overflow:hidden}.hero:before{content:"⚡ ✦ ✹ ✦ ⚔";position:absolute;right:16px;top:8px;color:rgba(157,255,106,.28);font-size:42px;letter-spacing:8px}h1{margin:0 0 10px;font-size:clamp(30px,6vw,66px);line-height:.95;text-transform:uppercase;text-shadow:4px 4px 0 #000,0 0 18px var(--mage)}.tag{font-size:18px;color:#fff}.date{display:inline-block;margin-top:12px;padding:7px 10px;background:#000;border:2px solid var(--acid);color:var(--acid)}
+  h2{margin:28px 0 14px;font-size:24px;color:var(--acid);text-shadow:2px 2px #000}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:2px solid var(--line);padding:14px;min-height:150px;box-shadow:5px 5px 0 #05030a}.card b{color:#fff}.card .src{font-size:12px;color:var(--muted);margin-top:8px}.chip{display:inline-block;border:1px solid currentColor;padding:2px 6px;margin:0 4px 6px 0;font-size:11px;color:var(--mage)}
+  .arena{position:relative;height:430px;border:4px solid #4b3676;background:linear-gradient(#140d28,#0b0717);box-shadow:0 0 35px rgba(125,247,255,.15),inset 0 0 60px #000;overflow:hidden}.arena:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(125,247,255,.07) 1px,transparent 1px),linear-gradient(0deg,rgba(125,247,255,.05) 1px,transparent 1px);background-size:32px 32px}.hud{position:absolute;left:18px;right:18px;top:16px;display:flex;gap:16px;align-items:center}.bar{height:18px;border:2px solid #fff;background:#080611;flex:1;box-shadow:3px 3px #000}.bar span{display:block;height:100%}.magebar span{width:72%;background:linear-gradient(90deg,var(--mage),var(--mage2))}.fightbar span{width:64%;background:linear-gradient(90deg,var(--fighter),var(--fighter2))}.timer{background:#000;border:2px solid var(--acid);padding:5px 10px;color:var(--acid);font-size:22px}.floor,.plat,.cover{position:absolute;background:#2b2148;border:3px solid #6e54a3;box-shadow:0 6px #07040e}.floor{left:40px;right:40px;bottom:38px;height:34px}.plat{width:170px;height:26px}.p1{left:150px;top:245px}.p2{right:150px;top:190px}.cover{width:58px;height:80px;left:520px;bottom:72px;background:#1c3142;border-color:#54a3ff}.sprite{position:absolute;width:42px;height:58px;bottom:72px;filter:drop-shadow(0 0 10px currentColor)}.mage{left:205px;color:var(--mage)}.fighter{right:220px;color:var(--fighter)}.sprite:before{content:"";position:absolute;left:11px;top:0;width:20px;height:20px;background:currentColor;box-shadow:0 20px currentColor, -10px 28px currentColor, 10px 28px currentColor,0 42px currentColor}.mage:after{content:"✦";position:absolute;left:-24px;top:-30px;color:var(--mage);font-size:30px;animation:pulse 1s infinite alternate}.fighter:after{content:"▰";position:absolute;right:-23px;top:18px;color:#fff;font-size:26px;transform:rotate(-25deg);text-shadow:0 0 8px var(--fighter)}.bolt{position:absolute;left:300px;bottom:120px;width:210px;height:10px;background:linear-gradient(90deg,var(--mage),transparent);box-shadow:0 0 18px var(--mage);transform:skewX(-25deg)}.slash{position:absolute;right:290px;bottom:112px;width:92px;height:92px;border:7px solid transparent;border-right-color:var(--fighter2);border-top-color:var(--fighter);border-radius:50%;transform:rotate(35deg);filter:drop-shadow(0 0 12px var(--fighter))}.particle{position:absolute;width:8px;height:8px;background:var(--acid);box-shadow:0 0 10px var(--acid)}.a{left:470px;bottom:148px}.b{left:585px;bottom:180px;background:var(--mage)}.c{right:350px;bottom:210px;background:var(--fighter2)}@keyframes pulse{to{transform:scale(1.25);opacity:.65}}
+  .grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}@media(max-width:850px){.grid2{grid-template-columns:1fr}.arena{height:390px}.p2{right:70px}.fighter{right:120px}.cover{left:46%}}.panel{background:var(--panel);border:2px solid var(--line);padding:16px;box-shadow:5px 5px #05030a}.panel ul{margin:8px 0 0 20px;padding:0}.panel li{margin:8px 0}.kbd{background:#05030a;border:1px solid #68509b;padding:1px 5px;color:#fff}.juice{columns:2}@media(max-width:700px){.juice{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>Neon Duel Cabinet</h1>
+    <div class="tag">A readable, rollback-minded 2D arena brawler where a tricksy spellcaster zones space while a brave fighter converts parries, cover, and movement bursts into explosive melee wins.</div>
+    <div class="date">Prototype vision seeded from indie signals — 2026-05-21</div>
+  </section>
+
+  <h2>Today's inspiration signals</h2>
+  <div class="cards">
+    <article class="card"><span class="chip">pixel art impact</span><span class="chip">neon clarity</span><br><b>Kusan: City of Wolves</b> coverage highlighted cyberpunk pixel art that “pops” with gunfire/blood color contrast. Steal the idea: every attack family gets a loud palette lane.</article>
+    <article class="card"><span class="chip">community scale</span><span class="chip">Steam funnel</span><br><b>Soulbound</b> announced a Steam version after building a 1M-player web MMO. Small-team lesson: use browser/demo accessibility first, then convert community into wishlists.</article>
+    <article class="card"><span class="chip">hero kits</span><span class="chip">fast combat</span><br><b>Drakantos</b> beta sign-up pitches 20+ pixel heroes with unique mechanics. For mage-vs-fighter: fewer characters, but two deeply asymmetric toolboxes with visible roles.</article>
+    <article class="card"><span class="chip">rollback</span><span class="chip">UGC</span><br><b>Fraymakers</b> keeps platform-fighter promises front-and-center: local 4P, rollback, assists, and custom content. Message technical trust and creator hooks early.</article>
+    <article class="card"><span class="chip">tiny arena</span><span class="chip">obstacles</span><br><b>Game Jolt’s Green Square</b> is a fresh 2D arena/platform action listing built around hazards and a rival. Even simple shapes can test spacing, traps, and line-of-sight fast.</article>
+  </div>
+
+  <h2>Prototype arena sketch</h2>
+  <div class="arena" aria-label="CSS arena sketch showing mage, fighter, projectiles, platforms, cover, and UI bars">
+    <div class="hud"><div class="bar magebar"><span></span></div><div class="timer">45</div><div class="bar fightbar"><span></span></div></div>
+    <div class="plat p1"></div><div class="plat p2"></div><div class="cover"></div><div class="floor"></div>
+    <div class="sprite mage" title="Mage"></div><div class="sprite fighter" title="Fighter"></div>
+    <div class="bolt"></div><div class="slash"></div><i class="particle a"></i><i class="particle b"></i><i class="particle c"></i>
+  </div>
+
+  <div class="grid2">
+    <section class="panel">
+      <h2>Mechanic of the day: Prism Parry Lane</h2>
+      <p><b>Controls:</b> Mage <span class="kbd">A</span> quick bolt, <span class="kbd">S</span> prism trap, <span class="kbd">D</span> blink. Fighter <span class="kbd">J</span> slash, <span class="kbd">K</span> parry, <span class="kbd">L</span> shoulder dash.</p>
+      <ul>
+        <li><b>Rules:</b> Mage bolts travel in cyan lanes; fighter parry reflects only if the shield color matches the incoming lane.</li>
+        <li><b>Win condition:</b> First to 3 stocks or most stocks after 60 seconds.</li>
+        <li><b>Test:</b> Can spectators read “unsafe spell → parry flash → punish dash” in under one second?</li>
+      </ul>
+    </section>
+    <section class="panel">
+      <h2>Juice checklist</h2>
+      <ul class="juice">
+        <li>6-frame hitstop on parry, 3-frame on block.</li><li>Palette flash: cyan magic, amber steel, magenta danger.</li><li>Screen-edge warning arrows for off-screen blinks.</li><li>CRT bass thump when timer drops below 10.</li><li>Chunky dust puffs on dash-cancel landings.</li><li>UI bars shake only on real damage, not block chip.</li><li>Reflected projectile changes silhouette, not just color.</li><li>Post-round “one reason you lost” stat: whiffed parries, trap damage, corner time.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+</body>
+</html>
