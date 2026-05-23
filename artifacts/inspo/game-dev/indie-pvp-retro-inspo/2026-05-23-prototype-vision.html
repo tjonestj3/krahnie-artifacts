@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prototype Vision — Neon Grimoire Duel</title>
+<style>
+  :root{--bg:#090612;--panel:#171126;--ink:#fff7d6;--cyan:#39f6ff;--pink:#ff3df2;--gold:#ffd84a;--red:#ff5266;--green:#54ff9f;--violet:#8a5cff;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 30% 10%,#241044 0,#090612 42%,#030208 100%);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.02em;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.55;z-index:20} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 120px #000, inset 0 0 35px rgba(57,246,255,.12);z-index:21}
+  .wrap{max-width:1100px;margin:auto;padding:34px 18px 60px}.hero{border:4px solid var(--cyan);box-shadow:0 0 0 4px #000,0 0 32px var(--cyan), inset 0 0 30px rgba(255,61,242,.18);background:linear-gradient(135deg,rgba(255,61,242,.18),rgba(57,246,255,.08));padding:28px;text-align:center;position:relative;overflow:hidden}.hero:before{content:"✦ ✧ ✦";position:absolute;left:18px;top:12px;color:var(--gold);text-shadow:0 0 10px var(--gold)}.hero:after{content:"⚔︎ ☄︎ ⚔︎";position:absolute;right:18px;bottom:12px;color:var(--pink);text-shadow:0 0 10px var(--pink)}
+  h1{font-size:clamp(30px,6vw,62px);line-height:.95;margin:8px 0;text-shadow:4px 4px #000,0 0 18px var(--pink)} h2{color:var(--gold);text-shadow:3px 3px #000;margin:30px 0 14px}.tag{font-size:18px;color:#d8fbff}.meta{color:#a8a0c9;font-size:13px;margin-top:10px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.cards .card:last-child{grid-column:1/-1}}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card,.section{background:linear-gradient(180deg,rgba(23,17,38,.96),rgba(10,8,18,.96));border:2px solid #4d3d79;box-shadow:0 8px 0 #05030a,0 0 20px rgba(138,92,255,.18);padding:14px}.card b{color:var(--cyan)}.card a{color:var(--pink)}.card p{font-size:13px;line-height:1.35;color:#ddd6ff}.pill{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:2px 7px;margin-bottom:8px;font-size:11px;background:#1b1330}
+  .arena{height:430px;position:relative;overflow:hidden;border:4px solid #6a56a4;background:linear-gradient(#151038 0 65%,#231330 65% 100%);box-shadow:inset 0 0 60px #000,0 0 30px rgba(57,246,255,.2)}.moon{position:absolute;right:70px;top:42px;width:70px;height:70px;border-radius:50%;background:var(--gold);box-shadow:0 0 34px var(--gold)}.plat{position:absolute;height:18px;background:#4a3b72;border:3px solid #a78cff;box-shadow:0 6px #08050f}.p1{left:70px;top:235px;width:210px}.p2{right:80px;top:185px;width:180px}.cover{position:absolute;left:485px;bottom:82px;width:65px;height:86px;background:#24385b;border:3px solid var(--cyan);box-shadow:0 0 14px var(--cyan)}.floor{position:absolute;left:0;right:0;bottom:55px;height:32px;background:repeating-linear-gradient(90deg,#3a2555 0 28px,#2a1a44 28px 56px);border-top:4px solid var(--pink)}
+  .hud{position:absolute;left:18px;right:18px;top:14px;display:flex;gap:14px;z-index:5}.bar{flex:1;background:#08050f;border:2px solid #fff;padding:4px}.fill{height:14px;background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 10px var(--cyan)}.bar:nth-child(2) .fill{margin-left:auto;background:linear-gradient(90deg,var(--pink),var(--red));width:76%}.label{font-size:11px;color:#fff;margin-top:2px}.sprite{position:absolute;width:42px;height:62px;bottom:86px;filter:drop-shadow(0 0 12px currentColor)}.mage{left:185px;color:var(--cyan)}.fighter{right:205px;color:var(--pink)}.head{width:26px;height:22px;margin:auto;background:currentColor;border:3px solid #fff}.body{width:38px;height:35px;margin:0 auto;background:#111;border:3px solid currentColor}.mage .body:after{content:"";display:block;width:56px;height:16px;margin:10px 0 0 -9px;background:linear-gradient(90deg,var(--cyan),transparent);clip-path:polygon(0 0,100% 50%,0 100%)}.fighter .body:after{content:"";display:block;width:60px;height:10px;margin:8px 0 0 -52px;background:linear-gradient(90deg,transparent,var(--gold),#fff);transform:rotate(-15deg)}.orb{position:absolute;left:315px;bottom:130px;width:22px;height:22px;border-radius:50%;background:var(--cyan);box-shadow:0 0 18px var(--cyan),40px -14px 0 -6px var(--cyan),77px 4px 0 -8px var(--cyan)}.slash{position:absolute;right:275px;bottom:135px;width:85px;height:85px;border:8px solid transparent;border-right-color:var(--gold);border-top-color:var(--gold);border-radius:50%;transform:rotate(35deg);box-shadow:0 0 12px var(--gold)}.parry{position:absolute;left:535px;bottom:155px;color:#fff;font-size:32px;text-shadow:0 0 10px #fff,0 0 20px var(--pink);animation:blink 1s infinite}.spark{position:absolute;width:6px;height:6px;background:var(--gold);box-shadow:0 0 10px var(--gold)}.s1{left:520px;bottom:190px}.s2{left:570px;bottom:160px}.s3{left:555px;bottom:220px}@keyframes blink{50%{opacity:.35;transform:scale(1.18)}}
+  .mechanic{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}@media(max-width:800px){.mechanic{grid-template-columns:1fr}} code{background:#05030a;color:var(--green);padding:2px 5px;border:1px solid #315}.check{columns:2}@media(max-width:700px){.check{columns:1}} li{margin:8px 0;line-height:1.35}.footer{color:#9f95c8;text-align:center;margin-top:24px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="pill">2026-05-23 • daily indie signal scan</div>
+    <h1>NEON GRIMOIRE DUEL</h1>
+    <div class="tag">A tiny-screen, big-sparks arena fighter where a zoning mage and a rushdown blade-bruiser fight over space, tempo, and one glorious parry flash.</div>
+    <div class="meta">Fresh 24–72h news was thin today, so this vision blends current Steam/itch signals with the best relevant finds from the last ~1–2 weeks.</div>
+  </section>
+
+  <h2>Today's inspiration signals</h2>
+  <section class="grid cards">
+    <article class="card"><span class="pill">Pixel arena</span><b>MythClash</b><p>Steam describes a fast-paced pixel-art arena fighter about mythical warriors and legendary powers — a useful north star for readable silhouettes plus culturally distinct ability kits.</p><a href="https://store.steampowered.com/app/3760800/MythClash/">source</a></article>
+    <article class="card"><span class="pill">Projectile party</span><b>MAGE Demo</b><p>The itch/Steam snippets pitch fast local/online 4-player projectile fighting with a single-stick control idea; strong reminder that spell games can be simple to pick up but hard to master.</p><a href="https://store.steampowered.com/app/4650140/MAGE_Mega_Awesome_Gregarious_Encounters_Demo/">source</a></article>
+    <article class="card"><span class="pill">Accessible fighter</span><b>Starkheim Tournament</b><p>A fantasy pixel-art 2D fighter emphasizing simplified controls and quick mastery — perfect pressure to keep mage-vs-fighter inputs compact.</p><a href="https://store.steampowered.com/app/1231070/Starkheim_Tournament/">source</a></article>
+    <article class="card"><span class="pill">Couch tactic</span><b>Memo Gallery 1.1</b><p>Even a calm memory game added same-device multiplayer; small indies can revive attention with local modes, quick updates, and clear devlog framing.</p><a href="https://baricci.itch.io/memo-gallery/devlog/1515331/devlog-2-update-110-local-multiplayer-more">source</a></article>
+    <article class="card"><span class="pill">FGC baseline</span><b>Rollback + tools</b><p>Avatar Legends marketing highlights rollback/crossplay plus training tools like hitboxes and frame data — competitive credibility now starts before release.</p><a href="https://store.steampowered.com/app/2424420/Avatar_Legends_The_Fighting_Game/">source</a></article>
+  </section>
+
+  <h2>Prototype arena sketch</h2>
+  <section class="arena" aria-label="CSS pixel arena mockup">
+    <div class="hud"><div class="bar"><div class="fill" style="width:84%"></div><div class="label">MAGE HP • MANA 3/5 • BLINK READY</div></div><div class="bar"><div class="fill"></div><div class="label" style="text-align:right">FIGHTER HP • GUARD 2/3 • DASH HOT</div></div></div>
+    <div class="moon"></div><div class="plat p1"></div><div class="plat p2"></div><div class="cover"></div><div class="floor"></div>
+    <div class="sprite mage"><div class="head"></div><div class="body"></div></div><div class="orb"></div><div class="parry">PERFECT!</div><div class="spark s1"></div><div class="spark s2"></div><div class="spark s3"></div><div class="slash"></div><div class="sprite fighter"><div class="head"></div><div class="body"></div></div>
+  </section>
+
+  <h2>Mechanic of the day: Mirror-Guard Parry</h2>
+  <section class="section mechanic">
+    <div><p><b>Controls:</b> Mage uses <code>Move</code>, <code>Light Bolt</code>, <code>Charge Rune</code>, <code>Blink</code>. Fighter uses <code>Move</code>, <code>Slash</code>, <code>Guard/Parry</code>, <code>Dash</code>.</p><p><b>Rules:</b> Fighter guard blocks weak bolts but drains guard. A 7-frame perfect parry reflects the next projectile as a slow golden orb. Mage can blink-cancel a charged rune, but blink becomes punishable if used through a reflected orb.</p><p><b>Win condition:</b> Best-of-5 stocks; rounds should resolve in 35–55 seconds with at least one dramatic space reversal.</p></div>
+    <div><p><b>What to test today:</b></p><ul><li>Can the fighter advance without feeling helpless?</li><li>Does the mage have a readable tell before charge?</li><li>Is parry success obvious in one frame: freeze, palette flash, sound, knockback?</li><li>Can a new player understand the HUD after one round?</li></ul></div>
+  </section>
+
+  <h2>Juice checklist</h2>
+  <section class="section check"><ul><li>2-frame white flash on parry, then pink/cyan palette split.</li><li>Projectile trails use shape language: circles = mage-owned, diamonds = reflected danger.</li><li>Hitstop: 3f light, 7f heavy, 11f perfect parry.</li><li>CRT edge vignette only outside playfield; keep hitboxes clean.</li><li>Landing dust differs by class: rune motes for mage, stone chips for fighter.</li><li>Audio callouts: tiny crowd “ooo!” on reflected kill, bass duck on super flash.</li><li>Post-round card: “Space Won,” “Parries Hit,” “Mana Wasted” for shareable clips.</li><li>Marketing micro-beat: weekly GIF of one matchup question, not a giant feature dump.</li></ul></section>
+  <div class="footer">Saved for local browser viewing • no external assets • Krahnie-adjacent arcade spell-sparks.</div>
+</div>
+</body>
+</html>
