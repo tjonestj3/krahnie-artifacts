@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-05-24 Prototype Vision — Neon Duel Grimoire</title>
+<style>
+  :root{--bg:#090414;--ink:#f7f4ff;--muted:#b9a9df;--mage:#38f6ff;--fighter:#ff3d8b;--gold:#ffe66d;--acid:#7dff6a;--panel:#171028;--line:#442a72;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#2a1455 0,#090414 45%,#030109 100%);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em;min-height:100vh;overflow-x:hidden}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.045) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35;z-index:20} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 100px #000,inset 0 0 30px #38f6ff33;border-radius:2vw;z-index:21}
+  .wrap{max-width:1120px;margin:auto;padding:36px 18px 60px}.hero{border:4px solid var(--line);background:linear-gradient(135deg,#161026dd,#261242dd);box-shadow:0 0 0 4px #07030e,0 0 38px #38f6ff55;border-radius:20px;padding:28px;text-align:center;position:relative;overflow:hidden}.hero:before{content:"✦ ✧ ✦";position:absolute;inset:auto 0 10px;color:#ffffff22;font-size:80px;letter-spacing:.4em}.kicker{color:var(--gold);text-transform:uppercase;font-size:13px}.hero h1{font-size:clamp(34px,7vw,72px);margin:8px 0;text-shadow:4px 4px 0 #000,0 0 16px var(--mage),0 0 22px var(--fighter)}.vision{font-size:18px;color:#fff;max-width:840px;margin:12px auto 0;line-height:1.45}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}.card{background:linear-gradient(180deg,#1d1531,#100b1d);border:2px solid #624096;border-radius:14px;padding:14px;min-height:150px;box-shadow:0 8px 0 #050208}.card h3{font-size:15px;margin:0 0 8px;color:var(--gold)}.card p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}.section-title{display:inline-block;margin:34px 0 12px;padding:8px 14px;border:2px solid var(--gold);background:#12091e;color:var(--gold);box-shadow:4px 4px 0 #000;text-transform:uppercase}.arena{position:relative;height:420px;border:5px solid #5b3b93;background:linear-gradient(#120927,#160c2f 55%,#231144 56%,#10071c);box-shadow:0 0 28px #38f6ff44, inset 0 0 55px #000;border-radius:18px;overflow:hidden}.hud{position:absolute;top:14px;left:18px;right:18px;display:flex;gap:16px;z-index:3}.bar{flex:1;height:26px;border:3px solid #fff;background:#160819;box-shadow:3px 3px 0 #000}.fill{height:100%;background:linear-gradient(90deg,var(--mage),#9affff);width:72%}.bar.f .fill{background:linear-gradient(90deg,var(--fighter),#ffb13d);width:81%}.name{font-size:12px;margin-top:4px;color:#fff;text-shadow:2px 2px #000}.platform{position:absolute;background:#33205c;border:3px solid #8b67d8;box-shadow:0 8px 0 #08030f}.p1{left:72px;bottom:82px;width:305px;height:24px}.p2{right:82px;bottom:148px;width:230px;height:24px}.p3{left:424px;bottom:236px;width:210px;height:20px}.cover{position:absolute;left:505px;bottom:82px;width:56px;height:80px;background:#231e3f;border:3px solid #ffe66d;box-shadow:0 0 18px #ffe66d55}.sprite{position:absolute;width:48px;height:76px;bottom:106px;filter:drop-shadow(0 0 12px currentColor)}.mage{left:180px;color:var(--mage)}.fighter{right:200px;color:var(--fighter);transform:scaleX(-1)}.head{width:30px;height:28px;margin:auto;background:currentColor;border:4px solid #fff;box-shadow:0 0 0 3px #000}.body{width:42px;height:42px;margin:3px auto;background:currentColor;border:4px solid #120816}.mage .body{clip-path:polygon(50% 0,100% 100%,0 100%)}.fighter .body{border-radius:8px}.staff,.sword{position:absolute;background:#fff;box-shadow:0 0 12px currentColor}.staff{width:8px;height:86px;left:-7px;top:4px}.sword{width:10px;height:92px;right:-12px;top:2px;transform:rotate(-18deg)}.orb{position:absolute;border-radius:50%;background:var(--mage);box-shadow:0 0 12px var(--mage),0 0 28px var(--mage);width:24px;height:24px;left:285px;bottom:170px;animation:float 1.2s infinite alternate}.slash{position:absolute;right:285px;bottom:180px;width:92px;height:92px;border:10px solid transparent;border-right-color:var(--fighter);border-radius:50%;transform:rotate(-20deg);filter:drop-shadow(0 0 10px var(--fighter))}.particle{position:absolute;width:8px;height:8px;background:var(--gold);box-shadow:0 0 10px var(--gold)}.a{left:395px;bottom:202px}.b{left:450px;bottom:145px;background:var(--acid)}.c{left:620px;bottom:210px;background:var(--fighter)}@keyframes float{to{transform:translate(20px,-12px)}}.mechanic,.juice{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.box{border:3px solid #624096;background:#140d24;border-radius:16px;padding:18px;box-shadow:0 8px 0 #050208}.box h3{margin-top:0;color:var(--mage)}.box li{margin:8px 0;color:#dbcfff;line-height:1.35}.pill{display:inline-block;border:2px solid #fff;padding:4px 8px;margin:3px;background:#06030b;color:#fff;box-shadow:2px 2px 0 #000}.footer{margin-top:28px;color:#8d7ab4;font-size:12px;text-align:center} a{color:#7dffea}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.mechanic,.juice{grid-template-columns:1fr}.arena{height:360px}.card{min-height:auto}}@media(max-width:560px){.grid{grid-template-columns:1fr}.sprite{transform:scale(.8)}.fighter{transform:scaleX(-1) scale(.8)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="kicker">Daily Krahnie-adjacent arcade spark • May 24, 2026</div>
+    <h1>NEON DUEL GRIMOIRE</h1>
+    <p class="vision">A retro 2D PvP duel where a fragile screen-control mage and a rushdown sword fighter trade space, reads, parries, and pixel fireworks in 90-second arena rounds.</p>
+  </section>
+
+  <h2 class="section-title">Today's inspiration signals</h2>
+  <div class="grid">
+    <article class="card"><h3>Six One Indie: 61-game signal burst</h3><p>Fresh showcase coverage highlights demos, wishlists, and compact trailers: small teams are selling clear hooks fast. Prototype implication: make every clip readable in 3 seconds.</p></article>
+    <article class="card"><h3>Fraymakers: assists + mod ecosystem</h3><p>Its platform-fighter pitch centers 4-player chaos, assists, custom content, and infinite community play. Prototype implication: add one “summoned familiar” assist without bloating core duels.</p></article>
+    <article class="card"><h3>2DRoyale: quick knockback PvP</h3><p>Mobile arena brawler framing: fast real-time matches where every hit changes ring-out danger. Prototype implication: test short rounds and strong positional consequence.</p></article>
+    <article class="card"><h3>Little Fighter 2 Remastered: LAN nostalgia</h3><p>Classic brawler remaster markets local network play up to 8 computers and extravagant moves. Prototype implication: couch/LAN-first can be a retro feature, not a compromise.</p></article>
+    <article class="card"><h3>Super Tilt Bro: rollback on NES spirit</h3><p>NES homebrew with Wi-Fi/rollback proves “retro” and modern online expectations can coexist. Prototype implication: design deterministic, rollback-friendly combat from day one.</p></article>
+  </div>
+
+  <h2 class="section-title">Prototype arena sketch</h2>
+  <div class="arena" aria-label="CSS prototype arena with mage, fighter, projectiles, cover, platforms, and HUD">
+    <div class="hud"><div><div class="bar"><div class="fill"></div></div><div class="name">MAGE MP 72% • CHARGE READY</div></div><div><div class="bar f"><div class="fill"></div></div><div class="name">FIGHTER HP 81% • PARRY FLASH</div></div></div>
+    <div class="platform p1"></div><div class="platform p2"></div><div class="platform p3"></div><div class="cover"></div>
+    <div class="sprite mage"><div class="staff"></div><div class="head"></div><div class="body"></div></div>
+    <div class="sprite fighter"><div class="sword"></div><div class="head"></div><div class="body"></div></div>
+    <div class="orb"></div><div class="slash"></div><div class="particle a"></div><div class="particle b"></div><div class="particle c"></div>
+  </div>
+
+  <h2 class="section-title">Mechanic of the day — Spell Catch Parry</h2>
+  <div class="mechanic">
+    <div class="box"><h3>Controls + rules</h3><ul><li><span class="pill">Mage: A</span> tap bolt, hold to charge slow orb, <span class="pill">B</span> blink-dodge with 18f recovery.</li><li><span class="pill">Fighter: A</span> slash, <span class="pill">B</span> 10-frame parry stance. Perfect parry catches a bolt and stores it as a one-shot sword beam.</li><li>Charged orbs cannot be stored, but parry splits them into two weaker ricochets.</li><li>Win condition: first to 3 stocks or highest stocks after 90 seconds. Ring-outs deal one stock; health-out causes stun into launch.</li></ul></div>
+    <div class="box"><h3>What to test today</h3><ul><li>Does the mage feel clever without becoming pure keepaway?</li><li>Can the fighter advance through spells with skill, not guesswork?</li><li>Are parry flash, hitstop, and projectile ownership readable on a tiny pixel screen?</li><li>Target: 20 duel reps, log “unfair” moments only.</li></ul></div>
+  </div>
+
+  <h2 class="section-title">Juice checklist</h2>
+  <div class="juice">
+    <div class="box"><h3>Feel + readability</h3><ul><li>Palette-flash owner colors: cyan mage shots, magenta returned shots, gold perfect parry ring.</li><li>3-frame hitstop on light hits, 8-frame hitstop on parry catch, screen nudge only on stock loss.</li><li>Different silhouettes: mage triangle cloak, fighter square armor; never rely on color alone.</li><li>Spell trails fade in chunky 8-bit squares so collision path remains legible.</li></ul></div>
+    <div class="box"><h3>Audio + community</h3><ul><li>Call-and-response SFX: wand “plink,” shield “clack,” returned beam “BWIP.”</li><li>Record GIF-sized clips of one mechanic per day; end each with a Steam/Discord wishlist CTA.</li><li>Name test builds like arcade cabinets: “Parry Cabinet v0.1.”</li></ul></div>
+  </div>
+  <p class="footer">Grounded in fresh/recent web signals from Six One Indie Showcase coverage, Fraymakers, 2DRoyale, Little Fighter 2 Remastered, Super Tilt Bro, and related indie PvP search results.</p>
+</div>
+</body>
+</html>
