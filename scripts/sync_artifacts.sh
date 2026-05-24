@@ -10,6 +10,9 @@ XENOS_ROYALE_WEB="$HOME/game-lab/projects/xenos-royale-prototype/export/web"
 SPELL_DUEL_WEB="$HOME/game-lab/projects/spell-duel/export/web"
 
 cd "$REPO_DIR"
+# Start from the latest remote state so the daily watchdog does not fail when
+# GitHub Pages/manual artifact updates land between runs.
+git pull --rebase --autostash origin main
 mkdir -p artifacts/html-sites artifacts/reports artifacts/inspo/game-dev artifacts/comics artifacts/media artifacts/docs
 
 copy_dir_if_exists() {
