@@ -1,0 +1,13 @@
+# Morning AI TL;DR — 2026-05-25
+
+Fresh, high-signal AI news was relatively light over the holiday/weekend window, so today’s brief includes the most relevant recent updates from the last ~48 hours plus a few still-actionable releases from the past week.
+
+- **Google kept I/O’s agent push in the spotlight** — its developer keynote roundup highlights Gemini 3.5, Antigravity 2.0, and agent tools for building/migrating apps, signaling that “agent platform + dev workflow” is now a core cloud battleground. [Source](https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/)
+- **Gemini 3 Flash reached Gemini CLI** — Google says the model raises the baseline for high-frequency terminal coding tasks and works with CLI auto-routing, useful for dev teams standardizing AI coding workflows. [Source](https://developers.googleblog.com/gemini-3-flash-is-now-available-in-gemini-cli/?ref=apidog.com)
+- **Salesforce’s Summer ’26 release leans into human/agent orchestration** — new AI, data, and automation features target enterprise teams trying to operationalize Agentforce-style workflows rather than run isolated copilots. [Source](https://www.salesforce.com/news/stories/summer-2026-product-release-announcement/)
+- **Salesforce announced Slackbot GA as a personal work agent** — positioning Slack as the “front door” to the agentic enterprise is strategically important for builders who live in CRM + collaboration data. [Source](https://investor.salesforce.com/news/news-details/2026/Salesforce-Announces-the-General-Availability-of-Slackbot--Your-Personal-Agent-for-Work/default.aspx)
+- **AI-agent security stayed hot after new RCE research** — Microsoft’s recent writeup shows how prompt injection in agent frameworks can become remote code execution, a practical warning for MCP/tool-using agent deployments. [Source](https://www.microsoft.com/en-us/security/blog/2026/05/07/prompts-become-shells-rce-vulnerabilities-ai-agent-frameworks/)
+- **Developer supply-chain risk is expanding into AI workflows** — Socket reported a TrapDoor campaign across npm/PyPI/crates that explicitly targets developer assistants and AI projects, reinforcing the need to sandbox coding agents and audit dependencies. [Source](https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates)
+- **Alibaba’s Qwen 3.7 launch is drawing attention for long-horizon agents** — coverage points to Qwen3.7-Max/Plus with a larger context window and agent benchmark focus, worth watching if you rely on non-US model/API optionality. [Source](https://www.aimadetools.com/blog/qwen-3-7-complete-guide/)
+
+**Worth watching:** The near-term edge is shifting from “best model” to “safest, cheapest agent workflow wired into the tools where work already happens.”
