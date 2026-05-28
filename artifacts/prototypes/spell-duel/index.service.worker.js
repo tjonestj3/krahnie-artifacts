@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1779213756|2708744';
+const CACHE_VERSION = '1779927068|1892900';
 /** @type {string} */
 const CACHE_PREFIX = 'Spell Duel-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
