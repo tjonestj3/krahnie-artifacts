@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spell Duel — Anatomy of a LAN Netcode Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070214;
+    --bg2:#0c0524;
+    --panel:rgba(18,9,40,0.66);
+    --ink:#e8e2ff;
+    --dim:#9a8fc8;
+    --cyan:#37f5ff;
+    --mag:#ff3ca6;
+    --pur:#b06cff;
+    --lime:#5dff9b;
+    --amber:#ffd23c;
+    --line:rgba(176,108,255,0.22);
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --body:"Rajdhani",sans-serif;
+    --disp:"Audiowide",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(255,60,166,0.10), transparent 60%),
+      radial-gradient(1000px 800px at 10% 20%, rgba(55,245,255,0.08), transparent 55%),
+      linear-gradient(160deg,var(--bg),#0a0420 60%, #060312);
+    color:var(--ink);
+    font-family:var(--body);
+    font-weight:400;
+    font-size:18px;
+    line-height:1.6;
+    letter-spacing:.2px;
+    overflow-x:hidden;
+    cursor:none;
+  }
+  body::before{ /* scanlines */
+    content:"";position:fixed;inset:0;z-index:9990;pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;opacity:.55;
+  }
+  body::after{ /* grain */
+    content:"";position:fixed;inset:0;z-index:9991;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* reticle cursor */
+  #reticle{position:fixed;top:0;left:0;width:26px;height:26px;z-index:9999;pointer-events:none;
+    transform:translate(-50%,-50%);transition:width .15s,height .15s,border-color .15s}
+  #reticle::before,#reticle::after{content:"";position:absolute;inset:0;border-radius:50%}
+  #reticle::before{border:1.5px solid var(--cyan);box-shadow:0 0 10px var(--cyan),inset 0 0 6px rgba(55,245,255,.4)}
+  #reticle::after{width:3px;height:3px;background:var(--mag);box-shadow:0 0 8px var(--mag);top:50%;left:50%;transform:translate(-50%,-50%)}
+  #reticle.hot{width:40px;height:40px}
+  #reticle.hot::before{border-color:var(--mag);box-shadow:0 0 14px var(--mag)}
+
+  /* scroll progress */
+  #prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:9998;
+    background:linear-gradient(90deg,var(--cyan),var(--pur),var(--mag));box-shadow:0 0 12px var(--cyan)}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+  /* ---------- HERO ---------- */
+  header.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+  .hero .grid{position:absolute;inset:0;z-index:0;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:54px 54px;mask-image:radial-gradient(circle at 50% 42%, #000 30%, transparent 78%)}
+  .hero .inner{position:relative;z-index:2}
+  .kicker{font-family:var(--mono);font-size:13px;letter-spacing:6px;text-transform:uppercase;color:var(--cyan);
+    opacity:0;animation:fade .8s .1s forwards}
+  h1{font-family:var(--disp);font-size:clamp(46px,9vw,118px);line-height:.94;margin:14px 0 8px;letter-spacing:1px}
+  h1 .s1{color:var(--cyan);text-shadow:0 0 18px rgba(55,245,255,.55),0 0 42px rgba(55,245,255,.28)}
+  h1 .s2{color:var(--mag);text-shadow:0 0 18px rgba(255,60,166,.55),0 0 42px rgba(255,60,166,.28)}
+  h1 .l{display:inline-block;opacity:0;transform:translateY(40px) rotate(-6deg);animation:drop .7s cubic-bezier(.2,.9,.25,1) forwards}
+  .sub{font-size:clamp(19px,2.4vw,26px);color:var(--dim);max-width:640px;font-weight:300;opacity:0;animation:fade .9s .9s forwards}
+  .sub b{color:var(--ink);font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px;opacity:0;animation:fade .9s 1.1s forwards}
+  .chip{font-family:var(--mono);font-size:12.5px;letter-spacing:1px;padding:7px 13px;border:1px solid var(--line);
+    border-radius:2px;color:var(--dim);background:rgba(176,108,255,.06)}
+  .chip b{color:var(--cyan);font-weight:600}
+  .scrollhint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;
+    letter-spacing:3px;color:var(--dim);z-index:2;opacity:0;animation:fade 1s 1.6s forwards}
+  .scrollhint span{display:block;text-align:center;font-size:20px;animation:bob 1.8s ease-in-out infinite}
+
+  @keyframes drop{to{opacity:1;transform:translateY(0) rotate(0)}}
+  @keyframes fade{to{opacity:1}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+  /* ---------- NAV ---------- */
+  nav#dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:14px}
+  nav#dots a{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--dim);opacity:.5;transition:.25s;position:relative}
+  nav#dots a:hover,nav#dots a.on{opacity:1;border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  nav#dots a span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--mono);
+    font-size:11px;letter-spacing:1px;color:var(--cyan);opacity:0;pointer-events:none;transition:.2s}
+  nav#dots a:hover span{opacity:1}
+  @media(max-width:760px){nav#dots{display:none}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:88px 0;position:relative}
+  .seg{opacity:0;transform:translateY(38px);transition:opacity .7s,transform .7s}
+  .seg.in{opacity:1;transform:none}
+  .ghostnum{position:absolute;right:0;top:34px;font-family:var(--disp);font-size:clamp(80px,16vw,200px);
+    color:transparent;-webkit-text-stroke:1px rgba(176,108,255,.12);z-index:0;pointer-events:none;line-height:1}
+  .label{font-family:var(--mono);font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--mag);margin-bottom:12px;position:relative;z-index:2}
+  h2{font-family:var(--disp);font-size:clamp(28px,4.4vw,46px);line-height:1.05;margin-bottom:20px;position:relative;z-index:2}
+  h2 em{font-style:normal;color:var(--cyan)}
+  p{margin:0 0 18px;max-width:760px;position:relative;z-index:2}
+  p .hl{color:var(--amber);font-weight:600}
+  p code, li code{font-family:var(--mono);font-size:.84em;background:rgba(55,245,255,.1);color:var(--cyan);padding:1px 6px;border-radius:3px}
+  ul{margin:0 0 18px 0;padding-left:0;list-style:none;max-width:760px;position:relative;z-index:2}
+  li{margin:0 0 11px;padding-left:26px;position:relative}
+  li::before{content:"▹";position:absolute;left:0;color:var(--mag);text-shadow:0 0 8px var(--mag)}
+
+  /* code blocks */
+  pre.code{position:relative;z-index:2;background:linear-gradient(180deg,rgba(8,3,22,.9),rgba(10,5,30,.85));
+    border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:6px;
+    padding:20px 22px;margin:8px 0 26px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:1.65;
+    box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 0 60px rgba(55,245,255,.03)}
+  pre.code .cap{position:absolute;top:-11px;left:18px;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--dim);background:var(--bg2);padding:2px 9px;border:1px solid var(--line);border-radius:3px}
+  pre.code .file{position:absolute;top:-11px;right:14px;font-size:10.5px;color:var(--pur);background:var(--bg2);padding:2px 9px;border:1px solid var(--line);border-radius:3px}
+  .cm{color:#6b6394;font-style:italic}
+  .st{color:var(--lime)}
+  .kw{color:var(--mag);font-weight:500}
+  .ty{color:var(--cyan)}
+  .nu{color:var(--amber)}
+  .an{color:var(--pur);font-weight:500}
+
+  .callout{position:relative;z-index:2;border:1px solid var(--line);border-radius:8px;padding:22px 24px;margin:10px 0 24px;
+    background:linear-gradient(120deg,rgba(255,60,166,.07),rgba(55,245,255,.05));box-shadow:0 0 30px rgba(176,108,255,.08)}
+  .callout .t{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:8px}
+  .callout.verdict{border-color:rgba(93,255,155,.4);border-left:3px solid var(--lime)}
+  .callout.verdict .t{color:var(--lime)}
+
+  /* ---------- transport timeline ---------- */
+  .saga{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:24px 0;position:relative;z-index:2}
+  .stop{cursor:none;text-align:center;padding:0 6px;position:relative}
+  .stop .node{width:20px;height:20px;border-radius:50%;border:2px solid var(--dim);margin:0 auto 14px;background:var(--bg);
+    position:relative;z-index:2;transition:.25s}
+  .stop:not(:last-child)::after{content:"";position:absolute;top:9px;left:50%;width:100%;height:2px;background:var(--line);z-index:1}
+  .stop .ttl{font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--ink);font-weight:600}
+  .stop .tag{font-size:12px;color:var(--dim);margin-top:3px}
+  .stop.ok .node{border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+  .stop.bad .node{border-color:var(--mag);background:var(--mag);box-shadow:0 0 14px var(--mag)}
+  .stop.win .node{border-color:var(--lime);background:var(--lime);box-shadow:0 0 16px var(--lime)}
+  .stop.active{transform:translateY(-3px)}
+  .stop.active .node{transform:scale(1.35)}
+  .sagabody{position:relative;z-index:2;border:1px solid var(--line);border-radius:8px;padding:20px 24px;min-height:96px;
+    background:var(--panel);font-size:16.5px}
+  .sagabody .h{font-family:var(--mono);letter-spacing:1px;font-size:13px;text-transform:uppercase;margin-bottom:7px}
+  @media(max-width:620px){.saga{grid-template-columns:repeat(2,1fr);gap:18px 0}.stop:not(:last-child)::after{display:none}}
+
+  /* ---------- authority diagram ---------- */
+  .authgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0 26px;position:relative;z-index:2}
+  @media(max-width:620px){.authgrid{grid-template-columns:1fr}}
+  .authcard{border:1px solid var(--line);border-radius:8px;padding:18px;background:var(--panel)}
+  .authcard.bug{border-color:rgba(255,60,166,.35)}
+  .authcard.fix{border-color:rgba(93,255,155,.35)}
+  .authcard .tag{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .authcard.bug .tag{color:var(--mag)} .authcard.fix .tag{color:var(--lime)}
+  .stage{height:110px;position:relative;display:flex;align-items:center;justify-content:center}
+  .txt-box{width:54px;height:54px;border-radius:7px;border:2px solid var(--cyan);background:rgba(55,245,255,.12);
+    box-shadow:0 0 16px rgba(55,245,255,.4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--cyan)}
+  .bug .txt-box{animation:jitter .28s infinite}
+  .fix .txt-box{animation:glide 2.6s ease-in-out infinite}
+  @keyframes jitter{0%{transform:translate(-14px,3px) rotate(-3deg)}25%{transform:translate(16px,-4px) rotate(4deg)}
+    50%{transform:translate(-9px,5px) rotate(-2deg)}75%{transform:translate(13px,-2px) rotate(3deg)}100%{transform:translate(-14px,3px)}}
+  @keyframes glide{0%,100%{transform:translateX(-30px)}50%{transform:translateX(30px)}}
+  .arrow{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:1px}
+  .arrow.l{left:6px;color:var(--mag)} .arrow.r{right:6px;color:var(--amber)} .arrow.c{left:6px;color:var(--lime)}
+  .authcard .note{font-size:14px;color:var(--dim);margin-top:8px;min-height:20px}
+
+  /* ---------- interpolation toy ---------- */
+  .toy{position:relative;z-index:2;border:1px solid var(--line);border-radius:10px;padding:22px;background:var(--panel);margin:14px 0 26px;
+    box-shadow:0 0 40px rgba(55,245,255,.05)}
+  .toy canvas{width:100%;height:160px;display:block;border-radius:6px;background:
+    radial-gradient(600px 200px at 50% 120%,rgba(176,108,255,.1),transparent),#08031a;border:1px solid rgba(176,108,255,.14)}
+  .toy .ctl{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:16px;font-family:var(--mono);font-size:13px}
+  .toy .ctl label{color:var(--dim);letter-spacing:1px}
+  .toy input[type=range]{-webkit-appearance:none;appearance:none;height:3px;width:200px;background:var(--line);border-radius:3px;cursor:none}
+  .toy input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--cyan);box-shadow:0 0 12px var(--cyan);cursor:none}
+  .toy input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .toy .val{color:var(--cyan);font-weight:600;min-width:34px}
+  .toy button{cursor:none;font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--mag);background:rgba(255,60,166,.08);
+    border:1px solid rgba(255,60,166,.4);border-radius:4px;padding:8px 14px;text-transform:uppercase;transition:.2s}
+  .toy button:hover{background:rgba(255,60,166,.2);box-shadow:0 0 14px rgba(255,60,166,.3)}
+  .toy .legend{display:flex;gap:20px;margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .toy .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+  footer{padding:70px 0 90px;text-align:center;border-top:1px solid var(--line);margin-top:40px;position:relative;z-index:2}
+  footer .big{font-family:var(--disp);font-size:clamp(24px,4vw,40px);color:var(--ink);margin-bottom:10px}
+  footer .big .c{color:var(--cyan)} footer .big .m{color:var(--mag)}
+  footer p{color:var(--dim);font-size:15px;margin:0 auto;text-align:center}
+  footer .mono{font-family:var(--mono);font-size:12px;letter-spacing:1px;margin-top:20px;color:var(--pur)}
+  a.lnk{color:var(--cyan);text-decoration:none;border-bottom:1px dashed rgba(55,245,255,.4)}
+</style>
+</head>
+<body>
+<div id="reticle"></div>
+<div id="prog"></div>
+
+<nav id="dots"></nav>
+
+<header class="hero">
+  <div class="grid"></div>
+  <div class="wrap inner">
+    <div class="kicker">// Build journal · 2D mage-vs-mage PvP</div>
+    <h1>
+      <span class="s1"><span class="l" style="animation-delay:.15s">S</span><span class="l" style="animation-delay:.21s">P</span><span class="l" style="animation-delay:.27s">E</span><span class="l" style="animation-delay:.33s">L</span><span class="l" style="animation-delay:.39s">L</span></span>
+      <span class="s2"><span class="l" style="animation-delay:.5s">D</span><span class="l" style="animation-delay:.56s">U</span><span class="l" style="animation-delay:.62s">E</span><span class="l" style="animation-delay:.68s">L</span></span>
+    </h1>
+    <p class="sub">Anatomy of a LAN netcode build — the desync that wasn't a bug report, the hitbox that ignored your hat, and why the <b>right</b> netcode is the one you <b>don't</b> write.</p>
+    <div class="chips">
+      <span class="chip"><b>Engine</b> &nbsp;Godot 4.6</span>
+      <span class="chip"><b>Lang</b> &nbsp;GDScript</span>
+      <span class="chip"><b>Transport</b> &nbsp;ENet / UDP</span>
+      <span class="chip"><b>Online</b> &nbsp;Tailscale</span>
+      <span class="chip"><b>Model</b> &nbsp;Owner-authoritative</span>
+    </div>
+  </div>
+  <div class="scrollhint">SCROLL<span>↓</span></div>
+</header>
+
+<main class="wrap">
+
+  <!-- 1 -->
+  <section id="s1" data-nav="The Game">
+    <div class="ghostnum">01</div>
+    <div class="seg">
+      <div class="label">The Premise</div>
+      <h2>Two wizards. One arena. <em>Skillshots, terrain, and prediction.</em></h2>
+      <p>Spell Duel is a side-view platformer duel. Four mouse-aimed abilities per mage, environmental patches that linger — ice that strips your jump, fire that ticks, lightning that amplifies — and an elemental matrix where <span class="hl">fire melts ice into water</span> and <span class="hl">lightning shatters earth walls</span>. The whole identity is reactive terrain, which (spoiler) is exactly what makes one popular netcode technique the wrong choice here.</p>
+      <p>Visually it's <code>NeonShape</code>: flat fill, bright outline, soft glow — procedural neon, no sprites. That same arcade-cabinet look is what this page is wearing.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2" data-nav="Transport Saga">
+    <div class="ghostnum">02</div>
+    <div class="seg">
+      <div class="label">Getting Bits Between Two Machines</div>
+      <h2>The transport saga <em>— click a stop</em></h2>
+      <p>Online play went through four transports before it felt right. The lesson: a dead end (Cloudflare) forced the architecture that was actually correct.</p>
+      <div class="saga" id="saga">
+        <div class="stop ok active" data-i="0"><div class="node"></div><div class="ttl">WebSocket</div><div class="tag">TCP</div></div>
+        <div class="stop bad" data-i="1"><div class="node"></div><div class="ttl">Cloudflare</div><div class="tag">tunnel</div></div>
+        <div class="stop ok" data-i="2"><div class="node"></div><div class="ttl">ENet</div><div class="tag">UDP</div></div>
+        <div class="stop win" data-i="3"><div class="node"></div><div class="ttl">Tailscale</div><div class="tag">WireGuard</div></div>
+      </div>
+      <div class="sagabody" id="sagabody"></div>
+      <pre class="code"><span class="cap">Net.gd</span><span class="file">final transport</span><code data-snip="enet"></code></pre>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3" data-nav="The Desync">
+    <div class="ghostnum">03</div>
+    <div class="seg">
+      <div class="label">The Bug You Feel, Not Read</div>
+      <h2>Two writers, <em>one transform</em></h2>
+      <p>The first real playtest symptom: "I'm standing on a platform but my brother sees me on the floor." Classic. The cause wasn't a dropped packet — it was <span class="hl">two systems both writing the same position</span> every frame.</p>
+      <p>The host simulated the client's mage from relayed input <em>and</em> a <code>MultiplayerSynchronizer</code> pushed the client's own authoritative position back over the top. They fought. The fix is structural: each mage gets <b>exactly one simulator</b>, and the synchronizer replicates a shadow field — <code>_net_position</code> — never the live <code>position</code>.</p>
+      <div class="authgrid">
+        <div class="authcard bug">
+          <div class="tag">✗ Before — dual authority</div>
+          <div class="stage">
+            <div class="arrow l">local sim →</div>
+            <div class="txt-box">pos</div>
+            <div class="arrow r">← MoveSync</div>
+          </div>
+          <div class="note">Two writers → jitter, rubber-band, platform/floor disagreement.</div>
+        </div>
+        <div class="authcard fix">
+          <div class="tag">✓ After — single writer</div>
+          <div class="stage">
+            <div class="arrow c">owner → _net_position → lerp →</div>
+            <div class="txt-box">pos</div>
+          </div>
+          <div class="note">Owner publishes; the puppet only ever lerps. One writer per peer.</div>
+        </div>
+      </div>
+      <pre class="code"><span class="cap">Mage.gd</span><span class="file">owner publishes</span><code data-snip="owner"></code></pre>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4" data-nav="Interpolation">
+    <div class="ghostnum">04</div>
+    <div class="seg">
+      <div class="label">Making 30 Packets Look Like 60 Frames</div>
+      <h2>The puppet only <em>lerps</em></h2>
+      <p>The opponent's mage is a <b>puppet</b>: no physics, no input. It feeds its position forward by the synced velocity, then eases toward the authoritative target. The one twist — <span class="hl">skip the feed-forward during a dash</span>, because a 780px/s blink that stops on a dime would overshoot and snap back.</p>
+      <p>Drag the slider: watch the rendered dot chase the authoritative one. Low smoothing floats; high snaps. This <em>is</em> <code>_puppet_tick</code>.</p>
+      <div class="toy">
+        <canvas id="lerpcanvas"></canvas>
+        <div class="ctl">
+          <label>PUPPET_SMOOTH</label>
+          <input id="smooth" type="range" min="3" max="60" value="40" step="1">
+          <span class="val" id="smoothval">40</span>
+          <button id="dashbtn">⚡ Trigger dash</button>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--amber);box-shadow:0 0 8px var(--amber)"></i>authoritative (_net_position)</span>
+          <span><i style="background:var(--cyan);box-shadow:0 0 8px var(--cyan)"></i>rendered (global_position)</span>
+        </div>
+        <p style="font-size:13px;color:var(--dim);margin:14px 0 0;max-width:none">Shipping value: <span style="color:var(--cyan);font-family:var(--mono)">40</span>. Note this sim feeds a <em>frame-perfect</em> target — the real game syncs at ~30Hz with network jitter, so higher values trade jitter-smoothing for tightness. Judge it on two machines, especially a dashing opponent.</p>
+      </div>
+      <pre class="code"><span class="cap">Mage.gd</span><span class="file">the puppet tick</span><code data-snip="puppet"></code></pre>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5" data-nav="Prediction">
+    <div class="ghostnum">05</div>
+    <div class="seg">
+      <div class="label">Hiding The Round Trip</div>
+      <h2>Predict the cast, <em>relay the intent</em></h2>
+      <p>Your own casts fire instantly (a visual-only mirror), while the host stays authoritative for damage. But charged Fireball was <span class="hl">intermittently swallowing casts</span> — the host re-derived your charge from relayed press/hold/release timing, and if your press landed during a cooldown it was dropped, so the release found no charge.</p>
+      <p>Fix: you own your mage, so you already know the resolved charge at release. Relay the <b>intent</b> — slot, charge, aim — and let the host spawn that exact variant. No re-derivation, no dropped press, no variant mismatch.</p>
+      <pre class="code"><span class="cap">Mage.gd</span><span class="file">client → host cast intent</span><code data-snip="cast"></code></pre>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6" data-nav="Hurtbox">
+    <div class="ghostnum">06</div>
+    <div class="seg">
+      <div class="label">When The Hat Is Invincible</div>
+      <h2>A hurtbox that isn't <em>the body</em></h2>
+      <p>"When I hit the top of the enemy they don't take damage." The collision box stopped at the shoulders — the pointy wizard hat had no hurtbox, so head shots sailed over. But you can't just enlarge the body: surface patches mask layer 2 to detect a mage <em>standing in them</em>, and that same box drives platform clearance.</p>
+      <ul>
+        <li>Add a separate <code>Area2D</code> hurtbox on the <b>Hitboxes</b> layer, sized to the full silhouette — it forwards <code>take_damage</code> to the mage.</li>
+        <li>Drop layer 2 from projectile masks (<code>31 → 29</code>) so spells hit the hurtbox, not the physics body.</li>
+        <li>Patches still key off the unchanged body. Platform clearance untouched. Heads now count.</li>
+      </ul>
+      <pre class="code"><span class="cap">Hurtbox.gd</span><span class="file">non-physics damage receiver</span><code data-snip="hurt"></code></pre>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7" data-nav="Free Sync">
+    <div class="ghostnum">07</div>
+    <div class="seg">
+      <div class="label">The Cheapest Multiplayer Feature</div>
+      <h2>Random arenas, <em>zero extra netcode</em></h2>
+      <p>Seven hand-built, left/right-symmetric platform layouts; a random one each round. The trick: the round counter is <span class="hl">already synced</span> across the network. Seed an RNG with <code>round_id</code> and both peers independently compute the <b>identical</b> layout — no RPC, no handshake, no desync surface.</p>
+      <pre class="code"><span class="cap">Arena.gd</span><span class="file">deterministic-from-round_id</span><code data-snip="layout"></code></pre>
+      <div class="callout">
+        <div class="t">Why it works</div>
+        Determinism is free synchronization. Anything both peers can derive from already-synced state (the round id) needs no replication at all. The opposite — re-deriving timing-sensitive state independently — is exactly what broke charged Fireball. Same coin, both sides.
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8" data-nav="The Verdict">
+    <div class="ghostnum">08</div>
+    <div class="seg">
+      <div class="label">The Netcode You Don't Write</div>
+      <h2>Why <em>not</em> rollback?</h2>
+      <p>The obvious instinct for a fighting game is full client prediction + server reconciliation — the Counter-Strike / fighting-game model. Two analyses, one conclusion: <span class="hl">wrong tool here.</span></p>
+      <ul>
+        <li><b>Nothing to hide.</b> On LAN, round-trip is ~1–5ms. Your own mage is already frame-perfect (you simulate it locally). Rollback exists to mask latency you don't have.</li>
+        <li><b>It fights the game.</b> Reconciliation needs deterministic replay — but spawnable earth walls and surface patches change the collision world mid-replay, so it would hitch <em>precisely during combat</em>, the worst possible moment.</li>
+        <li><b>The engine resists it.</b> Godot's high-level multiplayer isn't built for tick-aligned rollback; you'd hand-roll a lot to lose on LAN.</li>
+      </ul>
+      <div class="callout verdict">
+        <div class="t">Verdict</div>
+        Owner-authoritative movement + opponent interpolation, with host-authoritative combat left intact. On LAN it's indistinguishable from perfect, it's a fraction of the code, and it doesn't pick a fight with the dynamic terrain that makes the game the game. The best engineering decision of the build was the feature we chose not to build.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="big"><span class="c">SPELL</span> <span class="m">DUEL</span></div>
+    <p>A neon mage duel, and the small pile of decisions that made it playable over a tunnel with a friend.</p>
+    <div class="mono">GODOT 4.6 · GDSCRIPT · ENET/UDP · TAILSCALE · owner-authoritative + interpolation</div>
+  </div>
+</footer>
+
+<script>
+/* ---------- syntax highlighter (GDScript-ish) ---------- */
+const KW = new Set("func var const if else elif for in return and or not true false null extends class_name await signal match continue break enum as is self pass".split(" "));
+const TY = new Set("int float bool String Vector2 Vector2i Dictionary Array Color Node Node2D Area2D void PackedVector2Array PackedStringArray RandomNumberGenerator ENetMultiplayerPeer RectangleShape2D StaticBody2D CollisionShape2D Polygon2D Line2D PackedScene AudioStream Mage Error MultiplayerPeer".split(" "));
+function hl(src){
+  src = src.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const re=/(#[^\n]*)|("(?:[^"\\]|\\.)*")|(@[A-Za-z_]\w*)|([A-Za-z_]\w*)|(\b\d+\.?\d*\b)/g;
+  return src.replace(re,(m,cm,st,an,id,nu)=>{
+    if(cm) return '<span class="cm">'+cm+'</span>';
+    if(st) return '<span class="st">'+st+'</span>';
+    if(an) return '<span class="an">'+an+'</span>';
+    if(id){ if(KW.has(id))return '<span class="kw">'+id+'</span>'; if(TY.has(id))return '<span class="ty">'+id+'</span>'; return id;}
+    if(nu) return '<span class="nu">'+nu+'</span>';
+    return m;
+  });
+}
+const SNIPPETS = {
+enet:
+`func host_game(port := 7777) -> Error:
+    var peer := ENetMultiplayerPeer.new()      # UDP — low-latency, no head-of-line blocking
+    var err := peer.create_server(port, 2)     # host + one client; it's a duel
+    if err != OK: return err
+    multiplayer.multiplayer_peer = peer
+    return OK`,
+owner:
+`func _owner_tick(delta: float) -> void:
+    # ... read input, gravity, jump, dash, move_and_slide() ...
+    _handle_ability_input(delta)
+    _net_position = position   # publish the authoritative transform for the synchronizer
+
+# MoveSync replicates ".:_net_position" (NOT ".:position"). The owner writes the
+# visible transform via move_and_slide; the puppet writes it via a lerp; the
+# synchronizer only ever touches the shadow field. One writer per peer, by design.`,
+puppet:
+`func _puppet_tick(delta: float) -> void:
+    if _dash_remaining <= 0.0:
+        _net_position += velocity * delta      # feed-forward; the next packet corrects it
+    # ...but a dash is a 780px/s blink that stops abruptly — extrapolating it
+    # would overshoot the endpoint, so we skip the feed-forward while dashing.
+    var t: float = clamp(PUPPET_SMOOTH * delta, 0.0, 1.0)
+    global_position = global_position.lerp(_net_position, t)`,
+cast:
+`# Client OWNS its mage, so it resolves WHEN and with WHAT CHARGE to cast,
+# then relays the intent. The host spawns that exact variant — no re-deriving
+# charge from press/hold/release timing (which dropped casts during cooldown).
+@rpc("any_peer", "call_remote", "reliable")
+func receive_cast(slot: int, charge_held: float, aim: Vector2) -> void:
+    if not multiplayer.is_server(): return
+    if _cooldowns[slot] > 0.0: return          # host stays authoritative
+    _last_aim_unit = aim
+    _try_cast_slot(slot, charge_held)`,
+hurt:
+`extends Area2D
+# Non-physics hurtbox: lets the hittable area extend past the physics body
+# (up over the hat) without touching collision or platform clearance.
+func take_damage(amount, element, knockback, attacker) -> bool:
+    var parent := get_parent()
+    if parent != null and parent.has_method("take_damage"):
+        return parent.take_damage(amount, element, knockback, attacker)
+    return false`,
+layout:
+`func _load_layout(round_id: int) -> void:
+    var rng := RandomNumberGenerator.new()
+    rng.seed = round_id          # round_id is already synced across the network...
+    var idx := rng.randi() % PLATFORM_LAYOUTS.size()   # ...so both peers pick the SAME layout
+    for plat in PLATFORM_LAYOUTS[idx]:
+        _spawn_platform(plat[0], plat[1])   # zero extra RPCs. free synchronization.`
+};
+document.querySelectorAll("[data-snip]").forEach(el=>{ el.innerHTML = hl(SNIPPETS[el.dataset.snip]); });
+
+/* ---------- reticle cursor ---------- */
+const ret=document.getElementById("reticle");
+let rx=innerWidth/2,ry=innerHeight/2,tx=rx,ty=ry;
+addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY});
+(function loop(){rx+=(tx-rx)*.25;ry+=(ty-ry)*.25;ret.style.left=rx+"px";ret.style.top=ry+"px";requestAnimationFrame(loop)})();
+document.addEventListener("mouseover",e=>{ if(e.target.closest("a,button,input,.stop")) ret.classList.add("hot"); });
+document.addEventListener("mouseout",e=>{ if(e.target.closest("a,button,input,.stop")) ret.classList.remove("hot"); });
+
+/* ---------- scroll progress ---------- */
+const prog=document.getElementById("prog");
+addEventListener("scroll",()=>{const h=document.documentElement;prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+"%";});
+
+/* ---------- nav dots + scrollspy + reveal ---------- */
+const secs=[...document.querySelectorAll("section")];
+const dots=document.getElementById("dots");
+secs.forEach(s=>{const a=document.createElement("a");a.href="#"+s.id;a.innerHTML='<span>'+s.dataset.nav+'</span>';dots.appendChild(a);});
+const dotEls=[...dots.children];
+const io=new IntersectionObserver(es=>{es.forEach(e=>{
+  const seg=e.target.querySelector(".seg");
+  if(e.isIntersecting){ if(seg)seg.classList.add("in");
+    const i=secs.indexOf(e.target); dotEls.forEach((d,k)=>d.classList.toggle("on",k===i)); }
+});},{threshold:.3});
+secs.forEach(s=>io.observe(s));
+
+/* ---------- transport saga ---------- */
+const SAGA=[
+ {h:"WebSocket / TCP",c:"var--cyan",t:"Worked, and let Cloudflare tunnel it. But TCP head-of-line blocking + Nagle made input relay feel mushy — wrong protocol for a twitch duel."},
+ {h:"Cloudflare Tunnel ✗",c:"var--mag",t:"Gave a public domain over WSS… but Cloudflare doesn't route raw UDP (that's enterprise Spectrum). The dead end that forced the right call."},
+ {h:"ENet / UDP",c:"var--cyan",t:"Swapped to UDP for low-latency input. No head-of-line blocking, no Nagle. Cost: it killed the Cloudflare path — UDP doesn't tunnel there."},
+ {h:"Tailscale / WireGuard",c:"var--lime",t:"A WireGuard overlay: your friend joins your tailnet and appears on your LAN. Direct P2P UDP, near-LAN latency, same ENet code — and the game port is exposed to nobody but the tailnet."}
+];
+const sbody=document.getElementById("sagabody");
+function showSaga(i){const s=SAGA[i];sbody.innerHTML='<div class="h" style="color:'+s.c.replace('var--','var(--')+')">'+s.h+'</div>'+s.t;}
+document.querySelectorAll("#saga .stop").forEach(st=>{
+  st.addEventListener("mouseenter",()=>{document.querySelectorAll("#saga .stop").forEach(x=>x.classList.remove("active"));st.classList.add("active");showSaga(+st.dataset.i);});
+  st.addEventListener("click",()=>{document.querySelectorAll("#saga .stop").forEach(x=>x.classList.remove("active"));st.classList.add("active");showSaga(+st.dataset.i);});
+});
+showSaga(0);
+
+/* ---------- interpolation toy ---------- */
+const cv=document.getElementById("lerpcanvas"),cx=cv.getContext("2d");
+let SMOOTH=40;
+const sl=document.getElementById("smooth"),sv=document.getElementById("smoothval");
+sl.addEventListener("input",()=>{SMOOTH=+sl.value;sv.textContent=sl.value;});
+function fit(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+addEventListener("resize",fit);fit();
+let truth=0.3, rendered=0.3, vel=0.06, last=performance.now(), dashTimer=2.4;
+const trail=[];
+document.getElementById("dashbtn").addEventListener("click",()=>doDash());
+function doDash(){ vel=(Math.random()>.5?1:-1)*0.9; dashTimer=2.4; }
+function frame(now){
+  let dt=Math.min((now-last)/1000,0.05); last=now;
+  // authoritative motion: gentle drift + periodic dashes that stop abruptly
+  dashTimer-=dt;
+  if(dashTimer<=0){ doDash(); }
+  truth += vel*dt;
+  vel *= 0.86;                       // dashes decay fast (abrupt stop)
+  if(Math.abs(vel)<0.02) vel += (Math.random()-0.5)*0.04*dt*60; // idle wander
+  if(truth<0.06){truth=0.06;vel=Math.abs(vel);} if(truth>0.94){truth=0.94;vel=-Math.abs(vel);}
+  // rendered chases truth — exactly the puppet lerp
+  const t=Math.min(SMOOTH*dt,1); rendered += (truth-rendered)*t;
+  trail.push(rendered); if(trail.length>40) trail.shift();
+  draw();
+  requestAnimationFrame(frame);
+}
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight,y=h/2;
+  cx.clearRect(0,0,w,h);
+  // baseline
+  cx.strokeStyle="rgba(176,108,255,.18)";cx.lineWidth=1;cx.beginPath();cx.moveTo(0,y);cx.lineTo(w,y);cx.stroke();
+  // trail of rendered
+  for(let i=0;i<trail.length;i++){const a=i/trail.length;cx.fillStyle="rgba(55,245,255,"+(a*0.5)+")";cx.beginPath();cx.arc(trail[i]*w,y,3+a*4,0,7);cx.fill();}
+  // authoritative (amber) — the target
+  const txp=truth*w;
+  cx.fillStyle="#ffd23c";cx.shadowColor="#ffd23c";cx.shadowBlur=18;cx.beginPath();cx.arc(txp,y,9,0,7);cx.fill();
+  cx.shadowBlur=0;cx.strokeStyle="rgba(255,210,60,.4)";cx.beginPath();cx.moveTo(txp,y-22);cx.lineTo(txp,y+22);cx.stroke();
+  // rendered (cyan) — what the opponent sees
+  const rxp=rendered*w;
+  cx.fillStyle="#37f5ff";cx.shadowColor="#37f5ff";cx.shadowBlur=20;cx.beginPath();cx.arc(rxp,y,11,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle="rgba(7,2,20,.9)";cx.beginPath();cx.arc(rxp,y,4,0,7);cx.fill();
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
