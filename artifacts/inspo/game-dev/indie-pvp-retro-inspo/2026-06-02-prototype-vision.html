@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>June 2, 2026 — Mage vs Fighter Prototype Vision</title>
+<style>
+  :root{--bg:#080414;--ink:#f7f1ff;--cyan:#27f5ff;--pink:#ff3df2;--gold:#ffd15a;--green:#71ff87;--red:#ff5277;--violet:#8d5cff;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0%,#271257 0,#080414 38%,#020109 100%);color:var(--ink);font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.055) 0 1px,transparent 1px 5px);mix-blend-mode:overlay;opacity:.45;z-index:9} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 100px #000, inset 0 0 22px #27f5ff22;z-index:10}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px}.hero{border:4px solid var(--cyan);box-shadow:0 0 0 4px #000,0 0 38px #27f5ff99, inset 0 0 38px #ff3df222;background:linear-gradient(135deg,#12072e,#1b0d3f 55%,#300821);padding:28px;text-align:center;position:relative;overflow:hidden}.hero:before{content:"✦ ✦ ✦";position:absolute;left:-20px;top:16px;color:var(--gold);font-size:64px;opacity:.25;animation:float 5s infinite alternate}.hero h1{font-size:clamp(30px,6vw,68px);line-height:.95;margin:0;text-shadow:4px 4px #000,0 0 20px var(--pink);letter-spacing:1px}.tag{color:var(--gold);font-size:18px;margin-top:14px}.date{display:inline-block;margin-top:16px;border:2px solid var(--pink);padding:6px 12px;background:#0009;color:var(--cyan)}
+  h2{color:var(--cyan);text-shadow:2px 2px #000,0 0 14px var(--cyan);margin:30px 0 14px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:#0d0920dd;border:2px solid #ffffff22;box-shadow:0 0 0 2px #000,0 8px 0 #0008;padding:14px;min-height:160px}.card b{color:var(--gold)}.card a{color:var(--cyan)}.card .sig{color:#fff;font-size:13px;line-height:1.45}.pill{display:inline-block;margin-bottom:8px;padding:3px 7px;background:#ff3df233;border:1px solid var(--pink);color:#ffd7fb;font-size:11px}
+  .arena-shell{background:#05030d;border:4px solid var(--gold);box-shadow:0 0 0 4px #000,0 0 32px #ffd15a55;padding:14px}.hud{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin-bottom:10px}.bar{height:22px;border:2px solid #fff;background:#111;position:relative}.bar span{display:block;height:100%}.mana span{background:linear-gradient(90deg,var(--cyan),var(--violet));width:72%}.stam span{background:linear-gradient(90deg,var(--gold),var(--red));width:64%}.score{font-size:26px;color:var(--green);text-shadow:0 0 10px var(--green)}
+  .arena{height:420px;position:relative;overflow:hidden;background:linear-gradient(#161136,#080412 70%),linear-gradient(90deg,transparent 0 48px,#ffffff08 48px 50px);border:2px solid #ffffff44}.floor{position:absolute;left:0;right:0;bottom:0;height:58px;background:repeating-linear-gradient(45deg,#151515 0 12px,#202020 12px 24px);border-top:4px solid var(--cyan)}.platform{position:absolute;height:18px;background:#2b2148;border:3px solid #8065ff;box-shadow:0 0 18px #8d5cff}.p1{left:190px;bottom:150px;width:160px}.p2{right:200px;bottom:225px;width:150px}.cover{position:absolute;bottom:58px;left:50%;width:54px;height:82px;transform:translateX(-50%);background:#221b32;border:3px solid #ffd15a;box-shadow:0 0 16px #ffd15a66}.sprite{position:absolute;width:54px;height:78px;bottom:58px;filter:drop-shadow(0 0 14px currentColor)}.mage{left:18%;color:var(--cyan)}.fighter{right:18%;color:var(--gold)}.head{width:34px;height:28px;margin:0 auto;border:3px solid currentColor;background:#111}.body{width:46px;height:42px;margin:0 auto;border:3px solid currentColor;background:linear-gradient(#111,#23133e)}.mage .hat{width:0;height:0;border-left:28px solid transparent;border-right:28px solid transparent;border-bottom:32px solid var(--pink);margin:0 auto -4px}.fighter .sword{position:absolute;right:-22px;top:15px;width:10px;height:64px;background:#e7e7ff;box-shadow:0 0 10px #fff;transform:rotate(-18deg)}.projectile{position:absolute;left:31%;bottom:142px;width:82px;height:18px;border-radius:999px;background:linear-gradient(90deg,var(--cyan),transparent);box-shadow:0 0 20px var(--cyan);animation:bolt 1.4s infinite}.parry{position:absolute;right:26%;bottom:95px;width:88px;height:88px;border:4px dashed var(--gold);border-radius:50%;box-shadow:0 0 22px var(--gold);animation:pulse .8s infinite alternate}.particle{position:absolute;width:7px;height:7px;background:var(--pink);box-shadow:0 0 12px var(--pink);animation:spark 2s infinite}.pa{left:42%;bottom:180px}.pb{left:58%;bottom:245px;background:var(--cyan)}.pc{left:50%;bottom:130px;background:var(--green)}
+  .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{background:#0d0920dd;border:2px solid #ffffff2d;padding:18px;box-shadow:0 8px 0 #0008}.panel h3{margin-top:0;color:var(--gold)} li{margin:8px 0}.kbd{border:1px solid #fff;background:#000;padding:2px 6px;color:var(--green)}.checklist{columns:2}.footer{text-align:center;color:#bfb1ff;margin:26px 0 10px;font-size:13px}
+  @keyframes bolt{0%{transform:translateX(-25px);opacity:.2}50%{opacity:1}100%{transform:translateX(210px);opacity:.1}}@keyframes pulse{from{transform:scale(.9)}to{transform:scale(1.08)}}@keyframes spark{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-30px)}}@keyframes float{to{transform:translateX(60px) rotate(6deg)}}
+  @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}.checklist{columns:1}.arena{height:360px}}@media(max-width:620px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.sprite{transform:scale(.8)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>NEON HEX<br/>DUEL PIT</h1>
+    <div class="tag">A retro 2D PvP duel where a glass-cannon mage zones with readable spells while a fearless fighter wins by timing dash, shield, and parry windows.</div>
+    <div class="date">Prototype vision grounded in indie signals — June 2, 2026</div>
+  </section>
+
+  <h2>Today's inspiration signals</h2>
+  <section class="grid">
+    <div class="card"><span class="pill">fresh trailer</span><b>TechnoBlobs</b><p class="sig">A recent demo trailer/search result highlights top-down Smash-like knockback, ability picks, and using arenas/environment as combat tools.</p></div>
+    <div class="card"><span class="pill">Steam PvP</span><b>Pirate's Dual</b><p class="sig">2D pixel-art PvP ship battles emphasize aim, timing, defense maneuvers, specials, matchmaking, tournaments, currency, and skins.</p></div>
+    <div class="card"><span class="pill">arena builds</span><b>Reborn Arena</b><p class="sig">High-tempo multiplayer arena shooter + precise 2D platforming + elemental deck-building suggests swappable spell loadouts per round.</p></div>
+    <div class="card"><span class="pill">FGC baseline</span><b>Avatar Legends FG</b><p class="sig">Recent listings stress hand-drawn 2D readability, rollback netcode, and cross-play as expected competitive features.</p></div>
+    <div class="card"><span class="pill">event tactic</span><b>Steam Next Fest June</b><p class="sig">June 15 demo visibility window: small teams should build a GIF-able core duel loop and press/demo checklist now.</p></div>
+  </section>
+
+  <h2>Prototype arena sketch</h2>
+  <section class="arena-shell">
+    <div class="hud"><div><small>MAGE MANA</small><div class="bar mana"><span></span></div></div><div class="score">1 ✦ 1</div><div><small>FIGHTER STAMINA</small><div class="bar stam"><span></span></div></div></div>
+    <div class="arena">
+      <div class="platform p1"></div><div class="platform p2"></div><div class="cover"></div>
+      <div class="sprite mage"><div class="hat"></div><div class="head"></div><div class="body"></div></div>
+      <div class="sprite fighter"><div class="sword"></div><div class="head"></div><div class="body"></div></div>
+      <div class="projectile"></div><div class="parry"></div><div class="particle pa"></div><div class="particle pb"></div><div class="particle pc"></div><div class="floor"></div>
+    </div>
+  </section>
+
+  <h2>Mechanic of the day: Arcane Guardbreak Parry</h2>
+  <section class="cols">
+    <div class="panel">
+      <h3>Controls / rules / win condition</h3>
+      <ul>
+        <li><span class="kbd">Mage A</span> tap = slow orb, hold = charged piercing bolt; <span class="kbd">Mage B</span> blink with afterimage but drains mana.</li>
+        <li><span class="kbd">Fighter A</span> slash; <span class="kbd">Fighter B</span> 12-frame shield-parry that reflects orbs but loses to charged bolts if held too early.</li>
+        <li>Cover blocks normal orbs, platforms enable jump angles, and every hit adds knockback percent instead of raw HP.</li>
+        <li>Win condition: first to 3 ring-outs, with sudden-death lava floor after 90 seconds.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>What to test today</h3>
+      <ul>
+        <li>Can players read the difference between normal orb, charged bolt, and reflected orb in <b>under 250ms</b>?</li>
+        <li>Does fighter feel brave—not helpless—while crossing a mage zoning lane?</li>
+        <li>Do parry successes create clip-worthy hitstop, palette flash, and screen thump without hiding the next input?</li>
+      </ul>
+    </div>
+  </section>
+
+  <h2>Juice checklist</h2>
+  <section class="panel">
+    <ul class="checklist">
+      <li>8-frame mage cast anticipation: staff glow → eye flash → orb spawn.</li>
+      <li>Fighter parry ring expands in team color, then snaps inward on success.</li>
+      <li>Projectile trails use distinct silhouettes: orb round, bolt spear, reflected zig-zag.</li>
+      <li>2-frame global hitstop + 6-frame local freeze on parry; avoid freezing UI bars.</li>
+      <li>CRT bloom only on VFX, not player bodies, to preserve readability.</li>
+      <li>Audio callouts: low “woom” charge, glass “plink” parry, crunchy ring-out bass.</li>
+      <li>Round-end postcard: “Fighter crossed the spell lane!” for social sharing.</li>
+      <li>Wishlist/demo CTA mock: one-button rematch, Discord link, tournament night teaser.</li>
+    </ul>
+  </section>
+  <div class="footer">Krahnie-adjacent arcade gremlin energy: tiny scope, loud feedback, readable duels, daily build momentum.</div>
+</div>
+</body>
+</html>
