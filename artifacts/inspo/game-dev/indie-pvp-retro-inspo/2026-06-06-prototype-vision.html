@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-06-06 Prototype Vision — Neon Duel: Mage vs Fighter</title>
+<style>
+  :root{--bg:#070510;--ink:#f7f3ff;--muted:#b7a7d9;--mage:#35f7ff;--fighter:#ff3d7f;--gold:#ffd166;--acid:#a7ff38;--panel:#151026;--line:#3f2d66;}
+  *{box-sizing:border-box} html,body{margin:0;background:radial-gradient(circle at 50% -10%,#2c1555 0,#090611 42%,#020107 100%);color:var(--ink);font-family:"Trebuchet MS",Verdana,sans-serif;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35;z-index:9}
+  body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 90px #000,inset 0 0 18px #35f7ff66;border-radius:18px;z-index:10}
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 18px 50px}.badge{display:inline-block;border:2px solid var(--gold);padding:6px 10px;color:var(--gold);text-shadow:0 0 8px var(--gold);background:#2a1730;margin-bottom:14px;transform:rotate(-1deg)}
+  h1{font-size:clamp(38px,7vw,74px);line-height:.92;margin:0;text-transform:uppercase;letter-spacing:2px;text-shadow:4px 4px 0 #000,0 0 18px var(--mage),0 0 30px var(--fighter)}
+  h2{font-size:28px;color:var(--gold);text-shadow:2px 2px #000;margin:30px 0 14px}.vision{font-size:20px;color:#fff;margin:16px 0 26px;max-width:850px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.card{background:linear-gradient(145deg,#19102e,#0c0718);border:2px solid var(--line);box-shadow:0 0 0 3px #000,0 0 18px #35f7ff33;padding:14px;min-height:150px}.card b{color:var(--acid)}.card a{color:var(--mage)}
+  .arena{position:relative;height:430px;border:4px solid #6c4bb1;background:linear-gradient(#12091f,#090611 62%,#160a20);box-shadow:0 0 0 4px #000,0 0 30px #ff3d7f55;overflow:hidden}.moon{position:absolute;right:60px;top:34px;width:90px;height:90px;border-radius:50%;background:#f3dcff;box-shadow:0 0 35px #d067ff}.platform{position:absolute;height:22px;background:linear-gradient(#6b4d8e,#2c1c46);border:3px solid #bca7ff;box-shadow:0 8px #000}.p1{left:90px;bottom:86px;width:280px}.p2{right:90px;bottom:150px;width:260px}.p3{left:420px;top:170px;width:210px}.cover{position:absolute;left:512px;bottom:86px;width:72px;height:88px;background:#243046;border:3px solid #89a5ff;box-shadow:inset 0 0 18px #000,0 6px #000}.mage,.fighter{position:absolute;bottom:112px;width:46px;height:72px;image-rendering:pixelated}.mage{left:170px;background:linear-gradient(var(--mage) 0 16px,#28145e 16px 44px,#1de8ff 44px);box-shadow:0 0 18px var(--mage)}.mage:before{content:"";position:absolute;left:13px;top:-18px;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid var(--mage)}.fighter{right:190px;background:linear-gradient(#ffd0b0 0 14px,#5b1a29 14px 42px,var(--fighter) 42px);box-shadow:0 0 18px var(--fighter)}.fighter:after{content:"";position:absolute;right:-28px;top:18px;width:34px;height:9px;background:#e9e2ff;box-shadow:0 0 10px white}.orb{position:absolute;left:300px;bottom:176px;width:24px;height:24px;border-radius:50%;background:var(--mage);box-shadow:0 0 18px var(--mage),44px -18px 0 -5px #8ff,92px 10px 0 -7px #fff}.slash{position:absolute;right:260px;bottom:170px;width:90px;height:90px;border-top:8px solid var(--fighter);border-radius:50%;transform:rotate(-28deg);filter:drop-shadow(0 0 12px var(--fighter))}.hud{position:absolute;left:18px;right:18px;top:18px;display:flex;gap:16px;align-items:center}.bar{flex:1;height:22px;border:3px solid #fff;background:#25091d;box-shadow:0 4px #000}.bar span{display:block;height:100%}.magebar span{width:68%;background:linear-gradient(90deg,var(--mage),#9dfffb)}.fighterbar span{width:81%;background:linear-gradient(90deg,var(--fighter),#ffd166)}.timer{font-size:28px;color:#fff;text-shadow:0 0 10px var(--gold);background:#000;padding:4px 10px;border:2px solid var(--gold)}.label{position:absolute;font-size:13px;color:var(--muted);background:#000a;padding:3px 6px;border:1px solid #6c4bb1}.lm{left:142px;bottom:190px}.lf{right:155px;bottom:225px}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.two{grid-template-columns:1fr}.arena{height:360px}.p3{display:none}}
+  ul{margin:8px 0 0 20px;padding:0}li{margin:7px 0}.panel{background:#100a1d;border:2px dashed #7254bb;padding:16px;box-shadow:0 0 18px #000}.kbd{color:#000;background:var(--gold);padding:2px 6px;border:2px solid #000;box-shadow:2px 2px #000;font-weight:bold}.footer{margin-top:26px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Daily Krahnie Arcade Lab // 2026-06-06</span>
+  <h1>Neon Duel:<br>Mage vs Fighter</h1>
+  <p class="vision">A tiny, readable, rollback-ready 2D arena duel where a slippery spellcaster controls space and a fearless fighter converts perfect movement, blocks, and parries into explosive close-range wins.</p>
+
+  <h2>Today's inspiration signals</h2>
+  <div class="grid">
+    <div class="card"><b>Monkey Fruit Fight!</b><p>Steam positions it as fast 2D pixel-art PvP with precise platforming, throwable weapons, synthwave, and “easy to learn, difficult to master” appeal.</p><a href="https://store.steampowered.com/app/3764780/Monkey_Fruit_Fight/">Source</a></div>
+    <div class="card"><b>Pirate's Dual</b><p>A recent Steam result emphasizes short arena matches built around aim, timing, attack/defense patterns, matchmaking, tournaments, currency, and skins.</p><a href="https://store.steampowered.com/app/4214220/Pirates_Dual/">Source</a></div>
+    <div class="card"><b>Mage Arena</b><p>Voice-cast spell PvP shows how one memorable input gimmick can market a small multiplayer game better than feature volume.</p><a href="https://store.steampowered.com/app/3716600/Mage_Arena/">Source</a></div>
+    <div class="card"><b>Steam Next Fest June 2026</b><p>Valve's June demo window is a reminder to design the prototype as a 3-minute spectator-readable demo loop with immediate feedback.</p><a href="https://partner.steamgames.com/doc/marketing/upcoming_events/nextfest/2026june">Source</a></div>
+    <div class="card"><b>Indie rollback chatter</b><p>Search results around indie fighting prototypes keep calling out rollback/lobbies as trust signals; even early UI copy should say “network test” if online PvP is planned.</p><a href="https://indiefighting.games/">Source</a></div>
+  </div>
+
+  <h2>Prototype arena sketch</h2>
+  <div class="arena" aria-label="CSS pixel-art arena sketch">
+    <div class="moon"></div><div class="hud"><div class="bar magebar"><span></span></div><div class="timer">57</div><div class="bar fighterbar"><span></span></div></div>
+    <div class="platform p1"></div><div class="platform p2"></div><div class="platform p3"></div><div class="cover"></div>
+    <div class="mage"></div><div class="fighter"></div><div class="orb"></div><div class="slash"></div>
+    <div class="label lm">MAGE: charge, blink, bait parry</div><div class="label lf">FIGHTER: dash-block, vault, punish</div>
+  </div>
+
+  <div class="two">
+    <section><h2>Mechanic of the day</h2><div class="panel"><b>Spell Parry: “Catch the Comet”</b><ul><li><b>Controls:</b> Mage <span class="kbd">Q</span> tap bolt / hold comet. Fighter <span class="kbd">J</span> slash, <span class="kbd">K</span> parry, <span class="kbd">L</span> dash.</li><li><b>Rules:</b> Parry window is 8 frames; success freezes both players for 6 frames, flips projectile ownership, and grants fighter one glowing step-cancel.</li><li><b>Win:</b> First to 3 stocks; ring-outs count only after 20 seconds to encourage opening duels.</li><li><b>Test:</b> Can a spectator identify owner/color, danger timing, and punish opportunity in under one second?</li></ul></div></section>
+    <section><h2>Juice checklist</h2><div class="panel"><ul><li>Projectile palette swaps owner: cyan → pink with a single chunky sparkle burst.</li><li>Hitstop tiers: 3f graze, 6f parry, 10f stock-ending wall splat.</li><li>CRT bass “thunk” on block; glassy arpeggio on spell charge; silence dip before lethal hit.</li><li>UI bars shake only on real damage, not chip; meter pips use distinct silhouettes.</li><li>After-match card: “Most stylish parry,” “longest air chase,” and one GIF-friendly replay beat.</li></ul></div></section>
+  </div>
+  <p class="footer">Grounded in current web searches from 2026-06-06; fresh PvP-specific news was thin, so today blends last-72-hour/festival signals with best recent Steam/community finds.</p>
+</div>
+</body>
+</html>
