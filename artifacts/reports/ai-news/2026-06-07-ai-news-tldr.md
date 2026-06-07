@@ -1,0 +1,13 @@
+# Morning AI TL;DR — 2026-06-07
+
+Fresh weekend AI news is thin, so this run includes the highest-signal updates from the last few days.
+
+- **OpenAI on AWS Bedrock is GA:** Amazon says GPT-5.5, GPT-5.4 and Codex are now generally available in Bedrock, including Codex via app/CLI/IDE integrations with AWS controls and committed-spend alignment. [AWS](https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-openai-models-codex-generally-available/)
+- **GitHub Copilot SDK reaches GA:** GitHub opened the Copilot SDK to existing Copilot subscribers and BYOK users, making Copilot’s agentic engine embeddable in third-party apps. [GitHub](https://github.blog/changelog/2026-06-02-copilot-sdk-is-now-generally-available/)
+- **Copilot agents get sandboxes:** GitHub added public-preview local and cloud sandboxes so Copilot tool execution can run in isolated environments—important for safer autonomous coding workflows. [GitHub](https://github.blog/changelog/2026-06-02-cloud-and-local-sandboxes-for-github-copilot-now-in-public-preview/)
+- **Copilot usage-based billing is live:** As of June 1, Copilot plans consume GitHub AI Credits, and code review also burns GitHub Actions minutes, making AI FinOps a real developer-platform concern. [GitHub](https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans/)
+- **Microsoft ships its own coding model:** MAI-Code-1-Flash is rolling into GitHub Copilot for VS Code as a fast, efficient Microsoft-built coding model, signaling more provider diversification inside coding assistants. [Microsoft](https://microsoft.ai/news/introducingmai-code-1-flash/) / [GitHub](https://github.blog/changelog/2026-06-02-mai-code-1-flash-is-now-available-for-github-copilot/)
+- **OpenAI highlights Responses API production patterns:** OpenAI’s latest developer post focuses on real agentic products built over the Responses API, useful as pattern mining for teams turning prompts into durable workflows. [OpenAI](https://developers.openai.com/blog/one-year-of-responses)
+- **Salesforce Connections leans agentic marketing:** Coverage from Connections 2026 points to Agentforce-centered marketing workflows and new marketing agents, relevant for Salesforce ecosystem builders planning CRM-native agent products. [Salesforce Ben](https://www.salesforceben.com/how-many-ai-agents-is-too-many-salesforce-adds-four-more-at-connections/) / [Salesforce](https://www.salesforce.com/blog/agentforce-life-sciences-june-2026-newsletter/)
+
+**Worth watching:** The practical edge is shifting from “which model?” to governed agent runtime, sandboxing, observability, and cost controls—budget for AI usage metering as a first-class platform feature.

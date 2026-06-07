@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-06-07 Prototype Vision — Neon Spellblade Duel</title>
+<style>
+  :root{
+    --bg:#090817; --ink:#f6f0ff; --muted:#b9a7ff; --mage:#35f7ff; --fighter:#ffb13b; --pink:#ff4fd8; --green:#7dff73; --danger:#ff4267;
+    --panel:rgba(18,15,42,.88); --grid:rgba(89,247,255,.14);
+  }
+  *{box-sizing:border-box} body{margin:0; color:var(--ink); font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:radial-gradient(circle at 18% 8%,#30206b 0 12%,transparent 30%),radial-gradient(circle at 82% 12%,#6b2a20 0 10%,transparent 28%),linear-gradient(180deg,#090817,#14102a 55%,#070611); min-height:100vh; overflow-x:hidden;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.55;z-index:20} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 80px #000,inset 0 0 180px #000;z-index:21}
+  .wrap{width:min(1120px,94vw);margin:0 auto;padding:34px 0 60px}.hero{text-align:center;padding:34px 18px;border:3px solid var(--mage);background:linear-gradient(135deg,rgba(53,247,255,.10),rgba(255,79,216,.08)),var(--panel);box-shadow:0 0 0 5px #090817,0 0 34px rgba(53,247,255,.4), inset 0 0 40px rgba(255,79,216,.08);position:relative}.badge{display:inline-block;color:#090817;background:var(--green);padding:6px 10px;margin-bottom:12px;text-transform:uppercase;font-weight:900;box-shadow:4px 4px 0 var(--pink)}h1{font-size:clamp(30px,6vw,70px);line-height:.9;margin:8px 0 14px;text-shadow:4px 4px 0 #000,0 0 18px var(--mage);letter-spacing:-2px}.vision{font-size:clamp(15px,2.1vw,22px);color:#fff}.section{margin-top:26px;padding:22px;border:2px solid rgba(255,255,255,.16);background:var(--panel);box-shadow:8px 8px 0 rgba(0,0,0,.45)}h2{margin:0 0 16px;color:var(--green);text-shadow:2px 2px 0 #000}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.card{border:2px solid rgba(53,247,255,.35);padding:14px;background:rgba(0,0,0,.28);min-height:145px}.card b{color:var(--mage)}.card small{color:var(--muted)}.arena{position:relative;height:430px;border:4px solid #5df7ff;background:linear-gradient(transparent 23px,var(--grid) 24px),linear-gradient(90deg,transparent 23px,var(--grid) 24px),radial-gradient(circle at 30% 40%,rgba(53,247,255,.18),transparent 24%),radial-gradient(circle at 70% 38%,rgba(255,177,59,.14),transparent 24%),#11132c;background-size:24px 24px,24px 24px,auto,auto,auto;overflow:hidden;box-shadow:inset 0 -18px 0 #080713,0 0 24px rgba(53,247,255,.25)}.ui{position:absolute;top:12px;left:14px;right:14px;display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;z-index:3}.bar{height:18px;border:2px solid #fff;background:#2a1b39}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--mage),#4b7bff);width:78%}.bar.f span{float:right;background:linear-gradient(90deg,var(--danger),var(--fighter));width:64%}.timer{font-size:28px;color:#fff;text-shadow:2px 2px #000}.floor{position:absolute;left:0;right:0;bottom:0;height:58px;background:repeating-linear-gradient(90deg,#2b2254 0 42px,#211943 42px 84px);border-top:4px solid #7965ff}.plat{position:absolute;height:20px;background:#3b3279;border:3px solid #a69cff;box-shadow:0 8px 0 rgba(0,0,0,.35)}.p1{left:105px;bottom:155px;width:210px}.p2{right:120px;bottom:190px;width:190px}.cover{position:absolute;bottom:58px;width:50px;height:92px;background:#20204b;border:3px solid var(--green);box-shadow:0 0 14px rgba(125,255,115,.28)}.c1{left:42%}.c2{left:55%;height:66px}.sprite{position:absolute;bottom:58px;width:52px;height:82px;filter:drop-shadow(0 0 12px currentColor)}.mage{left:140px;color:var(--mage)}.fighter{right:165px;color:var(--fighter)}.head{position:absolute;left:12px;top:0;width:28px;height:28px;background:currentColor;border:3px solid #fff}.body{position:absolute;left:8px;top:30px;width:36px;height:44px;background:currentColor;border:3px solid #fff}.mage .hat{position:absolute;left:2px;top:-20px;width:48px;height:24px;background:var(--pink);clip-path:polygon(50% 0,100% 100%,0 100%)}.fighter .sword{position:absolute;right:-35px;top:16px;width:50px;height:9px;background:#fff;box-shadow:8px 0 0 var(--fighter);transform:rotate(-18deg)}.bolt{position:absolute;left:260px;bottom:126px;width:130px;height:18px;background:linear-gradient(90deg,var(--mage),transparent);border-radius:999px;box-shadow:0 0 18px var(--mage);animation:zap 1.2s infinite}.slash{position:absolute;right:250px;bottom:120px;width:86px;height:86px;border:10px solid transparent;border-right-color:var(--fighter);border-top-color:var(--fighter);border-radius:50%;transform:rotate(28deg);box-shadow:0 0 18px var(--fighter)}.particle{position:absolute;width:8px;height:8px;background:var(--pink);box-shadow:0 0 10px var(--pink)}.a{left:45%;top:38%}.b{left:49%;top:52%;background:var(--mage)}.d{left:60%;top:35%;background:var(--green)}@keyframes zap{0%{transform:translateX(0);opacity:.5}50%{transform:translateX(80px);opacity:1}100%{transform:translateX(0);opacity:.5}}.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}.pill{display:inline-block;border:1px solid rgba(255,255,255,.25);padding:4px 8px;margin:3px;background:rgba(255,255,255,.08)}ul{margin:8px 0 0 20px;padding:0}li{margin:7px 0}.note{color:var(--muted);font-size:13px}.kbd{color:#000;background:#fff;padding:1px 5px;border-bottom:3px solid #999;font-weight:900}@media(max-width:760px){.cols{grid-template-columns:1fr}.arena{height:360px}.p1{left:50px}.p2{right:45px}.fighter{right:70px}.mage{left:70px}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">Daily Krahnie combat spark · 2026-06-07</div>
+      <h1>NEON SPELLBLADE DUEL</h1>
+      <p class="vision">A retro 2D couch/online arena where a projectile-bending mage and a momentum-heavy fighter trade space, counters, and explosive reads in 90-second rounds.</p>
+    </section>
+
+    <section class="section">
+      <h2>Today's inspiration signals</h2>
+      <div class="cards">
+        <div class="card"><b>MAGE demo signal</b><br><small>Steam search surfaced a 2D projectile fighter demo with 5 mages, 40 maps, and up-to-4-player local play.</small><p>Lean into readable spell identities and lots of tiny arenas instead of one huge ruleset.</p></div>
+        <div class="card"><b>Counterspell twist</b><br><small>FunRug's itch listing mentions a Ghost Mage counterspelling their own returning projectile for an enhanced shot.</small><p>Self-interaction can make magic feel skillful without adding buttons.</p></div>
+        <div class="card"><b>Rollback expectation</b><br><small>Platform Fighter Engine notes and A Few Quick Matches coverage emphasize rollback, quickplay, lobbies, and spectating.</small><p>If PvP is online, market netcode and lobby flow as features, not plumbing.</p></div>
+        <div class="card"><b>Movement toggles</b><br><small>Latin American Games Showcase coverage highlighted a pixel platformer where colored crystals toggle platforms and movement abilities.</small><p>Give arenas one active “rune state” that changes routes, cover, and punish windows.</p></div>
+        <div class="card"><b>Next Fest prep</b><br><small>June 2026 Next Fest chatter centers demos, livestreams, and dev chats.</small><p>Package one punchy duel slice with GIF-friendly hitstop and a feedback form.</p></div>
+      </div>
+      <p class="note">Fresh 24–72h PvP-specific news was thin, so this combines current showcase/Next Fest signals with recent searchable indie PvP/devlog finds.</p>
+    </section>
+
+    <section class="section">
+      <h2>Prototype arena sketch</h2>
+      <div class="arena" role="img" aria-label="Pixel arena mockup with mage, fighter, platforms, cover, projectiles, and UI bars">
+        <div class="ui"><div class="bar"><span></span></div><div class="timer">:47</div><div class="bar f"><span></span></div></div>
+        <div class="plat p1"></div><div class="plat p2"></div><div class="cover c1"></div><div class="cover c2"></div>
+        <div class="sprite mage"><div class="hat"></div><div class="head"></div><div class="body"></div></div>
+        <div class="sprite fighter"><div class="head"></div><div class="body"></div><div class="sword"></div></div>
+        <div class="bolt"></div><div class="slash"></div><div class="particle a"></div><div class="particle b"></div><div class="particle d"></div><div class="floor"></div>
+      </div>
+    </section>
+
+    <section class="section cols">
+      <div>
+        <h2>Mechanic of the day: Return-Fire Parry</h2>
+        <p><span class="pill">Mage: zoning + recall</span><span class="pill">Fighter: dash parry + punish</span></p>
+        <ul>
+          <li><b>Controls:</b> Mage <span class="kbd">X</span> casts, <span class="kbd">B</span> recalls bolt, <span class="kbd">Y</span> detonates. Fighter <span class="kbd">X</span> slash, <span class="kbd">B</span> dash, <span class="kbd">Y</span> parry.</li>
+          <li><b>Rules:</b> Recalled bolts pass through the mage; fighter parry reflects only during 8 active frames; mage can counterspell their own returning bolt to overcharge it.</li>
+          <li><b>Win:</b> First to 3 stocks or highest health after 90 seconds.</li>
+          <li><b>Test:</b> Is the fighter's parry fair against delayed recall, and can spectators read who owns an overcharged projectile?</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Juice checklist</h2>
+        <ul>
+          <li>3-frame hitstop on parry, 6-frame hitstop on reflected kill.</li>
+          <li>Palette flash: cyan owner, orange reflected, magenta overcharged.</li>
+          <li>CRT bloom only on active threats; keep background lower contrast.</li>
+          <li>Distinct “cast / recall / reflect” chirps with rising pitch on danger.</li>
+          <li>Screen-edge warning arrows for offscreen returning projectiles.</li>
+          <li>End-round card: “best read,” “longest reflect chain,” “rune control %.”</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
