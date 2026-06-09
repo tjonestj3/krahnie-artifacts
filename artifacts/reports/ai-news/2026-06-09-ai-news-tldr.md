@@ -1,0 +1,12 @@
+# Morning AI TL;DR — 2026-06-09
+
+Fresh, high-signal AI news in the last 24–48 hours was somewhat thin, so this includes the most relevant recent updates for AI/dev/Salesforce builders.
+
+- **Google DeepMind lists Gemma 4 12B for June.** The official Gemma page describes the new open model as a “unified, encoder-free multimodal model,” a useful signal for builders watching smaller open-weight multimodal stacks ([Google DeepMind](https://deepmind.google/models/gemma/)).
+- **Google Colab CLI gives agents terminal access to remote GPU/TPU runtimes.** The open-source CLI can provision CPU/GPU/TPU runtimes, run local code remotely, manage files, and support headless automation/AI-agent integrations ([GitHub](https://github.com/googlecolab/google-colab-cli)).
+- **NVIDIA and Doosan expanded a physical-AI/robotics infrastructure partnership.** The collaboration targets robotics, industrial systems, and “AI factory” infrastructure, reinforcing that agentic AI is moving beyond software workflows into operational technology ([NVIDIA blog](https://blogs.nvidia.com/blog/nvidia-and-doosan-group-physical-ai/)).
+- **NVIDIA released open-source physical-AI agent tools and skills.** The toolkit turns robotics, AV, vision-AI, and digital-twin workflows into agent-executable tasks, which matters for anyone building tool-using agents grounded in simulation or real-world systems ([NVIDIA Newsroom](https://nvidianews.nvidia.com/news/nvidia-releases-major-collection-of-open-source-agent-tools-and-skills-for-physical-ai)).
+- **Salesforce Summer ’26 keeps pushing Agentforce toward multi-agent enterprise workflows.** Salesforce says the release focuses on AI, data, and automation features to help humans and AI agents work together across the enterprise—relevant for CRM-native builders preparing for the June rollout ([Salesforce](https://www.salesforce.com/news/stories/summer-2026-product-release-announcement/)).
+- **Anthropic added a Services Track and Partner Hub to the Claude Partner Network.** This is less of a model launch and more of an enterprise-channel move, but it matters because Claude implementation capacity and partner certification are becoming buying criteria for AI rollouts ([Anthropic](https://www.anthropic.com/news/services-track-partner-hub)).
+
+**Worth watching:** Agent infrastructure is converging around MCP/CLI-style control planes—expect more “AI agent can operate my dev/cloud/SaaS environment” launches than pure chatbot features this summer.

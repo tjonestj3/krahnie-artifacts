@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prototype Vision — Neon Spellblade Duel — 2026-06-09</title>
+<style>
+  :root{--bg:#080412;--ink:#f8f4ff;--muted:#b8a7d9;--mage:#35f7ff;--fighter:#ffb02e;--danger:#ff3df2;--lime:#9cff39;--panel:#17102b;--line:#4a2e83;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 25% 10%,#24125b 0,#080412 36%,#030208 100%);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden;}
+  body:before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,.035) 50%,rgba(0,0,0,.11) 50%);background-size:100% 4px;mix-blend-mode:screen;pointer-events:none;z-index:9} body:after{content:"";position:fixed;inset:0;box-shadow:inset 0 0 90px #000;pointer-events:none;z-index:10}
+  .wrap{max-width:1120px;margin:auto;padding:28px}.hero{border:4px solid var(--line);background:linear-gradient(135deg,rgba(53,247,255,.16),rgba(255,61,242,.1) 45%,rgba(255,176,46,.13));box-shadow:0 0 28px rgba(53,247,255,.22), inset 0 0 40px rgba(255,61,242,.08);padding:28px;position:relative;overflow:hidden}.hero:before{content:"KRAHNIE-CABINET // DAILY BUILD SIGNAL";position:absolute;right:-42px;top:22px;transform:rotate(12deg);color:#ffe76a55;font-size:14px;border:2px dashed #ffe76a77;padding:8px}h1{font-size:clamp(34px,7vw,72px);line-height:.9;margin:0;text-shadow:4px 4px 0 #000,0 0 18px var(--mage);letter-spacing:-3px}.subtitle{font-size:18px;color:#ffeeb7;max-width:760px;margin-top:14px}.tag{display:inline-block;margin-top:16px;padding:7px 10px;background:#000;border:2px solid var(--mage);color:var(--mage);box-shadow:3px 3px 0 var(--danger)}
+  h2{font-size:24px;margin:30px 0 14px;color:#fff;text-shadow:2px 2px 0 #000}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:var(--panel);border:3px solid var(--line);padding:14px;min-height:150px;box-shadow:5px 5px 0 #000}.card b{color:#ffe76a}.card p{color:var(--muted);font-size:13px;line-height:1.45}.card:nth-child(1){border-color:var(--mage)}.card:nth-child(2){border-color:var(--fighter)}.card:nth-child(3){border-color:var(--danger)}.card:nth-child(4){border-color:var(--lime)}.card:nth-child(5){border-color:#fff}
+  .arena{position:relative;height:430px;background:linear-gradient(#120a2b,#0b0618 55%,#120914);border:5px solid #6b4bd6;box-shadow:0 0 0 5px #000,inset 0 0 80px #000;overflow:hidden}.moon{position:absolute;right:56px;top:44px;width:70px;height:70px;border-radius:50%;background:#ffe76a;box-shadow:0 0 30px #ffe76a}.platform{position:absolute;height:22px;background:repeating-linear-gradient(90deg,#53348e 0 18px,#7557c9 18px 36px);border:3px solid #b9a4ff;box-shadow:0 7px 0 #090411}.p1{left:90px;bottom:92px;width:300px}.p2{right:95px;bottom:176px;width:245px}.ground{left:35px;right:35px;bottom:32px}.cover{position:absolute;left:515px;bottom:54px;width:68px;height:92px;background:#21173e;border:3px solid #8a6dff;box-shadow:inset 0 0 16px #35f7ff55}.sprite{position:absolute;width:48px;height:72px;bottom:115px;filter:drop-shadow(0 0 12px currentColor)}.mage{left:180px;color:var(--mage)}.fighter{right:210px;color:var(--fighter)}.head{width:28px;height:28px;margin:auto;background:currentColor;border:4px solid #fff}.body{width:40px;height:34px;margin:2px auto;background:#111;border:4px solid currentColor}.wand{position:absolute;width:70px;height:8px;background:#fff;left:36px;top:20px;transform:rotate(-14deg);box-shadow:0 0 16px var(--mage)}.sword{position:absolute;width:86px;height:10px;background:#ffe8a3;right:35px;top:34px;transform:rotate(20deg);box-shadow:0 0 16px var(--fighter)}.bolt{position:absolute;left:300px;bottom:190px;width:120px;height:16px;background:linear-gradient(90deg,var(--mage),transparent);clip-path:polygon(0 45%,70% 45%,70% 0,100% 50%,70% 100%,70% 55%,0 55%);animation:pulse 1s infinite}.slash{position:absolute;right:300px;bottom:150px;width:95px;height:95px;border:8px solid var(--fighter);border-left:0;border-bottom:0;border-radius:50%;transform:rotate(25deg);opacity:.9}.particle{position:absolute;width:8px;height:8px;background:var(--danger);box-shadow:0 0 10px var(--danger)}.a{left:430px;bottom:230px}.b{left:610px;bottom:128px;background:var(--lime)}.c{left:750px;bottom:240px;background:var(--mage)}@keyframes pulse{50%{transform:translateX(18px);filter:brightness(1.8)}}.hud{position:absolute;left:24px;right:24px;top:18px;display:flex;justify-content:space-between;gap:20px}.bar{width:42%;height:24px;background:#000;border:3px solid #fff}.fill{height:100%;background:linear-gradient(90deg,var(--mage),#2a70ff);width:72%}.bar:last-child .fill{float:right;background:linear-gradient(90deg,#ff4d3d,var(--fighter));width:61%}.label{position:absolute;top:47px;font-size:12px;color:#fff}.lm{left:28px}.lf{right:28px}.panel{background:rgba(23,16,43,.92);border:3px solid var(--line);box-shadow:5px 5px 0 #000;padding:18px;margin-top:12px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.check{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.check div{background:#0d0820;border:2px solid #3c2b72;padding:10px;color:#d9ccff;font-size:13px}a{color:var(--mage)}@media(max-width:850px){.grid{grid-template-columns:1fr}.cols,.check{grid-template-columns:1fr}.arena{height:360px}.fighter{right:80px}.mage{left:80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>NEON SPELLBLADE DUEL</h1>
+    <div class="subtitle">A retro 2D PvP arena where a drifting projectile mage and a pressure-heavy fighter collide in readable, crunchy, best-of-5 micro-rounds.</div>
+    <span class="tag">2026-06-09 inspiration build • mage vs fighter asymmetry • couch-first, online-ready</span>
+  </section>
+
+  <h2>Today's inspiration signals</h2>
+  <section class="grid">
+    <div class="card"><b>MAGE demo/release ramp</b><p>Steam/itch describe a magical 2D projectile fighter with up to 4 local/online players, single-stick control, pixel art, and explosive short rounds.</p></div>
+    <div class="card"><b>Cursemark launch</b><p>June 8 Early Access mage-knight roguelite: spells + ability-transforming runes suggest modular spell loadouts that change reads without bloating inputs.</p></div>
+    <div class="card"><b>Blood Dungeon reveal</b><p>Messhof's Nidhogg lineage returns with 2D platforming auto-shooter energy; a reminder that narrow silhouettes, motion, and music can sell chaos.</p></div>
+    <div class="card"><b>Steam Next Fest prep</b><p>June 15-22 demos and livestreams emphasize building feedback loops now: a tiny polished PvP slice can be the marketing asset.</p></div>
+    <div class="card"><b>Super Tilt Bro netcode lesson</b><p>Recent NES homebrew chatter highlights resilient netcode even for tiny teams/hardware: communicate online feel early, not as an afterthought.</p></div>
+  </section>
+
+  <h2>Prototype arena sketch</h2>
+  <section class="arena" aria-label="CSS pixel arena sketch">
+    <div class="moon"></div><div class="hud"><div class="bar"><div class="fill"></div></div><div class="bar"><div class="fill"></div></div></div><div class="label lm">MAGE: mana 3 • blink ready</div><div class="label lf">FIGHTER: guard 2 • dash cut</div>
+    <div class="platform ground"></div><div class="platform p1"></div><div class="platform p2"></div><div class="cover"></div>
+    <div class="sprite mage"><div class="head"></div><div class="body"></div><div class="wand"></div></div>
+    <div class="sprite fighter"><div class="head"></div><div class="body"></div><div class="sword"></div></div>
+    <div class="bolt"></div><div class="slash"></div><div class="particle a"></div><div class="particle b"></div><div class="particle c"></div>
+  </section>
+
+  <h2>Mechanic of the day — Reflect Break</h2>
+  <section class="panel cols">
+    <div><b>Controls</b><p>Mage: Left stick move/fly, right stick aim, R shoot, L blink. Fighter: Left stick move, A jump, X slash, B guard/parry, R dash-cut.</p><b>Rules</b><p>Projectiles can be parried during a 10-frame shimmer. A parried bolt becomes a slow neutral orb; either player can strike it to redirect. Fighter loses guard pips on mistimed parries; mage loses mana on spam.</p></div>
+    <div><b>Win condition</b><p>Best of 5, 20-second rounds. Ring-out or HP knockout. Sudden death: center cover sinks and neutral orb spawns.</p><b>What to test</b><p>Can the fighter advance through fire without feeling helpless? Can the mage zone without becoming a runaway? Measure round length, parry success rate, and spectators' ability to read who owns each projectile.</p></div>
+  </section>
+
+  <h2>Juice checklist</h2>
+  <section class="check">
+    <div>Palette-flash projectile ownership: cyan → white → orange on reflect.</div><div>6-frame hitstop on parry, 10-frame hitstop on counter-hit slash.</div><div>CRT bass thump when guard pip breaks; tiny crowd gasp on whiffed parry.</div><div>Screen-edge danger arrows before ring-out, never hidden by particles.</div><div>Afterimage trails only on invulnerable movement, not every dash.</div><div>Demo menu: “2 buttons, 20 seconds, trash-talk safe” for instant party comprehension.</div>
+  </section>
+</div>
+</body>
+</html>
