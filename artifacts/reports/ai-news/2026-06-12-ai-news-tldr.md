@@ -1,0 +1,10 @@
+# Morning AI TL;DR — 2026-06-12
+
+- **OpenAI plans to acquire Ona to expand Codex into persistent cloud agent environments** — the deal is strategically relevant for developers because it points Codex toward secure, long-running enterprise workflows rather than only chat/IDE assistance. ([OpenAI](https://openai.com/index/openai-to-acquire-ona/))
+- **OpenAI backed the EU Code of Practice on AI content transparency** — provenance and content-labeling norms are becoming product requirements, especially for enterprise builders shipping generated content into regulated workflows. ([OpenAI](https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem/))
+- **Anthropic published details on Claude Fable 5 and Claude Mythos 5** — the notable signal is capacity-managed frontier-model access, with Anthropic saying availability may shift as capacity allows. ([Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5))
+- **NVIDIA and LG announced an AI factory partnership** — another sign that “AI factory” infrastructure is moving from hyperscaler talk into large-enterprise robotics, autonomous-driving, GPU-cloud, and data-center programs. ([NVIDIA Newsroom](https://nvidianews.nvidia.com/news))
+- **NVIDIA highlighted Taiwan healthcare deployments using AI agent workforces with Foxconn and medical centers** — practical vertical-agent rollouts are becoming a bigger near-term adoption story than general-purpose consumer agents. ([NVIDIA Latest News](https://nvidianews.nvidia.com/news/latest))
+- **GitHub’s June Copilot changelog shows ongoing model and plan churn** — recent Copilot changes around model availability, larger context/reasoning controls, app preview access, and usage-based billing reinforce that AI coding tools now need active cost and model governance. ([GitHub Changelog](https://github.blog/changelog/month/06-2026/))
+
+**Worth watching:** Persistent cloud coding agents plus usage-based billing will push teams to treat AI dev tools like managed infrastructure: provisioned, policy-controlled, and monitored for cost/quality.
