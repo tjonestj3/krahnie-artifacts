@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>June 13 Prototype Vision — Neon Duel: Mage vs Fighter</title>
+<style>
+  :root{--bg:#090617;--ink:#f7f4ff;--cyan:#32f6ff;--pink:#ff3df2;--gold:#ffd45a;--green:#7cff6b;--red:#ff4e6a;--panel:#171032;--purple:#8d4dff;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% 0,#25165b 0,#090617 45%,#020106 100%);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;image-rendering:pixelated;overflow-x:hidden}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.05) 0 1px,transparent 1px 4px);mix-blend-mode:overlay;opacity:.35;z-index:10} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 120px #000;z-index:11}
+  .wrap{max-width:1120px;margin:auto;padding:28px} header{border:4px solid var(--cyan);box-shadow:0 0 0 4px #000,0 0 30px var(--cyan),inset 0 0 30px rgba(50,246,255,.15);padding:28px;background:linear-gradient(135deg,rgba(255,61,242,.14),rgba(50,246,255,.11));position:relative;overflow:hidden}
+  h1{font-size:clamp(34px,6vw,72px);line-height:.92;margin:0;text-shadow:4px 4px 0 #000,0 0 18px var(--pink);letter-spacing:-2px}.tag{margin-top:14px;font-size:18px;color:#d9fbff}.pill{display:inline-block;border:2px solid var(--gold);padding:7px 10px;margin-top:18px;color:var(--gold);background:#201209;box-shadow:0 0 12px rgba(255,212,90,.35)}
+  h2{font-size:28px;color:var(--cyan);text-shadow:3px 3px 0 #000;margin:32px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:linear-gradient(180deg,#1b123b,#100b23);border:3px solid #46328d;padding:16px;box-shadow:6px 6px 0 #000}.card b{color:var(--gold)}.card a{color:var(--cyan)}
+  .arena{position:relative;height:470px;border:5px solid var(--pink);background:linear-gradient(#140a2b 0 65%,#0c0718 65%);box-shadow:0 0 0 5px #000,0 0 35px var(--pink);overflow:hidden}.moon{position:absolute;right:60px;top:40px;width:70px;height:70px;border-radius:50%;background:#ffe9a7;box-shadow:0 0 30px #ffe9a7}.stars i{position:absolute;width:5px;height:5px;background:#fff;box-shadow:0 0 8px #fff}.s1{left:10%;top:18%}.s2{left:32%;top:11%}.s3{left:56%;top:23%}.s4{left:78%;top:15%}.hud{position:absolute;left:20px;right:20px;top:18px;display:flex;gap:18px;z-index:3}.bar{flex:1;height:26px;border:3px solid #fff;background:#08040f;box-shadow:4px 4px 0 #000}.fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));}.fill.mage{width:72%}.fill.fighter{width:58%;background:linear-gradient(90deg,var(--red),var(--pink))}.label{font-size:12px;margin-bottom:4px;color:#fff;text-shadow:2px 2px #000}.floor{position:absolute;left:0;right:0;bottom:0;height:90px;background:repeating-linear-gradient(90deg,#24134d 0 32px,#1a0d38 32px 64px);border-top:5px solid var(--cyan)}.plat{position:absolute;height:28px;background:#29185c;border:4px solid var(--cyan);box-shadow:0 0 12px var(--cyan),5px 5px 0 #000}.p1{left:90px;top:260px;width:230px}.p2{right:120px;top:220px;width:210px}.cover{position:absolute;left:500px;bottom:88px;width:74px;height:88px;background:#2a2442;border:4px solid #b8a7ff;box-shadow:5px 5px #000}.sprite{position:absolute;width:56px;height:82px;bottom:88px;filter:drop-shadow(0 0 12px currentColor)}.mage{left:150px;color:var(--cyan)}.fighter{right:170px;color:var(--pink)}.head{width:34px;height:30px;margin:0 auto;background:currentColor;border:4px solid #fff}.body{width:48px;height:40px;margin:auto;background:#140b28;border:4px solid currentColor}.feet{display:flex;gap:10px;justify-content:center}.feet span{width:16px;height:12px;background:currentColor}.staff{position:absolute;left:-13px;top:6px;width:8px;height:78px;background:var(--gold);box-shadow:0 0 8px var(--gold)}.sword{position:absolute;right:-32px;top:24px;width:64px;height:10px;background:#fff;box-shadow:0 0 10px #fff;transform:rotate(-18deg)}.orb{position:absolute;left:260px;bottom:170px;width:30px;height:30px;background:var(--cyan);border:4px solid #fff;box-shadow:0 0 20px var(--cyan);animation:float 1.2s infinite alternate}.slash{position:absolute;right:260px;bottom:150px;width:90px;height:40px;border-top:8px solid var(--pink);border-radius:50%;transform:rotate(-22deg);box-shadow:0 -8px 16px var(--pink)}.particle{position:absolute;width:8px;height:8px;background:var(--gold);box-shadow:0 0 9px var(--gold);animation:blink .7s infinite alternate}.q1{left:370px;bottom:198px}.q2{left:420px;bottom:218px}.q3{right:360px;bottom:200px}.q4{right:430px;bottom:150px}@keyframes float{to{transform:translate(34px,-18px)}}@keyframes blink{to{opacity:.2;transform:scale(1.8)}}
+  .mechanic,.check{background:#120d28;border:3px solid var(--purple);padding:18px;box-shadow:6px 6px #000}.cols{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.kbd{color:#000;background:var(--gold);padding:2px 6px;border:2px solid #fff}.check li{margin:8px 0} footer{opacity:.72;margin:24px 0 8px;font-size:12px} @media(max-width:760px){.cols{grid-template-columns:1fr}.arena{height:430px}.sprite{transform:scale(.85)}.mage{left:60px}.fighter{right:70px}.cover{left:45%;}.hud{gap:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NEON GRIMOIRE: BLADEBREAK</h1>
+    <p class="tag">A retro 2D arena duel where a slippery spellcaster bends space while a grounded fighter wins through reads, parries, and explosive gap-closing.</p>
+    <span class="pill">Daily prototype vision · 2026-06-13 · fresh-search grounded</span>
+  </header>
+
+  <h2>Today's inspiration signals</h2>
+  <section class="grid">
+    <article class="card"><b>MAGE</b><br/>Steam/itch show a couch-party 2D projectile fighter with local/online play, charming pixel art, 3-button/single-stick accessibility, 21 mages and 200+ maps. <a href="https://store.steampowered.com/app/4459080/MAGE_Mega_Awesome_Gregarious_Encounters/">Steam</a> · <a href="https://funrug-studio.itch.io/mage">itch</a></article>
+    <article class="card"><b>Steam Next Fest June 2026</b><br/>Valve's June event starts June 15, emphasizing demos, feedback, wishlists and audience-building before launch — perfect timing for a tiny PvP vertical slice. <a href="https://partner.steamgames.com/doc/marketing/upcoming_events/nextfest/2026june">Steamworks</a></article>
+    <article class="card"><b>Evo Indie Devs</b><br/>The indie fighting scene continues to foreground competitive clarity and netcode; "Netcode Warriors" is pitched as an arena fighter built around competitive play. <a href="https://evo.gg/indiedevs">Evo Indie Devs</a></article>
+    <article class="card"><b>Spell Swap</b><br/>A wizard-vs-wizard 2D fighter hook: the last spell you cast comes back at your face — a reminder that spell rules can create comedy, mind games and readable danger. <a href="https://store.steampowered.com/app/1587810/Spell_Swap/">Steam</a></article>
+    <article class="card"><b>Turbo Cat Fight</b><br/>Its loadout-first pitch — choose 4 loadouts totaling 20 moves — suggests a compact way to let small rosters feel deep without making 12 characters. <a href="https://store.steampowered.com/app/903450/Turbo_Cat_Fight/">Steam</a></article>
+  </section>
+
+  <h2>Prototype arena sketch</h2>
+  <section class="arena" aria-label="pixel arena mockup">
+    <div class="moon"></div><div class="stars"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i></div>
+    <div class="hud"><div><div class="label">MAGE · MANA ECHO</div><div class="bar"><div class="fill mage"></div></div></div><div><div class="label">FIGHTER · GUARD HEAT</div><div class="bar"><div class="fill fighter"></div></div></div></div>
+    <div class="plat p1"></div><div class="plat p2"></div><div class="cover"></div>
+    <div class="sprite mage"><div class="staff"></div><div class="head"></div><div class="body"></div><div class="feet"><span></span><span></span></div></div>
+    <div class="sprite fighter"><div class="sword"></div><div class="head"></div><div class="body"></div><div class="feet"><span></span><span></span></div></div>
+    <div class="orb"></div><div class="slash"></div><div class="particle q1"></div><div class="particle q2"></div><div class="particle q3"></div><div class="particle q4"></div><div class="floor"></div>
+  </section>
+
+  <h2>Mechanic of the day: Echo-Parry Duel</h2>
+  <section class="cols">
+    <div class="mechanic">
+      <p><b>Controls:</b> Mage: <span class="kbd">A</span> cast, <span class="kbd">B</span> blink, <span class="kbd">RT</span> redirect last orb. Fighter: <span class="kbd">A</span> slash, <span class="kbd">B</span> dash, <span class="kbd">RT</span> parry stance.</p>
+      <p><b>Rules:</b> Mage projectiles leave a 1-second echo trail. Fighter can parry the orb only during its bright flash; a perfect parry converts it into a pink counter-orb. Mage can redirect once, but each redirect drains visible mana pips.</p>
+      <p><b>Win condition:</b> First to 3 stocks, 90-second rounds; center crystal activates after 30 seconds to force engagement.</p>
+      <p><b>Test:</b> Does the fighter feel brave closing distance, or helpless? Tune parry window, blink cooldown, hitstop and projectile speed until both players yell at the same moment.</p>
+    </div>
+    <ul class="check">
+      <li>Palette-flash owner color on every projectile state change.</li>
+      <li>8-frame hitstop on parry, 12-frame on stock-ending blow.</li>
+      <li>CRT bass thump for fighter dash; glassy arpeggio for mage redirect.</li>
+      <li>UI bars use shapes + colors so mana/guard are readable in chaos.</li>
+      <li>Dust puffs show landing lag; spark shower shows blocked slash angle.</li>
+      <li>One-screen rules card for festivals: “Cast, Parry, Steal the Orb.”</li>
+    </ul>
+  </section>
+  <footer>Saved for local inspiration. Sources are current web-search results; fresh daily news was thin, so this vision blends today's finds with relevant recent/store pages.</footer>
+</div>
+</body>
+</html>
