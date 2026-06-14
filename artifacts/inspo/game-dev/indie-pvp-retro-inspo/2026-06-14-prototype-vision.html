@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Indie PvP Retro Inspo — 2026-06-14</title>
+<style>
+  :root{--bg:#080314;--ink:#f7f0ff;--pink:#ff3df2;--cyan:#38f7ff;--gold:#ffd166;--green:#7cff6b;--red:#ff496d;--violet:#8b5cff;--panel:#17102c;--panel2:#241746;}
+  *{box-sizing:border-box} html,body{margin:0;background:radial-gradient(circle at 20% 0%,#29104d 0,#080314 45%,#020008 100%);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.045) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.28;z-index:9}
+  body:after{content:"";position:fixed;inset:-4rem;pointer-events:none;background:radial-gradient(circle,transparent 55%,rgba(0,0,0,.55));z-index:10}
+  .wrap{max-width:1120px;margin:auto;padding:28px;position:relative;z-index:1}.tag{display:inline-block;border:2px solid var(--cyan);padding:6px 10px;color:var(--cyan);box-shadow:0 0 16px #38f7ff66;text-transform:uppercase;letter-spacing:.12em;background:#0008}
+  h1{font-size:clamp(32px,7vw,76px);line-height:.9;margin:22px 0 10px;text-shadow:4px 0 var(--pink),-4px 0 var(--cyan),0 0 24px #fff4;letter-spacing:-.06em}.vision{font-size:18px;color:#d9c9ff;max-width:860px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:28px 0}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.arena{height:420px}}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card,.section{background:linear-gradient(180deg,var(--panel),#100820);border:2px solid #6142a8;box-shadow:0 0 0 4px #000,0 0 22px #8b5cff55;padding:16px;border-radius:2px}.card h3{margin:0 0 8px;color:var(--gold);font-size:15px}.card p{font-size:12px;line-height:1.45;color:#d8d0f0;margin:0}.section{margin:22px 0}.section h2{margin:0 0 14px;color:var(--cyan);text-shadow:2px 0 var(--pink)}
+  .arena{height:500px;position:relative;overflow:hidden;background:linear-gradient(#160b32,#090512 60%,#040208);border:4px solid #b49cff;box-shadow:inset 0 0 40px #000,0 0 30px #38f7ff44}.moon{position:absolute;right:70px;top:38px;width:80px;height:80px;border-radius:50%;background:var(--gold);box-shadow:0 0 40px var(--gold)}.floor,.plat,.cover{position:absolute;background:linear-gradient(90deg,#36205c,#6b3db0,#36205c);border:3px solid #d5c4ff}.floor{left:25px;right:25px;bottom:54px;height:32px}.plat{width:190px;height:24px}.p1{left:135px;top:230px}.p2{right:135px;top:168px}.cover{width:54px;height:90px;bottom:86px;left:52%;background:linear-gradient(#2bd4ff,#164e9c);box-shadow:0 0 18px #38f7ff88}.ui{position:absolute;left:28px;right:28px;top:20px;display:flex;gap:18px;align-items:center}.bar{flex:1;height:20px;border:2px solid #fff;background:#130b22}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--violet));box-shadow:0 0 12px var(--pink)}.bar.f span{float:right;background:linear-gradient(90deg,var(--gold),var(--red));box-shadow:0 0 12px var(--gold);width:68%}.bar.m span{width:72%}.round{font-size:20px;color:#fff;text-shadow:0 0 8px #fff}.sprite{position:absolute;width:54px;height:78px;bottom:86px}.mage{left:165px}.fighter{right:175px}.head{position:absolute;left:15px;top:0;width:24px;height:24px;background:#f5d0ff;border:3px solid #fff}.body{position:absolute;left:8px;top:24px;width:38px;height:46px;background:var(--violet);border:3px solid #fff;box-shadow:0 0 16px var(--pink)}.mage .hat{position:absolute;left:5px;top:-20px;width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:30px solid var(--pink);filter:drop-shadow(0 0 10px var(--pink))}.fighter .body{background:#b96b21;box-shadow:0 0 16px var(--gold)}.sword{position:absolute;right:-34px;top:28px;width:48px;height:7px;background:#eee;transform:rotate(-18deg);box-shadow:0 0 12px #fff}.shield{position:absolute;left:-18px;top:30px;width:24px;height:34px;background:#38f7ff;border:3px solid #fff;border-radius:0 0 14px 14px;box-shadow:0 0 16px var(--cyan)}
+  .bolt{position:absolute;left:250px;bottom:142px;width:150px;height:16px;background:linear-gradient(90deg,var(--cyan),transparent);clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%);filter:drop-shadow(0 0 12px var(--cyan));animation:pulse .8s infinite alternate}.slash{position:absolute;right:242px;bottom:128px;width:82px;height:82px;border-right:8px solid var(--gold);border-radius:50%;transform:rotate(25deg);filter:drop-shadow(0 0 13px var(--gold))}.particle{position:absolute;width:8px;height:8px;background:var(--pink);box-shadow:0 0 12px var(--pink)}.pa{left:415px;bottom:170px}.pb{left:455px;bottom:205px;background:var(--cyan)}.pc{right:330px;bottom:190px;background:var(--gold)}@keyframes pulse{from{transform:translateX(0)}to{transform:translateX(22px);filter:drop-shadow(0 0 24px var(--cyan))}}
+  .mechanic{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}@media(max-width:800px){.mechanic{grid-template-columns:1fr}}ul{margin:8px 0 0;padding-left:20px}li{margin:8px 0}.pill{display:inline-block;border:1px solid #fff7;background:#0007;padding:4px 7px;margin:3px;color:#fff}.check{columns:2}@media(max-width:700px){.check{columns:1}}a{color:var(--cyan)}.foot{opacity:.7;font-size:12px;text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">Daily Prototype Vision • 2026-06-14</span>
+  <h1>Mage vs Fighter: Neon Duel Goblin</h1>
+  <p class="vision">A tiny retro 2D arena where one player paints space with readable spells while the other weaponizes momentum, parries, and cover to turn every dodge into a counter-hit.</p>
+
+  <h2>Today's inspiration signals</h2>
+  <div class="grid">
+    <div class="card"><h3>Steam Next Fest is live</h3><p>June 9–16 demo/live-stream window reinforces: get an ugly-but-fun versus demo in players’ hands early, then watch matches.</p></div>
+    <div class="card"><h3>Platfighter jam rollback</h3><p>A small itch platform fighter ships rollback and “no blocking” all-or-nothing rules — scope can be tiny if the core duel is sharp.</p></div>
+    <div class="card"><h3>Pixel Gun 2 chaos</h3><p>Destructible arenas and short PvP rounds point toward breakable cover and fast rematches over giant feature sets.</p></div>
+    <div class="card"><h3>Pixelords’ pre-battle depth</h3><p>10 elements / 35 units / real-time PvP suggests elemental identity can create readable matchup mindgames even in compact arenas.</p></div>
+    <div class="card"><h3>Magic Battleground signal</h3><p>Browser spell-brawler descriptions emphasize momentum, timing, and flashy spell effects — VFX readability is the actual combat UI.</p></div>
+  </div>
+
+  <div class="section">
+    <h2>Prototype arena sketch</h2>
+    <div class="arena" aria-label="CSS sketch of mage and fighter arena">
+      <div class="moon"></div><div class="ui"><div class="bar m"><span></span></div><div class="round">99</div><div class="bar f"><span></span></div></div>
+      <div class="plat p1"></div><div class="plat p2"></div><div class="cover"></div><div class="floor"></div>
+      <div class="sprite mage"><div class="hat"></div><div class="head"></div><div class="body"></div></div>
+      <div class="sprite fighter"><div class="head"></div><div class="body"></div><div class="sword"></div><div class="shield"></div></div>
+      <div class="bolt"></div><div class="slash"></div><div class="particle pa"></div><div class="particle pb"></div><div class="particle pc"></div>
+    </div>
+  </div>
+
+  <div class="section mechanic">
+    <div><h2>Mechanic of the day: Spell Guard Reversal</h2><p><span class="pill">Mage: A = bolt</span><span class="pill">Mage: B = rune mine</span><span class="pill">Fighter: A = slash</span><span class="pill">Fighter: B = guard/parry</span></p>
+      <ul><li><b>Rules:</b> Fighter parry is 10 frames active, costs stamina, reflects only the bright core of a spell; misty spell edges still cause chip/pushback.</li><li><b>Win condition:</b> best-of-5 rounds, 20-second timer, ring-out or HP zero.</li><li><b>What to test:</b> can the fighter advance through projectile pressure without the mage feeling helpless once cornered?</li></ul></div>
+    <div><h2>Today's balance thesis</h2><p>Make defense visible and expensive. The mage owns lanes; the fighter owns tempo after one clean read. The crowd should understand the reversal from one palette flash and one crunchy hitstop beat.</p></div>
+  </div>
+
+  <div class="section"><h2>Juice checklist</h2><ul class="check"><li>1-frame white flash on perfect parry</li><li>3-frame freeze when reflected bolt changes team color</li><li>Separate spell core / aura colors for gameplay readability</li><li>CRT rumble stripe on round start</li><li>Low-health UI sparks shaped like tiny goblin teeth</li><li>Whoosh up-pitch for fighter dash, down-pitch on whiff</li><li>Breakable cover leaves smoke silhouettes for 0.4s</li><li>Instant rematch button on KO card</li></ul></div>
+  <p class="foot">Self-contained HTML; no external assets. Sources summarized from current web search: Steam Next Fest June 2026, Platfighter itch page, Steam listings for Pixel Gun 2 / Pixelords / Smack Studio, and recent itch/arena search signals.</p>
+</div>
+</body>
+</html>
