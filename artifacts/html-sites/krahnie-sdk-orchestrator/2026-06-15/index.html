@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krahnie — SDK Orchestrator Build Reference</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#171b21; --panel2:#1d222a; --line:#2a313b;
+    --ink:#e8edf3; --mut:#9aa7b5; --mint:#3ddc97; --amber:#f0b65e; --rust:#e06b5a; --blue:#5aa6e0; --code:#0b0e12;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 28px 100px}
+  header.mast{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:26px}
+  .kicker{color:var(--mint);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+  h1{font-size:31px;margin:10px 0 8px;line-height:1.2}
+  h1 em{color:var(--mint);font-style:normal}
+  .sub{color:var(--mut);max-width:860px}
+  .meta{color:var(--mut);font-size:12.5px;margin-top:14px;display:flex;gap:18px;flex-wrap:wrap}
+  .meta b{color:var(--ink)}
+  h2{font-size:22px;margin:46px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+  h2 .n{color:var(--mint);font-variant-numeric:tabular-nums;margin-right:10px}
+  h3{font-size:16.5px;margin:26px 0 6px;color:#cdd6e0}
+  p{margin:10px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#d7e3ef}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow:auto;font-size:12px;line-height:1.5}
+  pre code{background:none;border:0;padding:0;color:#cfe0d6;white-space:pre}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:#cdd6e0;font-weight:600}
+  td code{font-size:12px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 20px 16px;margin:16px 0}
+  .note{border-left:3px solid var(--mint);background:#11231b;padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+  .warn{border-left:3px solid var(--amber);background:#2a2113;padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+  ul,ol{margin:8px 0;padding-left:22px} li{margin:5px 0}
+  .mut{color:var(--mut)}
+  .toc{columns:2;column-gap:34px;font-size:13.5px}
+  .toc a{color:#bcd;text-decoration:none} .toc a:hover{color:var(--mint)}
+  a{color:var(--mint)}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:20px;text-transform:uppercase}
+  .t-read{background:#13362a;color:var(--mint)} .t-write{background:#3a2017;color:var(--amber)} .t-ui{background:#142a3d;color:var(--blue)} .t-cmd{background:#2a1733;color:#c79be0}
+  .big{font-size:25px;font-weight:700;color:var(--mint);font-variant-numeric:tabular-nums}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .l{color:var(--mut);font-size:12px}
+  footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;color:var(--mut);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="kicker">Krahnborn · Krahnie · Claude Agent SDK</div>
+  <h1>Krahnie — <em>standalone SDK orchestrator</em><br>Technical build reference</h1>
+  <p class="sub">Krahnie rebuilt as its own Python service on the <b>Claude Agent SDK</b>, with Claude
+  orchestrating directly instead of running as a plugin inside the Hermes framework. Same Salesforce
+  delivery-ops workflows, same Slack UX — but Krahnie now owns its agent loop, which made it dramatically
+  faster and cheaper. This is the code-level reference and the rationale for treating it as the successor
+  to the <code>krahnie-slack</code> Hermes plugin.</p>
+  <div class="meta">
+    <span><b>Repo</b> ~/krahnie</span>
+    <span><b>Brain</b> Claude Haiku 4.5 (orchestrator) · Sonnet 4.6 (enrichment)</span>
+    <span><b>Org</b> krahn-tj-dev (sandbox)</span>
+    <span><b>Updated</b> 2026-06-15</span>
+  </div>
+</header>
+
+<div class="panel">
+  <h3 style="margin-top:14px">Contents</h3>
+  <div class="toc">
+    <a href="#why">1 · Why a standalone SDK orchestrator</a><br>
+    <a href="#arch">2 · Architecture &amp; request flow</a><br>
+    <a href="#layout">3 · Repo layout</a><br>
+    <a href="#agent">4 · The orchestrator (agent.py)</a><br>
+    <a href="#ctx">5 · Context delivery (the task-isolation fix)</a><br>
+    <a href="#tools">6 · Tools (the workflows)</a><br>
+    <a href="#writes">7 · Write flows &amp; confirm-before-commit</a><br>
+    <a href="#gateway">8 · Gateway: interactivity &amp; slash commands</a><br>
+    <a href="#sf">9 · Salesforce REST layer</a><br>
+    <a href="#enrich">10 · Sonnet enrichment</a><br>
+    <a href="#sched">11 · Durable scheduler</a><br>
+    <a href="#perf">12 · Cost &amp; performance</a><br>
+    <a href="#run">13 · Running it · env · cutover</a><br>
+    <a href="#learn">14 · Key learnings</a><br>
+  </div>
+</div>
+
+<h2 id="why"><span class="n">1</span>Why a standalone SDK orchestrator</h2>
+<p>The original Krahnie ran as the <code>krahnie-slack</code> plugin inside the self-hosted Hermes framework,
+with gpt-5.5 as the brain and Hermes' hand-rolled gateway/agent loop. The rebuild keeps every workflow but
+swaps that for a small Python service built directly on the <b>Claude Agent SDK</b> (<code>claude-agent-sdk</code>),
+with Claude running the agent loop.</p>
+<p>The architecture is three layers, and the key insight is that two of them are <b>model-agnostic</b>:</p>
+<ul>
+  <li><b>Transport</b> — Slack Socket Mode gateway (ack, threading, buttons, modals). Reused patterns from Hermes; doesn't care what the brain is.</li>
+  <li><b>Orchestrator</b> — the swappable brain. This is the <em>only</em> Claude-specific layer (<code>agent.py</code> + <code>prompts.py</code>, a few dozen lines).</li>
+  <li><b>Tools</b> — the workflows (Salesforce queries, Block Kit rendering). Pure business logic, ported verbatim from the Hermes plugin.</li>
+</ul>
+<div class="note"><b>The payoff (measured):</b> warm conversational turn dropped from ~10–13 s to <b>~2–3 s</b>,
+cold-start cost from <b>$0.16 → ~$0.01</b>, warm-turn cost to <b>~$0.004</b>, and the per-query Salesforce
+latency from ~6.6 s to ~0.3 s. See §12. Lock-in is thin: the tools and transport are reusable; only the
+orchestrator layer is Claude-native.</p></div>
+
+<h2 id="arch"><span class="n">2</span>Architecture &amp; request flow</h2>
+<pre><code>Slack (Socket Mode, shared app with Hermes)
+   │   message / assistant_thread / action / view / command
+   ▼
+slack_gateway.py ── set RequestContext (channel, thread, user) per turn
+   │
+   ▼
+agent.run_turn(text, ctx, session_key)        ← Claude Agent SDK, Haiku
+   │   warm persistent client per conversation; thinking disabled; tools=[]
+   ▼
+in-process MCP tools (tools/*)                ← only Krahnie's tools exist
+   │   query Salesforce (REST), render Block Kit
+   ▼
+post to Slack (slackio)  ·  the card IS the response</code></pre>
+<p>Writes and buttons bypass the agent: a tool posts a <b>confirm card</b>, and the gateway's button/modal
+handlers perform the actual Salesforce write on click (confirm-before-commit). Sonnet is called directly
+(not through the agent loop) for the genuinely reasoning-heavy bits — card-work summaries and story-point
+enrichment.</p>
+
+<h2 id="layout"><span class="n">3</span>Repo layout</h2>
+<pre><code>~/krahnie/
+  run.py                      entrypoint: load .env, start gateway, run forever
+  .env                        SLACK_*, ANTHROPIC_API_KEY, KRAHNIE_SF_* (gitignored)
+  requirements.txt            claude-agent-sdk, slack-bolt, slack-sdk, anthropic, PyYAML
+  krahnie/
+    agent.py                  SDK wiring: Haiku, tools=[], warm pool, run_turn()
+    prompts.py                system prompt + intent routing
+    context.py                RequestContext (per-conversation holder)
+    slack_gateway.py          Socket Mode transport + all interactivity/commands
+    tools/
+      __init__.py             build_server(get_ctx) → in-process MCP server
+      week.py                 post_week_at_a_glance
+      cards.py                post_client_cards, post_my_time, find_cards, scope/parse helpers
+      research.py             summarize_card_work + shared build_summary (Sonnet)
+      logtime.py              post_log_confirm (+ picker), post_correction_confirm
+      createcard.py           post_card_create_confirm
+    writes.py                 SF write layer + modal builders + result renderers
+    salesforce.py             REST query + create_record + patch_record (token cached)
+    blockkit.py               pure Block Kit renderers (verbatim from Hermes)
+    refresh.py                week payload + render
+    enrich.py                 Sonnet: summarize_work, estimate_card (rubric cached)
+    pending.py                confirm-before-commit store (nonce → proposed change)
+    scheduler.py              durable reusable scheduler (one-time + weekly)
+    state.py                  snooze/digest state · slackio.py · envload.py · story_points.md
+  scripts/                    smoke_sdk · test_context_flow · bench · test_prewarm · test_wave1 · test_wave3
+  var/                        state/ pending/ scheduled/ (gitignored runtime data)</code></pre>
+
+<h2 id="agent"><span class="n">4</span>The orchestrator (<code>agent.py</code>)</h2>
+<p>A single configured agent, reached via <code>run_turn(text, ctx, session_key)</code>. Three deliberate choices
+define its speed and cost profile:</p>
+<table>
+<tr><th>Option</th><th>Value</th><th>Why</th></tr>
+<tr><td><code>model</code></td><td><code>claude-haiku-4-5-20251001</code></td><td>Cheapest capable model; fast tool-routing (the Hermes "minimal reasoning" analog).</td></tr>
+<tr><td><code>thinking</code></td><td><code>{"type":"disabled"}</code></td><td>No thinking-token latency or spend on routing turns.</td></tr>
+<tr><td><code>tools</code></td><td><code>[]</code></td><td><b>Strips every built-in tool</b> (Bash/Read/Write/…). Cuts cached context ~54K → ~3K tokens (≈94%). Krahnie literally has no tools but its own.</td></tr>
+<tr><td><code>mcp_servers</code></td><td><code>{"krahnie": &lt;server&gt;}</code></td><td>In-process MCP server holding Krahnie's tools (<code>mcp__krahnie__*</code>).</td></tr>
+<tr><td><code>can_use_tool</code></td><td>deny-by-default</td><td>Defense in depth: allow only <code>mcp__krahnie__*</code>, deny everything else.</td></tr>
+<tr><td><code>setting_sources</code></td><td><code>[]</code></td><td>Hermetic — loads no <code>~/.claude</code> settings/skills/MCP from disk.</td></tr>
+</table>
+<h3>Warm-pool prewarming</h3>
+<p>The SDK spins up its runtime subprocess + MCP handshake on the first <code>query()</code> of a client (~13 s cold).
+To hide that, <code>prewarm()</code> at startup keeps a pool of pre-connected clients (each warmed with a throwaway
+query so the model path is hot) <em>and</em> primes the Salesforce token. A new conversation adopts a warm client;
+the pool replenishes in the background. Result: the first real message of a conversation is ~3 s, not ~13 s.
+Pool size via <code>KRAHNIE_WARM_POOL</code> (default 1).</p>
+
+<h2 id="ctx"><span class="n">5</span>Context delivery — the task-isolation fix</h2>
+<div class="warn"><b>The trap we hit:</b> a persistent SDK client runs tool callbacks inside its own <em>connection
+task</em>, which snapshots <code>contextvars</code> at <code>connect()</code> time. So an ambient contextvar set per-turn
+in the caller's task is <em>stale</em> inside the callback — turn 2's tool saw turn 1's channel.</div>
+<p><b>The fix:</b> each conversation owns a mutable holder; <code>run(text, ctx)</code> stamps the current turn's
+<code>RequestContext</code> into it, and that conversation's tools read it via a bound getter
+(<code>build_server(lambda: holder["current"])</code>). A mutable dict read at call-time is shared by reference and
+always reflects the current turn — immune to which task runs the callback. Validated across multi-turn.</p>
+
+<h2 id="tools"><span class="n">6</span>Tools (the workflows)</h2>
+<p>Tools are built per-conversation by factories bound to that conversation's context getter, then bundled into
+one in-process MCP server. Tool names the agent sees are <code>mcp__krahnie__&lt;name&gt;</code>.</p>
+<table>
+<tr><th>Tool</th><th></th><th>Behavior</th></tr>
+<tr><td><code>post_week_at_a_glance</code></td><td><span class="tag t-read">read</span></td><td>The "what's my week" digest — cards due/overdue, utilization vs capacity, Refresh/Snooze buttons.</td></tr>
+<tr><td><code>post_client_cards</code></td><td><span class="tag t-read">read</span></td><td>Cards for a client/project/board. Subject matched across all three (robust to which field the model picks). Filters: <code>overdue</code>, <code>unlogged</code>, <code>mine</code>.</td></tr>
+<tr><td><code>post_my_time</code></td><td><span class="tag t-read">read</span></td><td>Cards the asking user logged time to this week + utilization.</td></tr>
+<tr><td><code>summarize_card_work</code></td><td><span class="tag t-read">read</span></td><td>Fetch a card's work logs, write a <b>Sonnet</b> recap, post it. Shares <code>build_summary()</code> with the ⋯ menu.</td></tr>
+<tr><td><code>post_log_confirm</code></td><td><span class="tag t-write">write</span></td><td>Log time. Confident match → confirm card; otherwise a <b>picker</b> of the client's (or your own) open cards.</td></tr>
+<tr><td><code>post_correction_confirm</code></td><td><span class="tag t-write">write</span></td><td>Correct/move an existing entry — before→after diff card.</td></tr>
+<tr><td><code>post_card_create_confirm</code></td><td><span class="tag t-write">write</span></td><td>Create a card — Create/Edit/Cancel card; fires async Sonnet AI insights after creation.</td></tr>
+</table>
+<p>Routing lives in <code>prompts.py</code>. Key rules: a named client/project/board always wins over "do I have"
+phrasing; durations convert to decimal hours (90 min → 1.5); after a posting tool succeeds the agent stays
+silent (the card is the response).</p>
+
+<h2 id="writes"><span class="n">7</span>Write flows &amp; confirm-before-commit</h2>
+<p>No tool writes directly. A write tool stashes the proposed change in <code>pending.py</code> (one JSON-on-disk
+store, nonce-keyed, with a <code>kind</code> discriminator: <code>log</code> / <code>correction</code> /
+<code>card_create</code> / <code>log_intent</code>) and posts a Block Kit confirm card whose buttons carry the nonce.
+The gateway's button handler loads (and consumes) the pending change and performs the Salesforce write.</p>
+<pre><code>agent → post_log_confirm → pending.save("log", {...}) + confirm card
+user taps Confirm → gateway _run_log_confirm → pending.load(nonce) → writes.log_work → chat_update to "✅ Logged …"</code></pre>
+<p><b>The fuzzy picker</b> (a favorite Hermes feature): when the card hint isn't a confident match,
+<code>find_cards()</code> (difflib + token search over open cards, scoped to a client, relaxing to all of the
+client's cards) drives a picker. Each button carries <code>{intent_nonce, card_id}</code>; tapping one resolves the
+card and <code>chat_update</code>s the picker into the normal confirm card.</p>
+
+<h2 id="gateway"><span class="n">8</span>Gateway: interactivity &amp; slash commands</h2>
+<p><code>slack_gateway.py</code> reuses the Hermes transport patterns on <code>slack_bolt</code> AsyncApp + Socket Mode:
+the 3-second-ack rule is honored by <code>await ack()</code> then <code>asyncio.create_task(...)</code> for all
+work; assistant-pane threads are handled so replies land in the conversation; messages are de-duped.</p>
+<table>
+<tr><th>Surface</th><th></th><th>Handlers</th></tr>
+<tr><td>Digest buttons</td><td><span class="tag t-ui">ui</span></td><td>Refresh (re-query + chat_update), Snooze (durable schedule, §11)</td></tr>
+<tr><td>Confirm cards</td><td><span class="tag t-ui">ui</span></td><td>Confirm / Edit / Cancel for log, correction, card-create</td></tr>
+<tr><td>Picker</td><td><span class="tag t-ui">ui</span></td><td><code>krahnie_logpick</code> → resolve chosen card → confirm card</td></tr>
+<tr><td>Per-card ⋯ menu</td><td><span class="tag t-ui">ui</span></td><td>Log time → modal · Summarize → Sonnet recap in-thread</td></tr>
+<tr><td>Modals</td><td><span class="tag t-ui">ui</span></td><td><code>views.open</code> + <code>view_submission</code> for the log + new-card forms</td></tr>
+<tr><td>Slash commands</td><td><span class="tag t-cmd">cmd</span></td><td><code>/my-week</code> · <code>/logtime</code> · <code>/newcard</code> (registered in the shared Slack app)</td></tr>
+</table>
+<div class="warn"><b>Shared Slack app:</b> Krahnie connects to the same Slack app as the Hermes gateway. Two
+Socket Mode clients on one app token both receive events — <b>only one may run at a time</b>. Stop
+<code>hermes-gateway.service</code> before running Krahnie.</div>
+
+<h2 id="sf"><span class="n">9</span>Salesforce REST layer (<code>salesforce.py</code>)</h2>
+<p>The biggest single speed win. The Hermes plugin shelled out to the <code>sf</code> CLI per query (~3 s of Node
+cold-start <em>each</em>). Krahnie fetches an access token + instance URL <b>once</b> via <code>sf org display</code>
+(cached in-memory) and then hits the REST API directly over HTTPS for every query and write.</p>
+<table>
+<tr><th>Function</th><th>REST</th></tr>
+<tr><td><code>query(soql)</code></td><td>GET <code>/services/data/vXX/query</code> · follows pagination · 401 → refresh + retry</td></tr>
+<tr><td><code>create_record(sobject, fields)</code></td><td>POST <code>/sobjects/{sobject}</code></td></tr>
+<tr><td><code>patch_record(sobject, id, patch)</code></td><td>PATCH <code>/sobjects/{sobject}/{id}</code> (204 on success)</td></tr>
+</table>
+<p>Per-query latency went from ~6.6 s (two CLI calls) to ~0.3 s. The one-time token fetch (~3.5 s) is also
+prewarmed at startup, so even the first real query is fast.</p>
+
+<h2 id="enrich"><span class="n">10</span>Sonnet enrichment (<code>enrich.py</code>)</h2>
+<p>Haiku orchestrates; the genuinely reasoning-heavy work calls <b>Sonnet 4.6</b> directly via the Anthropic SDK:</p>
+<ul>
+  <li><code>summarize_work(...)</code> — the card-work recap behind <code>summarize_card_work</code> and the ⋯ menu.</li>
+  <li><code>estimate_card(title, desc)</code> — story points + next steps + follow-up questions, via a <b>forced tool call</b>
+  (<code>submit_estimate</code>) for guaranteed structure. The editable rubric (<code>story_points.md</code>) is sent as a
+  <code>cache_control</code> system block so repeated estimates reuse it.</li>
+</ul>
+<p>On card creation the gateway renders the created card with a "✨ Generating AI insights…" note, runs
+<code>estimate_card</code> in the background, writes the <code>AI_*</code> fields, and updates the message in place with
+story points + next steps + follow-ups.</p>
+
+<h2 id="sched"><span class="n">11</span>Durable scheduler (<code>scheduler.py</code>)</h2>
+<p>A <b>general, reusable</b> scheduling primitive — not snooze-specific. Each job is a JSON file under
+<code>var/scheduled/</code>: <code>{id, run_at (UTC), kind, payload, recurring}</code>. The gateway runs a 30-second
+poll loop that fires due jobs by dispatching on <code>kind</code>, then re-arms recurring jobs or removes one-time
+ones. Because jobs live on disk, they <b>survive gateway restarts</b> (the gap the Wave-2 in-process snooze had).</p>
+<ul>
+  <li><code>schedule(run_at, kind, payload, recurring=…)</code> · <code>due(now)</code> · <code>reschedule_recurring(job)</code> · <code>next_weekly(spec)</code></li>
+  <li>Kinds today: <code>week_repost</code> (snooze re-post) and <code>week_digest_all</code> (the proactive Monday 8:00 CT digest to all mapped users — opt-in via <code>KRAHNIE_WEEKLY_DIGEST=1</code>).</li>
+  <li>New scheduled features just pick a <code>kind</code> and register a handler. Mirrors Hermes' cron modularity.</li>
+</ul>
+
+<h2 id="perf"><span class="n">12</span>Cost &amp; performance</h2>
+<div class="grid">
+  <div class="stat"><div class="l">Warm turn latency</div><div class="big">~2–3 s</div><div class="l">was ~10–13 s on Hermes</div></div>
+  <div class="stat"><div class="l">Warm turn cost</div><div class="big">~$0.004</div><div class="l">Haiku, ~3K-token context</div></div>
+  <div class="stat"><div class="l">Cold-start cost</div><div class="big">~$0.01</div><div class="l">was $0.16 before stripping</div></div>
+  <div class="stat"><div class="l">Context size</div><div class="big">~3K tok</div><div class="l">from ~54K (tools=[])</div></div>
+  <div class="stat"><div class="l">SF query</div><div class="big">~0.3 s</div><div class="l">from ~6.6 s (REST vs CLI)</div></div>
+  <div class="stat"><div class="l">Cold-start latency</div><div class="big">hidden</div><div class="l">warm-pool prewarming</div></div>
+</div>
+<p>Pricing (per 1M tokens): Haiku 4.5 $1 / $5 · Sonnet 4.6 $3 / $15 · cache reads ≈ 0.1× input. Prompt caching is
+automatic via the SDK; stripping the built-in tool defs is what made it cheap by shrinking what gets cached.
+Sonnet is the only notable spend (summaries/enrichment, ~$0.01–0.02 each) and fires infrequently and by design.</p>
+
+<h2 id="run"><span class="n">13</span>Running it · env · cutover</h2>
+<pre><code># Krahnie shares the Slack app with Hermes — stop Hermes first
+systemctl --user stop hermes-gateway.service
+cd ~/krahnie &amp;&amp; ./.venv/bin/python run.py
+# Ctrl-C to stop, then: systemctl --user start hermes-gateway.service</code></pre>
+<table>
+<tr><th>Env flag</th><th>Effect</th></tr>
+<tr><td><code>KRAHNIE_WARM_POOL</code></td><td>Pre-connected client pool size (default 1).</td></tr>
+<tr><td><code>KRAHNIE_WEEKLY_DIGEST=1</code></td><td>Enable the recurring Monday 8:00 CT all-hands digest.</td></tr>
+<tr><td><code>KRAHNIE_STORY_POINT_GUIDE</code></td><td>Override the story-point rubric path.</td></tr>
+<tr><td><code>KRAHNIE_SF_ORG</code> / <code>KRAHNIE_SF_INSTANCE</code></td><td>Salesforce org alias + Lightning instance for record links.</td></tr>
+</table>
+<p><b>Cutover:</b> once Krahnie is proven, run it as its own systemd user service (mirroring
+<code>hermes-gateway.service</code>) and leave Hermes stopped/disabled for this workload. Both can't hold the
+shared Slack app at once.</p>
+
+<h2 id="learn"><span class="n">14</span>Key learnings</h2>
+<ol>
+  <li><b><code>tools=[]</code> is the cost lever.</b> The SDK loads its full built-in tool catalog by default (~51K cached tokens). Strip it when the agent only needs your MCP tools — context drops ~94% and cold cost collapses.</li>
+  <li><b>Persistent clients break ambient contextvars.</b> Tool callbacks run in the client's connection task. Deliver per-turn context through a mutable per-conversation holder, not a contextvar.</li>
+  <li><b>Go around the CLI for Salesforce.</b> Direct REST (token cached) is ~16× faster per query than <code>sf</code>; the MCP server also uses REST, so it wouldn't have helped — direct is leanest.</li>
+  <li><b>Prewarm to hide cold start.</b> <code>connect()</code> is lazy; the runtime spins up on the first <code>query()</code>. A throwaway warmup query + token prefetch at startup makes the first real turn fast.</li>
+  <li><b>The architecture is the moat.</b> Transport and tools are model-agnostic and ported verbatim; only ~a few dozen lines (<code>agent.py</code> + <code>prompts.py</code>) are Claude-specific. Cheap to maintain, cheap to re-point.</li>
+</ol>
+
+<footer>
+  Krahnie SDK orchestrator · <code>~/krahnie</code> · Claude Agent SDK (Haiku orchestrator / Sonnet enrichment) ·
+  successor to the Hermes <code>krahnie-slack</code> plugin · generated 2026-06-15.
+</footer>
+
+</div>
+</body>
+</html>
