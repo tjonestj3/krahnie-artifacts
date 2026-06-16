@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-06-16 Prototype Vision — Neon Grimoire Duel</title>
+<style>
+  :root{--bg:#090716;--ink:#f6f0ff;--pink:#ff3df2;--cyan:#29f7ff;--gold:#ffd166;--green:#6dff8f;--red:#ff4d6d;--violet:#7c4dff;}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% 0%,#23124a 0,#090716 45%,#04030a 100%);color:var(--ink);font-family:Verdana, Geneva, sans-serif;line-height:1.45;overflow-x:hidden;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen;z-index:10} body:after{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 100px #000;z-index:11}
+  .wrap{max-width:1100px;margin:auto;padding:28px}.hero{border:4px solid var(--cyan);box-shadow:0 0 18px var(--cyan), inset 0 0 24px #3b1a74;background:linear-gradient(135deg,rgba(255,61,242,.16),rgba(41,247,255,.09));padding:28px;border-radius:18px;text-align:center;position:relative;overflow:hidden}.hero h1{font-family:monospace;font-size:clamp(34px,6vw,72px);margin:0;text-shadow:4px 4px 0 #000,0 0 16px var(--pink);letter-spacing:2px}.hero p{font-size:20px;color:#d7fbff}.badge{display:inline-block;border:2px solid var(--gold);padding:6px 10px;color:var(--gold);background:#000;margin-bottom:12px}
+  h2{font-family:monospace;color:var(--cyan);text-shadow:0 0 10px var(--cyan);margin-top:34px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.card{background:#130d2c;border:2px solid #4930a3;border-radius:14px;padding:15px;box-shadow:0 0 0 3px #000,0 0 14px rgba(124,77,255,.55)}.card b{color:var(--gold)}.card a{color:var(--cyan)}
+  .arena{position:relative;height:430px;border:5px solid #111;background:linear-gradient(#19103a,#0c0920 65%,#080612);box-shadow:0 0 24px var(--pink), inset 0 0 45px #000;border-radius:18px;overflow:hidden}.hud{position:absolute;top:12px;left:18px;right:18px;display:flex;gap:20px;z-index:2}.bar{flex:1;height:22px;border:2px solid #fff;background:#111}.fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));}.name{font:700 12px monospace;margin-bottom:3px}.platform{position:absolute;background:#3a2b63;border:3px solid #7b68ee;box-shadow:0 0 12px #7b68ee}.p1{left:80px;bottom:90px;width:260px;height:24px}.p2{right:90px;bottom:155px;width:230px;height:24px}.floor{left:0;right:0;bottom:35px;height:30px;background:#20173d;border-top:4px solid var(--cyan)}.cover{position:absolute;left:500px;bottom:65px;width:70px;height:90px;background:#111a2d;border:3px solid var(--gold);box-shadow:0 0 14px var(--gold)}.sprite{position:absolute;width:48px;height:72px;bottom:115px}.mage{left:155px;background:linear-gradient(var(--violet),#261061);border:3px solid var(--cyan);box-shadow:0 0 18px var(--cyan)}.mage:before{content:"✦";position:absolute;top:-32px;left:9px;color:var(--cyan);font-size:34px;text-shadow:0 0 12px var(--cyan)}.fighter{right:170px;bottom:180px;background:linear-gradient(#713016,#d98d35);border:3px solid var(--gold);box-shadow:0 0 16px var(--gold)}.fighter:before{content:"▰";position:absolute;right:-20px;top:25px;color:#ddd;font-size:34px;text-shadow:0 0 10px #fff}.bolt{position:absolute;width:140px;height:10px;left:245px;bottom:160px;background:var(--cyan);box-shadow:0 0 16px var(--cyan);transform:skewX(-20deg)}.slash{position:absolute;right:250px;bottom:214px;width:82px;height:82px;border:8px solid transparent;border-right-color:var(--pink);border-radius:50%;transform:rotate(-25deg);filter:drop-shadow(0 0 10px var(--pink))}.particle{position:absolute;width:8px;height:8px;background:var(--pink);box-shadow:0 0 12px var(--pink)}.pt1{left:420px;bottom:195px}.pt2{left:610px;bottom:130px;background:var(--cyan)}.pt3{left:720px;bottom:260px;background:var(--gold)}
+  .panel{background:rgba(0,0,0,.45);border:2px solid #3ddcff;border-radius:14px;padding:18px;margin-top:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:750px){.grid{grid-template-columns:1fr}.arena{height:360px}.fighter{right:80px}.mage{left:70px}.bolt{left:150px;width:90px}.cover{left:45%}}
+  li{margin:7px 0}.kbd{font-family:monospace;background:#000;border:1px solid #fff;padding:2px 6px;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero"><div class="badge">DAILY PROTOTYPE VISION • 2026-06-16</div><h1>NEON GRIMOIRE DUEL</h1><p>A crunchy retro 2D arena where a fragile spellcaster controls space while a fearless fighter converts parries, dashes, and cover into point-blank punishment.</p></section>
+  <h2>Today's inspiration signals</h2>
+  <div class="cards">
+    <div class="card"><b>Steam Next Fest is live.</b><br>Hundreds of demos + livestreams make demo-first community loops visible. <a href="https://store.steampowered.com/sale/nextfest">Source</a></div>
+    <div class="card"><b>Press lists are discovery funnels.</b><br>June Next Fest roundups reward instantly readable hooks and GIF-friendly combat beats. <a href="https://press-start.com.au/features/2026/06/16/20-games-from-the-june-2026-steam-next-fest-that-you-should-check-out/">Source</a></div>
+    <div class="card"><b>Rollback is still grassroots.</b><br>2D Fighter Maker rollback launcher buzz shows old-school 2D communities care deeply about netplay feel. <a href="https://supercombo.gg/">Source</a></div>
+    <div class="card"><b>Pixel art = modern clarity, not nostalgia only.</b><br>Recent pixel-art discourse emphasizes lighting, depth, and animation priorities. <a href="https://androidexperto.com/15-must-play-indie-games-in-2026-trending-indie-video-games-and-top-indie-releases-gaining-serious-buzz/">Source</a></div>
+    <div class="card"><b>Odd tags can inspire combat.</b><br>Pixel Washer's spray/restore verb suggests readable beam pressure, cleansing shields, and territory control. <a href="https://gamingtrend.com/news/cozy-power-washing-sim-pixel-washer-arrives-at-steam-next-fest/">Source</a></div>
+  </div>
+  <h2>Prototype arena sketch</h2>
+  <div class="arena" aria-label="CSS arena sketch">
+    <div class="hud"><div style="flex:1"><div class="name">MAGE • MANA 72%</div><div class="bar"><div class="fill" style="width:72%"></div></div></div><div style="flex:1"><div class="name">FIGHTER • GUARD 41%</div><div class="bar"><div class="fill" style="width:41%"></div></div></div></div>
+    <div class="platform p1"></div><div class="platform p2"></div><div class="platform floor"></div><div class="cover"></div><div class="sprite mage"></div><div class="sprite fighter"></div><div class="bolt"></div><div class="slash"></div><div class="particle pt1"></div><div class="particle pt2"></div><div class="particle pt3"></div>
+  </div>
+  <div class="grid">
+    <section class="panel"><h2>Mechanic of the day</h2><p><b>Arcane Riposte: projectile parry into lunge confirm.</b></p><ul><li><b>Controls:</b> Mage <span class="kbd">A</span> bolt, <span class="kbd">S</span> ward, <span class="kbd">D</span> blink. Fighter <span class="kbd">J</span> slash, <span class="kbd">K</span> parry, <span class="kbd">L</span> burst dash.</li><li><b>Rules:</b> Parrying during the last 8 frames of a bolt creates a pink rebound shard; mage can ward-catch it, fighter can dash-cancel behind it.</li><li><b>Win:</b> Best of 5 stocks; ring-out or HP depletion.</li><li><b>Test:</b> Is parry timing legible at 1x speed and still satisfying with 4-frame hitstop?</li></ul></section>
+    <section class="panel"><h2>Juice checklist</h2><ul><li>Palette flash: cyan spell startup, magenta parry spark, gold punish window.</li><li>Short CRT bloom only on high-value events: ward break, stock loss, perfect parry.</li><li>Three audio layers: low mana hum, fighter boot skid, projectile pitch rises near parryable frames.</li><li>UI clarity: separate mana/guard bars from health; show cooldown pips as chunky runes.</li><li>Marketing capture: 6-second loop of parry → rebound → blink dodge → counter KO.</li></ul></section>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Morning AI TL;DR — 2026-06-16
+
+Fresh AI news in the last 24–48 hours was relatively concentrated; below are the most relevant recent updates for AI/dev/Salesforce builders, with a few high-signal items from the past week.
+
+- **Salesforce to buy Fin for ~$3.6B** — Salesforce is acquiring the autonomous customer-service agent platform to strengthen Agentforce’s service-agent stack, a strategically relevant move for CRM/agent builders. [Reuters](https://www.reuters.com/business/salesforce-buy-fin-about-36-billion-2026-06-15/), [CNBC](https://www.cnbc.com/2026/06/15/salesforce-ai-customer-service-fin-acquistion.html)
+- **GitHub Copilot enterprise metrics get broader telemetry** — Copilot usage reports now include server-side telemetry in addition to client signals, making enterprise adoption/ROI tracking less blind. [GitHub Changelog](https://github.blog/changelog/month/06-2026/)
+- **Google DeepMind highlights new Gemma work in June** — Gemma’s page points to a June release around a unified, encoder-free multimodal model, worth tracking for teams evaluating open/portable multimodal stacks. [Google DeepMind Gemma](https://deepmind.google/models/gemma/)
+- **Anthropic’s Claude Fable 5 reaches GitHub Copilot** — GitHub says Fable 5 is available in Copilot and aimed at long-horizon autonomous coding and knowledge-work tasks, continuing the push toward agentic dev workflows. [GitHub Changelog](https://github.blog/changelog/2026-06-09-claude-fable-5-is-generally-available-for-github-copilot/), [Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5)
+- **Microsoft Agent Framework Build updates continue to matter** — Microsoft’s open-source agent SDK/runtime announcements include Agent Harness, Hosted Agents, and CodeAct patterns for multi-agent workflows. [Microsoft Agent Framework blog](https://devblogs.microsoft.com/agent-framework/microsoft-agent-framework-at-build-2026-announce/)
+- **AI-coding stack competition stays hot below the flagship-model layer** — Recent GitHub Copilot updates added MAI-Code-1-Flash and larger/configurable reasoning options, reinforcing that practical coding-tool differentiation is moving into model routing, context, telemetry, and cost controls. [GitHub Copilot changelog](https://github.blog/changelog/label/copilot/)
+
+**Worth watching:** Salesforce buying Fin is a strong signal that CRM-native agents are shifting from demo workflows to acquisition-backed, production customer-service automation; expect faster Agentforce packaging and integration pressure across Salesforce ISVs.
