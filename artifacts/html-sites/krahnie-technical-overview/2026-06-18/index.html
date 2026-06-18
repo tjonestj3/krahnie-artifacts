@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krahnie — System Overview</title>
+<style>
+  :root { --ink:#1c2230; --muted:#5b6675; --line:#e6eaf0; --bg:#fff; --code:#f5f7fa;
+          --accent:#b45309; --accent2:#0369a1; --side:#fbfcfe; --pill:#eef2ff; --pillink:#3730a3; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); }
+  .wrap { display:flex; align-items:flex-start; max-width:1180px; margin:0 auto; }
+  nav { position:sticky; top:0; align-self:flex-start; width:240px; flex:0 0 240px; height:100vh; overflow-y:auto; background:var(--side); border-right:1px solid var(--line); padding:22px 16px; font-size:13px; }
+  nav h4 { margin:14px 0 6px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  nav a { display:block; color:var(--ink); text-decoration:none; padding:3px 8px; border-radius:6px; }
+  nav a:hover { background:#eef2f7; }
+  main { flex:1 1 auto; min-width:0; padding:36px 44px 120px; max-width:900px; }
+  h1 { font-size:2rem; margin:0 0 2px; }
+  h2 { font-size:1.4rem; margin:2.4em 0 .5em; padding-bottom:.25em; border-bottom:2px solid var(--line); scroll-margin-top:16px; }
+  h3 { font-size:1.1rem; margin:1.5em 0 .3em; color:var(--accent); scroll-margin-top:16px; }
+  .sub { color:var(--muted); margin:0 0 1.4em; }
+  code { background:var(--code); padding:.1em .4em; border-radius:4px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.86em; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:8px; padding:13px 15px; overflow-x:auto; font-size:.82rem; line-height:1.5; }
+  pre code { background:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:.8em 0; font-size:.88rem; }
+  th,td { text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  .file { color:var(--accent2); font-weight:600; }
+  .note { background:#fff7ed; border:1px solid #fdba74; border-radius:8px; padding:11px 15px; margin:1.1em 0; }
+  .pill { display:inline-block; font-size:.7rem; font-weight:700; padding:1px 7px; border-radius:10px; background:var(--pill); color:var(--pillink); vertical-align:middle; }
+  .flow { font-family:ui-monospace,monospace; font-size:.8rem; background:var(--code); border:1px solid var(--line); border-radius:8px; padding:14px 16px; white-space:pre; overflow-x:auto; line-height:1.5; }
+  hr { border:none; border-top:1px solid var(--line); margin:2em 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h4>Foundations</h4>
+  <a href="#overview">1 · What Krahnie is</a>
+  <a href="#arch">2 · Architecture</a>
+  <a href="#lifecycle">3 · Request lifecycle</a>
+  <a href="#blocks">4 · Core building blocks</a>
+  <a href="#sf">5 · Salesforce &amp; clients</a>
+  <h4>Capabilities</h4>
+  <a href="#feedback">6 · Feedback capture</a>
+  <a href="#voice">7 · Coyote voice</a>
+  <a href="#eggs">8 · Easter eggs</a>
+  <a href="#fuzzy">9 · Warm fuzzies</a>
+  <a href="#createcard">10 · Card create</a>
+  <a href="#channel">11 · Channel behavior</a>
+  <a href="#handoffB">12 · Handoff (deep link)</a>
+  <a href="#handoffA">13 · First pass (Codex)</a>
+  <a href="#ticketsync">14 · Ticket sync</a>
+  <h4>Reference</h4>
+  <a href="#datamodel">15 · Data model</a>
+  <a href="#modulemap">16 · Module map</a>
+  <a href="#extend">17 · How to extend</a>
+</nav>
+<main>
+
+<h1>Krahnie — System Overview</h1>
+<p class="sub">A high-level map of how Krahnie is put together: the Slack-native delivery-ops assistant for Krahnborn's Salesforce work.</p>
+
+<h2 id="overview">1 · What Krahnie is</h2>
+<p>Krahnie is a Slack-native assistant for Krahnborn's Salesforce delivery work. The team talks to it in Slack (DMs, or by @-mention in channels); it routes each message to one of ~30 tools that read/write Salesforce and reply with Block Kit cards. It also runs proactive work (digests, reminders), captures feedback, hands engineering cards off to coding agents, and cross-syncs with clients' own ticketing systems.</p>
+<p>It runs as a single Python service connected to Slack over Socket Mode and to Salesforce over the REST API.</p>
+
+<h2 id="arch">2 · Architecture</h2>
+<div class="flow">  Slack  ──Socket Mode──▶  Gateway            ──▶  Orchestrator        ──▶  Tools          ──▶  Salesforce REST
+ (events,                 slack_gateway.py        agent.py (Pydantic-AI,   tools/*.py          salesforce.py (multi-org)
+  buttons,                · fast-ack + route       Haiku router)           · @tool functions   ──▶  GitHub
+  modals,                 · mention-gating         · per-convo history     · post Block Kit    ──▶  Coding agents
+  reactions)              · easter-egg shortcuts   · prompt caching        · ctx.posted signal  ──▶  Client orgs (sync)</div>
+<p>Four layers, each with a clear seam:</p>
+<ul>
+  <li><span class="file">slack_gateway.py</span> — the transport. Receives Slack events/interactions, fast-acks them (Slack's 3s rule), and routes: chat → orchestrator; button/modal/reaction → dedicated handlers. Holds the channel/DM gating and easter eggs.</li>
+  <li><span class="file">agent.py</span> — the orchestrator: a thin Pydantic-AI agent (Claude Haiku) whose job is to recognize intent and call the right tool. The routing directive lives in <span class="file">prompts.py</span>.</li>
+  <li><span class="file">tools/*.py</span> — the verbs. Each is an <code>@tool</code> function that does the work and posts a Block Kit card.</li>
+  <li><span class="file">salesforce.py</span> / <span class="file">clients.py</span> / <span class="file">writes.py</span> — the data layer (multi-org REST + the client registry + write helpers).</li>
+</ul>
+<p class="note"><b>Why Pydantic-AI + Haiku?</b> The orchestrator is a cheap, fast router. Heavier reasoning (card enrichment, summaries) is delegated to Claude Sonnet inside specific tools, so most turns cost a fraction of a cent.</p>
+
+<h2 id="lifecycle">3 · Request lifecycle</h2>
+<h3>A chat message</h3>
+<div class="flow">Slack event ─▶ @app.event("message"|"app_mention")  → fast-ack, work runs in background
+  _handle_message:
+    1. drop bot msgs / edits / empty / non-allowlisted users
+    2. CHANNEL GATE: if not a DM and not @-mentioned → ignore   (§11)
+    3. strip the mention; easter-egg short-circuit (§8)
+    4. build RequestContext; run_turn(text, ctx)               (agent.py)
+    5. a tool posted a card? stay silent; else post the reply text
+    6. log the turn cost</div>
+<h3>A button / modal / reaction</h3>
+<p>Interactivity never goes through the LLM — it's wired directly: buttons → <code>@app.action</code>, modal submits → <code>@app.view</code>, searchable selects → <code>@app.options</code>, slash commands → <code>@app.command</code>, reactions → <code>@app.event("reaction_added")</code>. The pattern is always <code>ack()</code> first, then run the work in the background.</p>
+
+<h2 id="blocks">4 · Core building blocks</h2>
+<h3>RequestContext <span class="file">context.py</span></h3>
+<p>A frozen dataclass stamped per turn and read by tools: who (<code>slack_user_id</code>), where (<code>channel</code>, <code>thread_ts</code>), what (<code>text</code>), a <code>posted</code> flag (a tool appends to it when it posts a card → the gateway then stays silent), and a cost sink.</p>
+<h3>The tool contract <span class="file">tools/__init__.py</span></h3>
+<p>Every tool is an <code>@tool(name, description, input_schema)</code> function. Its <code>description</code> is the routing signal the model reads; <span class="file">prompts.py</span> carries the explicit "if the user says X → call tool Y" directive. Adding a tool = write the function, register it in <code>build_tools</code>, add a routing line.</p>
+<h3>Confirm-before-commit <span class="file">pending.py</span></h3>
+<p>Risky writes never fire on the first message. The tool posts a Confirm/Edit/Cancel card and stashes the proposed payload under a nonce; the button handler loads it and commits. This is the spine of every "are you sure?" flow.</p>
+<h3>Block Kit <span class="file">blockkit.py</span></h3>
+<p>Pure render functions returning <code>(blocks, fallback_text)</code>; all action ids are constants here. <span class="file">slackio.py</span> is the thin Slack Web API wrapper.</p>
+
+<h2 id="sf">5 · Salesforce &amp; the client registry</h2>
+<p><span class="file">salesforce.py</span> talks to Salesforce over the REST API across multiple orgs, caching auth per org. <span class="file">clients.py</span> reads a per-client registry (<code>clients.yaml</code>, refreshed per call, zero model-context cost) that resolves nicknames to accounts and holds per-client routing/defaults (channel, board, org aliases, repo, ticketing config). The model never sees this file — resolution happens deterministically in tool code.</p>
+
+<hr>
+<h2 id="feedback">6 · Feedback capture</h2>
+<p>The team reports what they were trying to do, what happened, and pastes the chat — so tools get hardened. NL "log feedback" or <code>/krahnie-feedback</code> opens a modal whose submission writes a <code>Krahnie_Feedback__c</code> record. <span class="file">feedback.py</span> + <span class="file">tools/feedback.py</span>.</p>
+
+<h2 id="voice">7 · Coyote voice</h2>
+<p>The brand persona is a literal contract: <span class="file">prompts.py</span> ends with a <code>VOICE</code> block — the Coyote (terse, clever-not-cute, confident, proactive). Voice lives in acks, nudges, and help; data stays neutral.</p>
+
+<h2 id="eggs">8 · Easter eggs</h2>
+<p>Handled before the agent (free + instant). Message-based: "hello friend", "ship it", team legends, <code>:linux:</code>×3, the konami code, "am I cooked", "coffee". Reaction-based: <code>:linux:</code> → a Linux fact in the thread; <code>:man-playing-handball:</code> → a warm fuzzy (§9).</p>
+
+<h2 id="fuzzy">9 · Warm fuzzies</h2>
+<p><span class="file">tools/warmfuzzy.py</span>. "@krahnie we got a warm fuzzy! shout out the SDI team" — or a <code>:man-playing-handball:</code> reaction — posts a celebratory shout-out to the warm-fuzzies channel, quoting the praise and crediting the team/person.</p>
+
+<h2 id="createcard">10 · Card create</h2>
+<p>Flow: <span class="file">tools/createcard.py</span> → a confirm card → <code>writes.create_card</code>. The model extracts a <b>description</b>; the confirm card offers two buttons — <b>Create</b> (plain) and <b>✨ Create + AI insights</b> (opt-in Sonnet enrichment: story points, next steps, follow-ups) — and the created card carries an <b>✏️ Edit</b> button into the edit modal.</p>
+
+<h2 id="channel">11 · Channel behavior</h2>
+<ul>
+  <li><b>Mention-gating</b> — in a channel Krahnie replies only when @-mentioned; DMs/assistant respond to everything.</li>
+  <li><b>Channel → client</b> — used in a client's channel, card-create defaults the client (and its default board) from the channel, so you don't name it every time.</li>
+</ul>
+
+<h2 id="handoffB">12 · Agent handoff — deep link <span class="pill">Mode B</span></h2>
+<p>"Hand off CARD-1234 to an agent" → a Claude Code deep link the dev clicks to open Claude Code locally, pre-loaded with the card brief (title, description, triage notes). <span class="file">agentwork.py</span> assembles the brief and builds the link; the human drives from there.</p>
+
+<h2 id="handoffA">13 · Agent handoff — Codex first pass <span class="pill">Mode A</span></h2>
+<p>An autonomous attempt that opens a <b>draft PR</b> for review. From the handoff card, a "⚡ First pass" button opens a confirm modal (review/edit the repo, the target sandbox, and the branch), then Krahnie runs Codex against the card brief <b>in an isolated container</b>, scoped to a chosen sandbox org, and opens a draft PR. Human-in-the-loop by design: it proposes, a person reviews and merges. <span class="file">codexwork.py</span> + <span class="file">agentwork.py</span>.</p>
+
+<h2 id="ticketsync">14 · Ticket sync (cross-org)</h2>
+<p>Krahnie-mediated sync between a client's own Salesforce ticket object and Krahnborn's <code>Card__c</code> — no middleware. <span class="file">ticketsync.py</span>.</p>
+<div class="flow">INBOUND  pull(client):  their tickets changed since a watermark → upsert Card__c
+                        (idempotent by External_Ticket_Id__c), request-side fields only
+OUTBOUND push(card):    crosswalked status + a client-visible note → back to the ticket</div>
+<ul>
+  <li><b>Field ownership</b> — the client owns the request; Krahnborn owns delivery status. Inbound never touches delivery fields.</li>
+  <li><b>Status crosswalk</b> — per-client maps between their statuses and Requests/Develop/Test/Done.</li>
+  <li><b>Idempotent linking</b> — a unique external-id key prevents duplicate cards on re-sync.</li>
+</ul>
+
+<hr>
+<h2 id="datamodel">15 · Data model</h2>
+<table>
+  <tr><th>Object</th><th>Role</th></tr>
+  <tr><td><code>Card__c</code></td><td>the unit of delivery work (status, due, estimate, assignee, AI insights, sync cross-refs)</td></tr>
+  <tr><td><code>Work_Log__c</code></td><td>time entries</td></tr>
+  <tr><td><code>Board__c / Project__c / Account</code></td><td>structure: board → project → account/client</td></tr>
+  <tr><td><code>Krahnie_Feedback__c</code></td><td>team feedback on Krahnie</td></tr>
+</table>
+<p>Custom metadata is source-controlled as an SFDX project. <code>clients.yaml</code> holds the per-client registry (name, aliases, channel, board, org aliases, repo, ticketing) plus a dev-sandboxes list.</p>
+
+<h2 id="modulemap">16 · Module map</h2>
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td class="file">slack_gateway.py</td><td>Socket Mode transport: events, interactivity, mention-gating, easter eggs, handlers</td></tr>
+  <tr><td class="file">agent.py</td><td>Pydantic-AI orchestrator (Haiku), tool adaptation, per-convo history, prompt caching</td></tr>
+  <tr><td class="file">prompts.py</td><td>System prompt: routing directive + the Coyote voice</td></tr>
+  <tr><td class="file">salesforce.py</td><td>Multi-org REST: query / create / patch / upsert, per-org token cache</td></tr>
+  <tr><td class="file">clients.py</td><td>Client registry: resolve, repo, orgs, channel→client, dev sandboxes, ticketing</td></tr>
+  <tr><td class="file">writes.py</td><td>Write layer: Work_Log + Card inserts/updates, modal builders, renderers</td></tr>
+  <tr><td class="file">blockkit.py</td><td>Pure Block Kit renderers + action-id constants</td></tr>
+  <tr><td class="file">enrich.py / refresh.py / pm.py</td><td>Sonnet reasoning · week digest · team rollups &amp; metrics</td></tr>
+  <tr><td class="file">agentwork.py / codexwork.py</td><td>Handoff core (brief, deep link, modal) · Codex first pass</td></tr>
+  <tr><td class="file">ticketsync.py</td><td>Cross-org ticket sync (pull/push, crosswalk)</td></tr>
+  <tr><td class="file">scheduler.py / state.py / usage.py</td><td>Durable scheduler · snooze state · cost/usage log</td></tr>
+  <tr><td class="file">tools/*.py</td><td>~30 tools — week, cards, logtime, createcard, editcard, cost, metrics, pm, research, reminders, leaderboard, help, feedback, handoff, warmfuzzy…</td></tr>
+</table>
+
+<h2 id="extend">17 · How to extend</h2>
+<h3>Add a tool</h3>
+<ol>
+  <li>New <code>tools/foo.py</code>: <code>make_foo_tool(get_ctx)</code> returning an <code>@tool(...)</code> function that posts via <code>slackio</code> and marks <code>ctx.posted</code>.</li>
+  <li>Register it in <code>tools/__init__.py</code>.</li>
+  <li>Add a routing line in <code>prompts.py</code>.</li>
+</ol>
+<h3>Add a confirm-card flow</h3>
+<ol>
+  <li>Render the card in <code>blockkit.py</code> with new action-id constants; stash the payload via <code>pending.save</code>.</li>
+  <li>Register the action handler in <code>slack_gateway.py</code> that loads the nonce and commits.</li>
+</ol>
+
+<hr>
+<p class="sub">Krahnie — Krahnborn's Salesforce delivery-ops assistant. Generated overview.</p>
+</main>
+</div>
+</body>
+</html>
