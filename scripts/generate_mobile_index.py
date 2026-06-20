@@ -496,6 +496,13 @@ JS = r"""
     benny(){ loveSon("Benny"); },
     calvin(){ loveSon("Calvin"); },
     sons(){ confetti(); print("Tommy · Benny · Calvin — I love my sons! ❤️", 'ok'); },
+    // ---- the right-hand man ----
+    q(){ confetti();
+      print("&gt;&gt;&gt;  H U G H   C A R L O S   J O N E S   I  &lt;&lt;&lt;", 'ok');
+      print("l33t gamer · right-hand man · certified 1337", 'info');
+      print("the clutch king — 360 no-scope, GG no re. 🎮👑", 'warn');
+      print("my brother, my MVP. respect. 🤝", 'dim');
+    },
     // ---- easter eggs ----
     sudo(a, rest){
       const s = rest.toLowerCase();
@@ -567,7 +574,8 @@ JS = r"""
     life(){ print("42.", 'ok'); }
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
-    ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix' };
+    ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
+    hugh:'q' };
 
   function run(raw){
     const cmd = raw.trim();
