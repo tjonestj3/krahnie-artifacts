@@ -3,6 +3,7 @@ import datetime
 import json
 from pathlib import Path
 from html import escape
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / "artifacts"
@@ -246,7 +247,7 @@ theme_options = "".join(f'<option value="{escape(t)}">{escape(t)}</option>' for 
 swatch_html = "".join(f'<span style="background:var({v})"></span>'
                       for v in ['--green', '--cyan', '--amber', '--magenta', '--pink', '--blue', '--text', '--dim'])
 
-CSS = """
+PALETTES = """
 :root{
   --bg:#0f1016; --bg2:#14151f; --surface:#171823; --surface2:#1c1d2b;
   --border:#2a2c3c; --border2:#3a3d57;
@@ -307,6 +308,24 @@ CSS = """
 [data-theme="win98"] .row{border-radius:0}
 [data-theme="win98"] .seg-count{border-radius:0;background:#000080;color:#fff;border-color:#000080}
 [data-theme="win98"] .theme-select{border-radius:0;background:#c0c0c0;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
+"""
+
+# Base skin for *other* artifacts that opt into theme.css: applies the palette to
+# the page even if they don't reference vars explicitly.
+BASE_SKIN = """
+*{box-sizing:border-box}
+html,body{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--mono);-webkit-text-size-adjust:100%;transition:background-color .3s ease,color .3s ease}
+a{color:var(--cyan)}
+::selection{background:var(--sel)}
+#jones-theme-switch{position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));
+  z-index:99999;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;
+  font-family:var(--mono);font-size:12px;padding:5px 8px;cursor:pointer;opacity:.85}
+#jones-theme-switch:hover{opacity:1}
+"""
+
+CSS = PALETTES + """
 *{box-sizing:border-box}
 body,.win,.console,details.block>summary,.row,.nf-colors span,.seg-count{transition:background-color .3s ease,border-color .3s ease,color .3s ease}
 html,body{max-width:100%;overflow-x:hidden}
@@ -389,6 +408,20 @@ img,svg,video{max-width:100%;height:auto}
   z-index:9999;color:#9effb8;font-family:var(--mono);font-size:13px;background:rgba(0,0,0,.5);
   border:1px solid rgba(158,255,184,.35);border-radius:999px;padding:6px 14px;pointer-events:none;
   text-shadow:0 0 8px rgba(53,211,106,.8)}
+/* ---- snake ---- */
+#snake{position:fixed;inset:0;width:100%;height:100%;z-index:9998;background:var(--bg);cursor:pointer;touch-action:none}
+/* ---- typing test ---- */
+#typing{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px}
+.tt-card{width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px 22px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.tt-head{font-size:14px;color:var(--amber);font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+.tt-head .tt-x{color:var(--faint);font-weight:400}
+.tt-stats{font-size:13px;color:var(--green);margin-bottom:14px}
+.tt-text{font-size:18px;line-height:1.9;color:var(--faint);word-break:break-word}
+.tt-text .tt-ok{color:var(--text)}
+.tt-text .tt-bad{color:#fff;background:var(--pink);border-radius:2px}
+.tt-text .tt-cur{background:var(--sel);border-bottom:2px solid var(--cyan)}
+#tt-in{position:absolute;opacity:0;width:1px;height:1px;border:0;padding:0}
 
 /* ---- collapsible section blocks ---- */
 details.block{margin:0}
@@ -458,6 +491,7 @@ JS = r"""
   function echo(cmd){ print("<span class='usr'>thomas@jones.com</span><span class='sep'>:</span><span class='cwd'>~/artifacts</span><span class='dollar'>$</span> "+esc(cmd)); }
   function sections(){ return blocks.map(b => ({el:b, name:b.querySelector('.seg-name').textContent.trim(), count:b.querySelector('.seg-count').textContent.trim()})); }
   function nameOf(r){ return r.querySelector('.row-name').textContent.trim(); }
+  function openArtifact(href){ location.href = 'viewer.html?p=' + encodeURIComponent(href); }
 
   function setFilter(v){
     v = (v||'').toLowerCase(); let shown = 0;
@@ -547,6 +581,9 @@ JS = r"""
        ["clear","clear the console  (Ctrl-L)"],
        ["whoami / pwd / date","the usual"],
        ["echo <text>","say something back"],
+       ["theme [name]","switch themes (also: next, random)"],
+       ["snake","play snake 🐍"],
+       ["type","typing test: the story of TJ ⌨️"],
        ["neofetch","jump to the banner"],
        ["about / contact","what this is, where to find me"]
       ].forEach(p => print("  <span class='info'>"+esc(p[0])+"</span>  <span class='dim'>"+esc(p[1])+"</span>"));
@@ -564,7 +601,7 @@ JS = r"""
       const q = a.join(' ').toLowerCase(), sec = sections().find(x => x.name.toLowerCase().includes(q));
       if(sec){ sec.el.open = true; sec.el.scrollIntoView({behavior:'smooth', block:'start'}); print("opened section "+esc(sec.name), 'ok'); return; }
       const m = rows.filter(r => nameOf(r).toLowerCase().includes(q));
-      if(m.length === 1){ print("opening "+esc(nameOf(m[0]))+" …", 'ok'); setTimeout(() => { location.href = m[0].getAttribute('href'); }, 380); return; }
+      if(m.length === 1){ print("opening "+esc(nameOf(m[0]))+" …", 'ok'); setTimeout(() => openArtifact(m[0].getAttribute('href')), 380); return; }
       if(m.length > 1){ print(m.length+" matches — be more specific:", 'warn'); m.slice(0,8).forEach(r => print("  "+esc(nameOf(r)))); return; }
       print("open: not found: "+esc(q), 'err');
     },
@@ -681,6 +718,91 @@ JS = r"""
       cv.addEventListener('click', exit); cv.addEventListener('touchstart', exit, {passive:true});
       window.addEventListener('resize', size);
     },
+    snake(){
+      if(reduce){ print("snake needs motion — reduced-motion is on.", 'warn'); return; }
+      if(document.getElementById('snake')) return;
+      const cv = el('canvas'); cv.id = 'snake'; document.body.appendChild(cv);
+      const hint = el('div','matrix-hint','arrows / WASD · swipe · Esc to quit'); document.body.appendChild(hint);
+      const ctx = cv.getContext('2d'); const cell = 18;
+      const cs = (v) => { try { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); } catch(e){ return ''; } };
+      const colSnake = cs('--green')||'#9ece6a', colFood = cs('--pink')||'#f7768e', colText = cs('--text')||'#fff', colBg = cs('--bg')||'#000', colDim = cs('--faint')||'#888';
+      let W, H, cols, rws;
+      function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; cols = Math.floor(W/cell); rws = Math.floor(H/cell); }
+      size();
+      let body2, dx, dy, pend, food, score, dead, timer;
+      function place(){ food = {x:(Math.random()*cols)|0, y:(Math.random()*rws)|0}; }
+      function reset(){ dx=1; dy=0; pend=null; const cx=(cols/2)|0, cy=(rws/2)|0; body2=[{x:cx,y:cy},{x:cx-1,y:cy},{x:cx-2,y:cy}]; score=0; dead=false; place(); }
+      reset();
+      function draw(){
+        ctx.fillStyle=colBg; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle=colFood; ctx.fillRect(food.x*cell+1, food.y*cell+1, cell-2, cell-2);
+        ctx.fillStyle=colSnake; for(const s of body2) ctx.fillRect(s.x*cell+1, s.y*cell+1, cell-2, cell-2);
+        ctx.fillStyle=colText; ctx.font='16px monospace'; ctx.textAlign='left'; ctx.fillText('score '+score, 12, 24);
+        if(dead){ ctx.textAlign='center'; ctx.font='bold 30px monospace'; ctx.fillText('GAME OVER · '+score, W/2, H/2-8);
+          ctx.fillStyle=colDim; ctx.font='15px monospace'; ctx.fillText('space to retry · Esc to quit', W/2, H/2+22); ctx.textAlign='left'; }
+      }
+      function step(){
+        if(dead) return;
+        if(pend){ dx=pend.x; dy=pend.y; pend=null; }
+        const nx=body2[0].x+dx, ny=body2[0].y+dy;
+        if(nx<0||ny<0||nx>=cols||ny>=rws){ dead=true; draw(); return; }
+        for(const s of body2){ if(s.x===nx&&s.y===ny){ dead=true; draw(); return; } }
+        body2.unshift({x:nx,y:ny});
+        if(nx===food.x&&ny===food.y){ score++; place(); } else { body2.pop(); }
+        draw();
+      }
+      timer = setInterval(step, 110); draw();
+      function turn(x,y){ if(x===-dx&&y===-dy) return; pend={x:x,y:y}; }
+      const MAP = {ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+      function key(e){
+        const k = e.key;
+        if(k==='Escape'||k==='q'||k==='Q'){ quit(e); return; }
+        if(dead && (k===' '||k==='Enter')){ e.preventDefault(); e.stopPropagation(); reset(); return; }
+        const m = MAP[k] || MAP[(k||'').toLowerCase()];
+        if(m){ e.preventDefault(); e.stopPropagation(); turn(m[0], m[1]); }
+      }
+      let tx, ty;
+      function ts(e){ const t=e.touches[0]; tx=t.clientX; ty=t.clientY; }
+      function te(e){ const t=e.changedTouches[0]; const ax=t.clientX-tx, ay=t.clientY-ty; if(dead){ reset(); return; } if(Math.abs(ax)>Math.abs(ay)) turn(ax>0?1:-1,0); else turn(0,ay>0?1:-1); }
+      function quit(e){ if(e){ e.preventDefault&&e.preventDefault(); e.stopPropagation&&e.stopPropagation(); } clearInterval(timer); document.removeEventListener('keydown',key,true); cv.remove(); hint.remove(); window.removeEventListener('resize',size); print('snake over · score '+score+'. gg.', 'ok'); scroll(); }
+      document.addEventListener('keydown', key, true);
+      cv.addEventListener('touchstart', ts, {passive:true}); cv.addEventListener('touchend', te, {passive:true});
+      window.addEventListener('resize', size);
+      print('snake — arrows/WASD or swipe, Esc to quit. 🐍', 'ok');
+    },
+    type(){
+      if(document.getElementById('typing')) return;
+      const TEXT = "Thomas Jones III came up through the Apple Valley school system before earning a full-ride Chancellor Scholarship to UW-Madison, where he double-majored in Computer Engineering and Computer Science in the College of Engineering and graduated with a 3.421 GPA. Along the way he became a proud Pi Lambda Phi brother. After college he teamed up with Kyle Krahn as a Salesforce consultant and never looked back -- today he is a Solution Architect and employee number two at Krahnborn Consulting. Shoutout to his brother Hugh Jones, his main man from day one.";
+      const ov = el('div'); ov.id = 'typing';
+      ov.innerHTML = '<div class="tt-card"><div class="tt-head">typing test · the story of TJ <span class="tt-x">Esc to quit</span></div><div class="tt-stats" id="tt-stats">0 wpm · 100% · start typing</div><div class="tt-text" id="tt-text"></div><input id="tt-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="typing input"/></div>';
+      document.body.appendChild(ov);
+      const textEl = document.getElementById('tt-text'), statsEl = document.getElementById('tt-stats'), inp = document.getElementById('tt-in');
+      const spans = [];
+      for(let i=0;i<TEXT.length;i++){ const s = el('span'); s.textContent = TEXT[i]; textEl.appendChild(s); spans.push(s); }
+      let idx=0, correct=0, typed=0, t0=0, done=false; const marks=[];
+      spans[0].className = 'tt-cur';
+      function fmt(){ const mins=(performance.now()-t0)/60000; const wpm=(t0&&mins>0)?Math.round((typed/5)/mins):0; const acc=typed?Math.round(correct/typed*100):100; statsEl.textContent = wpm+' wpm · '+acc+'% · '+idx+'/'+TEXT.length; }
+      function finish(){ done=true; const mins=(performance.now()-t0)/60000; const wpm=mins>0?Math.round((TEXT.length/5)/mins):0; const acc=typed?Math.round(correct/typed*100):100; statsEl.innerHTML='<b>done!</b> '+wpm+' wpm · '+acc+'% accuracy — Esc to close'; }
+      function key(e){
+        const k = e.key;
+        if(k==='Escape'){ quit(e); return; }
+        if(done) return;
+        if(k==='Backspace'){ e.preventDefault(); e.stopPropagation(); if(idx>0){ spans[idx].className=''; idx--; if(marks[idx]) correct--; typed--; marks[idx]=undefined; spans[idx].className='tt-cur'; fmt(); } return; }
+        if(k.length!==1) return;
+        e.preventDefault(); e.stopPropagation();
+        if(!t0) t0=performance.now();
+        if(idx>=TEXT.length) return;
+        const ok = (k===TEXT[idx]); marks[idx]=ok; spans[idx].className = ok?'tt-ok':'tt-bad';
+        if(ok) correct++; typed++; idx++;
+        if(idx<TEXT.length) spans[idx].className='tt-cur';
+        fmt();
+        if(idx>=TEXT.length) finish();
+      }
+      function quit(e){ if(e){ e.preventDefault&&e.preventDefault(); e.stopPropagation&&e.stopPropagation(); } document.removeEventListener('keydown',key,true); ov.remove(); print('typing test closed.', 'dim'); scroll(); }
+      document.addEventListener('keydown', key, true);
+      setTimeout(() => { try { inp.focus(); } catch(e){} }, 60);
+      print('typing test — type the story of TJ. Esc to quit. ⌨️', 'ok');
+    },
     gg(){
       confetti();
       pre([
@@ -699,7 +821,8 @@ JS = r"""
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
     ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
-    hugh:'q', ggez:'gg', wp:'gg', themes:'theme' };
+    hugh:'q', ggez:'gg', wp:'gg', themes:'theme', bennett:'benny',
+    typetest:'type', typing:'type', game:'snake' };
 
   function run(raw){
     const cmd = raw.trim();
@@ -726,10 +849,23 @@ JS = r"""
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
   document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
 
+  // open artifacts inside the themed viewer frame (modifier-click opens raw)
+  rows.forEach(r => r.addEventListener('click', e => {
+    if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault(); openArtifact(r.getAttribute('href'));
+  }));
+
   const themeSel = document.getElementById('theme-select');
   if(themeSel) themeSel.addEventListener('change', () => { applyTheme(themeSel.value); print("theme → "+themeSel.value+" ✨", 'ok'); scroll(); });
   try { const saved = localStorage.getItem('jones-theme'); if(saved && THEMES.includes(saved)) applyTheme(saved); } catch(e){}
-  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b>)</span>", 'info');
+
+  // idle screensaver: launch cmatrix after 60s of no input
+  let idleTimer;
+  function resetIdle(){ clearTimeout(idleTimer); idleTimer = setTimeout(() => { if(!document.getElementById('matrix') && !document.getElementById('snake') && !document.getElementById('typing') && !document.hidden) cmds.cmatrix(); }, 60000); }
+  ['keydown','mousemove','touchstart','click','wheel'].forEach(ev => document.addEventListener(ev, resetIdle, {passive:true}));
+  resetIdle();
+
+  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b> or <b>snake</b>)</span>", 'info');
 })();
 """
 
@@ -774,6 +910,131 @@ body = f"""  <main class="term">
     </div>
   </main>"""
 
+SITE_URL = "https://tjonestj.com"
+DESC = ("Terminal-themed home of Thomas Jones III — Solution Architect & employee #2 at "
+        "Krahnborn Consulting. Browse generated sites, prototypes, comics & reports; switch "
+        "themes, play snake, or type the story of TJ.")
+FAVICON_SVG = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+               '<rect width="64" height="64" rx="13" fill="#0f1016"/>'
+               '<path d="M14 22l13 10-13 10" fill="none" stroke="#9ece6a" stroke-width="5" '
+               'stroke-linecap="round" stroke-linejoin="round"/>'
+               '<rect x="33" y="40" width="18" height="5" rx="2.5" fill="#7dcfff"/></svg>')
+FAVICON = "data:image/svg+xml," + quote(FAVICON_SVG, safe="")
+
+
+def head_meta(title, desc, url):
+    return (
+        f'  <link rel="icon" href="{FAVICON}" />\n'
+        f'  <meta name="description" content="{escape(desc)}" />\n'
+        f'  <meta property="og:type" content="website" />\n'
+        f'  <meta property="og:site_name" content="tjonestj.com" />\n'
+        f'  <meta property="og:title" content="{escape(title)}" />\n'
+        f'  <meta property="og:description" content="{escape(desc)}" />\n'
+        f'  <meta property="og:url" content="{escape(url)}" />\n'
+        f'  <meta property="og:image" content="{SITE_URL}/og-image.png" />\n'
+        f'  <meta name="twitter:card" content="summary_large_image" />\n'
+        f'  <meta name="twitter:title" content="{escape(title)}" />\n'
+        f'  <meta name="twitter:description" content="{escape(desc)}" />\n'
+        f'  <meta name="twitter:image" content="{SITE_URL}/og-image.png" />\n'
+    )
+
+
+# ---- shared files for other artifacts / the viewer frame ----
+THEME_JS = (
+    "(function(){\n"
+    "  var THEMES = " + json.dumps(THEME_NAMES) + ";\n"
+    "  var sel = document.getElementById('theme-select');\n"
+    "  if(!sel){\n"
+    "    sel = document.createElement('select'); sel.id = 'jones-theme-switch'; sel.setAttribute('aria-label','Theme');\n"
+    "    for(var i=0;i<THEMES.length;i++){ var o=document.createElement('option'); o.value=THEMES[i]; o.textContent=THEMES[i]; sel.appendChild(o); }\n"
+    "    (document.body||document.documentElement).appendChild(sel);\n"
+    "  }\n"
+    "  function applyTheme(n){ if(THEMES.indexOf(n)<0) return; document.documentElement.setAttribute('data-theme', n); try{localStorage.setItem('jones-theme', n);}catch(e){} if(sel.value!==n) sel.value=n; }\n"
+    "  sel.addEventListener('change', function(){ applyTheme(sel.value); });\n"
+    "  try{ var s = localStorage.getItem('jones-theme'); if(s && THEMES.indexOf(s)>=0){ document.documentElement.setAttribute('data-theme', s); sel.value = s; } }catch(e){}\n"
+    "})();\n"
+)
+
+VIEWER_HTML = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>viewer · tjonestj.com</title>
+<link rel="icon" href="__FAVICON__" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--mono)}
+  .vwin{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  .vbar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex:0 0 auto}
+  .dots{display:flex;gap:7px;flex:0 0 auto}
+  .dot{width:12px;height:12px;border-radius:50%}.dot.r{background:#f7768e}.dot.y{background:#e0af68}.dot.g{background:#9ece6a}
+  .vbtn{flex:0 0 auto;color:var(--cyan);text-decoration:none;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:3px 9px;background:var(--surface2)}
+  .vtitle{flex:1 1 auto;min-width:0;color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vtitle b{color:var(--text)}
+  iframe{flex:1 1 auto;width:100%;border:0;background:#fff}
+  #jones-theme-switch{bottom:auto;top:8px}
+</style>
+</head>
+<body>
+<div class="vwin">
+  <div class="vbar">
+    <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+    <a class="vbtn" href="/" title="Back to index">‹ index</a>
+    <div class="vtitle" id="vtitle"><b>viewer</b></div>
+    <a class="vbtn" id="vraw" href="#" target="_blank" rel="noopener" title="Open raw in a new tab">raw ↗</a>
+  </div>
+  <iframe id="vframe" title="artifact" referrerpolicy="no-referrer"></iframe>
+</div>
+<script>
+(function(){
+  function qp(n){ var m = new RegExp('[?&]' + n + '=([^&]+)').exec(location.search); return m ? decodeURIComponent(m[1]) : ''; }
+  var p = qp('p');
+  if(!p || /^([a-z]+:)?\/\//i.test(p) || p.indexOf('..') >= 0){ p = ''; }
+  var fr = document.getElementById('vframe'), t = document.getElementById('vtitle'), raw = document.getElementById('vraw');
+  if(p){ fr.src = p; raw.href = p; var safe = p.replace(/[&<>"]/g,''); t.innerHTML = '<b>' + safe + '</b>'; document.title = safe + ' · viewer'; }
+  else { t.textContent = 'no artifact specified — go back to index'; }
+})();
+</script>
+<script src="/theme.js" defer></script>
+</body>
+</html>
+"""
+
+NOTFOUND_HTML = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>404 · command not found</title>
+<link rel="icon" href="__FAVICON__" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .nf{max-width:560px}
+  .nf pre{color:var(--green);font-size:clamp(8px,2.6vw,16px);line-height:1.05;margin:0 0 18px;white-space:pre;overflow-x:hidden}
+  .nf p{color:var(--dim);font-size:14px;line-height:1.6}
+  .nf code{color:var(--amber)}
+  .nf a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<main class="nf">
+  <pre> _  _    ___  _  _
+| || |  / _ \| || |
+| || |_| | | | || |_
+|__   _| |_| |__   _|
+   |_|  \___/   |_|  </pre>
+  <p><code>bash: that page: command not found</code></p>
+  <p>The file you were looking for isn't here. <a href="/">cd ~/artifacts</a> to head home.</p>
+</main>
+<script src="/theme.js" defer></script>
+</body>
+</html>
+"""
+
 html = (
     "<!doctype html>\n<html lang=\"en\">\n<head>\n"
     "  <meta charset=\"utf-8\" />\n"
@@ -781,6 +1042,7 @@ html = (
     "  <meta name=\"color-scheme\" content=\"dark\" />\n"
     "  <meta name=\"theme-color\" content=\"#0f1016\" />\n"
     "  <title>Thomas Jones III · Solution Architect</title>\n"
+    + head_meta("Thomas Jones III · Solution Architect", DESC, SITE_URL + "/") +
     "  <style>\n" + CSS + "\n  </style>\n</head>\n<body>\n"
     + body +
     "\n  <script>window.__THEMES = " + json.dumps(THEME_NAMES) + ";</script>\n"
@@ -789,4 +1051,9 @@ html = (
 
 (ROOT / "index.html").write_text(html, encoding="utf-8")
 (ROOT / ".nojekyll").write_text("", encoding="utf-8")
+(ROOT / "theme.css").write_text(PALETTES + BASE_SKIN, encoding="utf-8")
+(ROOT / "theme.js").write_text(THEME_JS, encoding="utf-8")
+(ROOT / "viewer.html").write_text(VIEWER_HTML.replace("__FAVICON__", FAVICON), encoding="utf-8")
+(ROOT / "404.html").write_text(NOTFOUND_HTML.replace("__FAVICON__", FAVICON), encoding="utf-8")
 print(f"Wrote {ROOT / 'index.html'} with {len(files)} artifact links")
+print("Wrote theme.css, theme.js, viewer.html, 404.html")

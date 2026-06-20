@@ -6,6 +6,18 @@
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0f1016" />
   <title>Thomas Jones III · Solution Architect</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2213%22%20fill%3D%22%230f1016%22%2F%3E%3Cpath%20d%3D%22M14%2022l13%2010-13%2010%22%20fill%3D%22none%22%20stroke%3D%22%239ece6a%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Crect%20x%3D%2233%22%20y%3D%2240%22%20width%3D%2218%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%237dcfff%22%2F%3E%3C%2Fsvg%3E" />
+  <meta name="description" content="Terminal-themed home of Thomas Jones III — Solution Architect &amp; employee #2 at Krahnborn Consulting. Browse generated sites, prototypes, comics &amp; reports; switch themes, play snake, or type the story of TJ." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="tjonestj.com" />
+  <meta property="og:title" content="Thomas Jones III · Solution Architect" />
+  <meta property="og:description" content="Terminal-themed home of Thomas Jones III — Solution Architect &amp; employee #2 at Krahnborn Consulting. Browse generated sites, prototypes, comics &amp; reports; switch themes, play snake, or type the story of TJ." />
+  <meta property="og:url" content="https://tjonestj.com/" />
+  <meta property="og:image" content="https://tjonestj.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Thomas Jones III · Solution Architect" />
+  <meta name="twitter:description" content="Terminal-themed home of Thomas Jones III — Solution Architect &amp; employee #2 at Krahnborn Consulting. Browse generated sites, prototypes, comics &amp; reports; switch themes, play snake, or type the story of TJ." />
+  <meta name="twitter:image" content="https://tjonestj.com/og-image.png" />
   <style>
 
 :root{
@@ -68,6 +80,7 @@
 [data-theme="win98"] .row{border-radius:0}
 [data-theme="win98"] .seg-count{border-radius:0;background:#000080;color:#fff;border-color:#000080}
 [data-theme="win98"] .theme-select{border-radius:0;background:#c0c0c0;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
+
 *{box-sizing:border-box}
 body,.win,.console,details.block>summary,.row,.nf-colors span,.seg-count{transition:background-color .3s ease,border-color .3s ease,color .3s ease}
 html,body{max-width:100%;overflow-x:hidden}
@@ -150,6 +163,20 @@ img,svg,video{max-width:100%;height:auto}
   z-index:9999;color:#9effb8;font-family:var(--mono);font-size:13px;background:rgba(0,0,0,.5);
   border:1px solid rgba(158,255,184,.35);border-radius:999px;padding:6px 14px;pointer-events:none;
   text-shadow:0 0 8px rgba(53,211,106,.8)}
+/* ---- snake ---- */
+#snake{position:fixed;inset:0;width:100%;height:100%;z-index:9998;background:var(--bg);cursor:pointer;touch-action:none}
+/* ---- typing test ---- */
+#typing{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px}
+.tt-card{width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px 22px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.tt-head{font-size:14px;color:var(--amber);font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+.tt-head .tt-x{color:var(--faint);font-weight:400}
+.tt-stats{font-size:13px;color:var(--green);margin-bottom:14px}
+.tt-text{font-size:18px;line-height:1.9;color:var(--faint);word-break:break-word}
+.tt-text .tt-ok{color:var(--text)}
+.tt-text .tt-bad{color:#fff;background:var(--pink);border-radius:2px}
+.tt-text .tt-cur{background:var(--sel);border-bottom:2px solid var(--cyan)}
+#tt-in{position:absolute;opacity:0;width:1px;height:1px;border:0;padding:0}
 
 /* ---- collapsible section blocks ---- */
 details.block{margin:0}
@@ -273,6 +300,7 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
   function echo(cmd){ print("<span class='usr'>thomas@jones.com</span><span class='sep'>:</span><span class='cwd'>~/artifacts</span><span class='dollar'>$</span> "+esc(cmd)); }
   function sections(){ return blocks.map(b => ({el:b, name:b.querySelector('.seg-name').textContent.trim(), count:b.querySelector('.seg-count').textContent.trim()})); }
   function nameOf(r){ return r.querySelector('.row-name').textContent.trim(); }
+  function openArtifact(href){ location.href = 'viewer.html?p=' + encodeURIComponent(href); }
 
   function setFilter(v){
     v = (v||'').toLowerCase(); let shown = 0;
@@ -362,6 +390,9 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
        ["clear","clear the console  (Ctrl-L)"],
        ["whoami / pwd / date","the usual"],
        ["echo <text>","say something back"],
+       ["theme [name]","switch themes (also: next, random)"],
+       ["snake","play snake 🐍"],
+       ["type","typing test: the story of TJ ⌨️"],
        ["neofetch","jump to the banner"],
        ["about / contact","what this is, where to find me"]
       ].forEach(p => print("  <span class='info'>"+esc(p[0])+"</span>  <span class='dim'>"+esc(p[1])+"</span>"));
@@ -379,7 +410,7 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
       const q = a.join(' ').toLowerCase(), sec = sections().find(x => x.name.toLowerCase().includes(q));
       if(sec){ sec.el.open = true; sec.el.scrollIntoView({behavior:'smooth', block:'start'}); print("opened section "+esc(sec.name), 'ok'); return; }
       const m = rows.filter(r => nameOf(r).toLowerCase().includes(q));
-      if(m.length === 1){ print("opening "+esc(nameOf(m[0]))+" …", 'ok'); setTimeout(() => { location.href = m[0].getAttribute('href'); }, 380); return; }
+      if(m.length === 1){ print("opening "+esc(nameOf(m[0]))+" …", 'ok'); setTimeout(() => openArtifact(m[0].getAttribute('href')), 380); return; }
       if(m.length > 1){ print(m.length+" matches — be more specific:", 'warn'); m.slice(0,8).forEach(r => print("  "+esc(nameOf(r)))); return; }
       print("open: not found: "+esc(q), 'err');
     },
@@ -496,6 +527,91 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
       cv.addEventListener('click', exit); cv.addEventListener('touchstart', exit, {passive:true});
       window.addEventListener('resize', size);
     },
+    snake(){
+      if(reduce){ print("snake needs motion — reduced-motion is on.", 'warn'); return; }
+      if(document.getElementById('snake')) return;
+      const cv = el('canvas'); cv.id = 'snake'; document.body.appendChild(cv);
+      const hint = el('div','matrix-hint','arrows / WASD · swipe · Esc to quit'); document.body.appendChild(hint);
+      const ctx = cv.getContext('2d'); const cell = 18;
+      const cs = (v) => { try { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); } catch(e){ return ''; } };
+      const colSnake = cs('--green')||'#9ece6a', colFood = cs('--pink')||'#f7768e', colText = cs('--text')||'#fff', colBg = cs('--bg')||'#000', colDim = cs('--faint')||'#888';
+      let W, H, cols, rws;
+      function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; cols = Math.floor(W/cell); rws = Math.floor(H/cell); }
+      size();
+      let body2, dx, dy, pend, food, score, dead, timer;
+      function place(){ food = {x:(Math.random()*cols)|0, y:(Math.random()*rws)|0}; }
+      function reset(){ dx=1; dy=0; pend=null; const cx=(cols/2)|0, cy=(rws/2)|0; body2=[{x:cx,y:cy},{x:cx-1,y:cy},{x:cx-2,y:cy}]; score=0; dead=false; place(); }
+      reset();
+      function draw(){
+        ctx.fillStyle=colBg; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle=colFood; ctx.fillRect(food.x*cell+1, food.y*cell+1, cell-2, cell-2);
+        ctx.fillStyle=colSnake; for(const s of body2) ctx.fillRect(s.x*cell+1, s.y*cell+1, cell-2, cell-2);
+        ctx.fillStyle=colText; ctx.font='16px monospace'; ctx.textAlign='left'; ctx.fillText('score '+score, 12, 24);
+        if(dead){ ctx.textAlign='center'; ctx.font='bold 30px monospace'; ctx.fillText('GAME OVER · '+score, W/2, H/2-8);
+          ctx.fillStyle=colDim; ctx.font='15px monospace'; ctx.fillText('space to retry · Esc to quit', W/2, H/2+22); ctx.textAlign='left'; }
+      }
+      function step(){
+        if(dead) return;
+        if(pend){ dx=pend.x; dy=pend.y; pend=null; }
+        const nx=body2[0].x+dx, ny=body2[0].y+dy;
+        if(nx<0||ny<0||nx>=cols||ny>=rws){ dead=true; draw(); return; }
+        for(const s of body2){ if(s.x===nx&&s.y===ny){ dead=true; draw(); return; } }
+        body2.unshift({x:nx,y:ny});
+        if(nx===food.x&&ny===food.y){ score++; place(); } else { body2.pop(); }
+        draw();
+      }
+      timer = setInterval(step, 110); draw();
+      function turn(x,y){ if(x===-dx&&y===-dy) return; pend={x:x,y:y}; }
+      const MAP = {ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+      function key(e){
+        const k = e.key;
+        if(k==='Escape'||k==='q'||k==='Q'){ quit(e); return; }
+        if(dead && (k===' '||k==='Enter')){ e.preventDefault(); e.stopPropagation(); reset(); return; }
+        const m = MAP[k] || MAP[(k||'').toLowerCase()];
+        if(m){ e.preventDefault(); e.stopPropagation(); turn(m[0], m[1]); }
+      }
+      let tx, ty;
+      function ts(e){ const t=e.touches[0]; tx=t.clientX; ty=t.clientY; }
+      function te(e){ const t=e.changedTouches[0]; const ax=t.clientX-tx, ay=t.clientY-ty; if(dead){ reset(); return; } if(Math.abs(ax)>Math.abs(ay)) turn(ax>0?1:-1,0); else turn(0,ay>0?1:-1); }
+      function quit(e){ if(e){ e.preventDefault&&e.preventDefault(); e.stopPropagation&&e.stopPropagation(); } clearInterval(timer); document.removeEventListener('keydown',key,true); cv.remove(); hint.remove(); window.removeEventListener('resize',size); print('snake over · score '+score+'. gg.', 'ok'); scroll(); }
+      document.addEventListener('keydown', key, true);
+      cv.addEventListener('touchstart', ts, {passive:true}); cv.addEventListener('touchend', te, {passive:true});
+      window.addEventListener('resize', size);
+      print('snake — arrows/WASD or swipe, Esc to quit. 🐍', 'ok');
+    },
+    type(){
+      if(document.getElementById('typing')) return;
+      const TEXT = "Thomas Jones III came up through the Apple Valley school system before earning a full-ride Chancellor Scholarship to UW-Madison, where he double-majored in Computer Engineering and Computer Science in the College of Engineering and graduated with a 3.421 GPA. Along the way he became a proud Pi Lambda Phi brother. After college he teamed up with Kyle Krahn as a Salesforce consultant and never looked back -- today he is a Solution Architect and employee number two at Krahnborn Consulting. Shoutout to his brother Hugh Jones, his main man from day one.";
+      const ov = el('div'); ov.id = 'typing';
+      ov.innerHTML = '<div class="tt-card"><div class="tt-head">typing test · the story of TJ <span class="tt-x">Esc to quit</span></div><div class="tt-stats" id="tt-stats">0 wpm · 100% · start typing</div><div class="tt-text" id="tt-text"></div><input id="tt-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="typing input"/></div>';
+      document.body.appendChild(ov);
+      const textEl = document.getElementById('tt-text'), statsEl = document.getElementById('tt-stats'), inp = document.getElementById('tt-in');
+      const spans = [];
+      for(let i=0;i<TEXT.length;i++){ const s = el('span'); s.textContent = TEXT[i]; textEl.appendChild(s); spans.push(s); }
+      let idx=0, correct=0, typed=0, t0=0, done=false; const marks=[];
+      spans[0].className = 'tt-cur';
+      function fmt(){ const mins=(performance.now()-t0)/60000; const wpm=(t0&&mins>0)?Math.round((typed/5)/mins):0; const acc=typed?Math.round(correct/typed*100):100; statsEl.textContent = wpm+' wpm · '+acc+'% · '+idx+'/'+TEXT.length; }
+      function finish(){ done=true; const mins=(performance.now()-t0)/60000; const wpm=mins>0?Math.round((TEXT.length/5)/mins):0; const acc=typed?Math.round(correct/typed*100):100; statsEl.innerHTML='<b>done!</b> '+wpm+' wpm · '+acc+'% accuracy — Esc to close'; }
+      function key(e){
+        const k = e.key;
+        if(k==='Escape'){ quit(e); return; }
+        if(done) return;
+        if(k==='Backspace'){ e.preventDefault(); e.stopPropagation(); if(idx>0){ spans[idx].className=''; idx--; if(marks[idx]) correct--; typed--; marks[idx]=undefined; spans[idx].className='tt-cur'; fmt(); } return; }
+        if(k.length!==1) return;
+        e.preventDefault(); e.stopPropagation();
+        if(!t0) t0=performance.now();
+        if(idx>=TEXT.length) return;
+        const ok = (k===TEXT[idx]); marks[idx]=ok; spans[idx].className = ok?'tt-ok':'tt-bad';
+        if(ok) correct++; typed++; idx++;
+        if(idx<TEXT.length) spans[idx].className='tt-cur';
+        fmt();
+        if(idx>=TEXT.length) finish();
+      }
+      function quit(e){ if(e){ e.preventDefault&&e.preventDefault(); e.stopPropagation&&e.stopPropagation(); } document.removeEventListener('keydown',key,true); ov.remove(); print('typing test closed.', 'dim'); scroll(); }
+      document.addEventListener('keydown', key, true);
+      setTimeout(() => { try { inp.focus(); } catch(e){} }, 60);
+      print('typing test — type the story of TJ. Esc to quit. ⌨️', 'ok');
+    },
     gg(){
       confetti();
       pre([
@@ -514,7 +630,8 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
     ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
-    hugh:'q', ggez:'gg', wp:'gg', themes:'theme' };
+    hugh:'q', ggez:'gg', wp:'gg', themes:'theme', bennett:'benny',
+    typetest:'type', typing:'type', game:'snake' };
 
   function run(raw){
     const cmd = raw.trim();
@@ -541,10 +658,23 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
   document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
 
+  // open artifacts inside the themed viewer frame (modifier-click opens raw)
+  rows.forEach(r => r.addEventListener('click', e => {
+    if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault(); openArtifact(r.getAttribute('href'));
+  }));
+
   const themeSel = document.getElementById('theme-select');
   if(themeSel) themeSel.addEventListener('change', () => { applyTheme(themeSel.value); print("theme → "+themeSel.value+" ✨", 'ok'); scroll(); });
   try { const saved = localStorage.getItem('jones-theme'); if(saved && THEMES.includes(saved)) applyTheme(saved); } catch(e){}
-  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b>)</span>", 'info');
+
+  // idle screensaver: launch cmatrix after 60s of no input
+  let idleTimer;
+  function resetIdle(){ clearTimeout(idleTimer); idleTimer = setTimeout(() => { if(!document.getElementById('matrix') && !document.getElementById('snake') && !document.getElementById('typing') && !document.hidden) cmds.cmatrix(); }, 60000); }
+  ['keydown','mousemove','touchstart','click','wheel'].forEach(ev => document.addEventListener(ev, resetIdle, {passive:true}));
+  resetIdle();
+
+  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b> or <b>snake</b>)</span>", 'info');
 })();
 
   </script>

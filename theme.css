@@ -1,0 +1,72 @@
+
+:root{
+  --bg:#0f1016; --bg2:#14151f; --surface:#171823; --surface2:#1c1d2b;
+  --border:#2a2c3c; --border2:#3a3d57;
+  --text:#cdd1e6; --dim:#7b80a0; --faint:#565b78;
+  --green:#9ece6a; --cyan:#7dcfff; --amber:#e0af68; --magenta:#bb9af7; --pink:#f7768e; --blue:#7aa2f7;
+  --sel:rgba(125,207,255,.10);
+  --mono:"JetBrains Mono","Cascadia Code",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+/* ---- switchable themes (type `theme <name>`) ---- */
+[data-theme="gruvbox"]{
+  --bg:#1d2021;--bg2:#282828;--surface:#32302f;--surface2:#3c3836;--border:#504945;--border2:#665c54;
+  --text:#ebdbb2;--dim:#a89984;--faint:#7c6f64;--green:#b8bb26;--cyan:#8ec07c;--amber:#fabd2f;
+  --magenta:#d3869b;--pink:#fb4934;--blue:#83a598;--sel:rgba(142,192,124,.12);
+}
+[data-theme="dracula"]{
+  --bg:#21222c;--bg2:#282a36;--surface:#2b2e3b;--surface2:#343746;--border:#3b3f51;--border2:#4d5168;
+  --text:#f8f8f2;--dim:#9aa0c0;--faint:#6272a4;--green:#50fa7b;--cyan:#8be9fd;--amber:#f1fa8c;
+  --magenta:#bd93f9;--pink:#ff79c6;--blue:#6272a4;--sel:rgba(139,233,253,.12);
+}
+[data-theme="nord"]{
+  --bg:#242933;--bg2:#2e3440;--surface:#323847;--surface2:#3b4252;--border:#434c5e;--border2:#4c566a;
+  --text:#eceff4;--dim:#9aa3b2;--faint:#6b7689;--green:#a3be8c;--cyan:#88c0d0;--amber:#ebcb8b;
+  --magenta:#b48ead;--pink:#bf616a;--blue:#81a1c1;--sel:rgba(136,192,208,.12);
+}
+[data-theme="matrix"]{
+  --bg:#000a00;--bg2:#001400;--surface:#021a02;--surface2:#032403;--border:#0c3a0c;--border2:#125512;
+  --text:#9bff9b;--dim:#3fae3f;--faint:#2a7a2a;--green:#39ff14;--cyan:#69ffb0;--amber:#b6ff6b;
+  --magenta:#aaffaa;--pink:#caffca;--blue:#5fffa0;--sel:rgba(57,255,20,.13);
+}
+[data-theme="amber"]{
+  --bg:#1a1200;--bg2:#211700;--surface:#291d00;--surface2:#322400;--border:#4a3700;--border2:#6b5000;
+  --text:#ffcc66;--dim:#b8860b;--faint:#8a6508;--green:#ffd479;--cyan:#ffb347;--amber:#ffcc33;
+  --magenta:#ffa500;--pink:#ff8c00;--blue:#ffbf66;--sel:rgba(255,191,0,.12);
+}
+[data-theme="pokemon"]{
+  --bg:#0e1726;--bg2:#12203a;--surface:#15294a;--surface2:#1b3358;--border:#26416b;--border2:#345a8f;
+  --text:#f6f7fb;--dim:#9fb6d6;--faint:#5f7aa3;--green:#ffcb05;--cyan:#3da9fc;--amber:#ffcb05;
+  --magenta:#ff5350;--pink:#ee1515;--blue:#2a75bb;--sel:rgba(255,203,5,.16);
+}
+[data-theme="salesforce"]{
+  --bg:#021b3a;--bg2:#04274f;--surface:#063063;--surface2:#0a3b75;--border:#13497f;--border2:#1b5c9c;
+  --text:#eaf3fb;--dim:#9cc3e6;--faint:#5e87b3;--green:#4bca81;--cyan:#00a1e0;--amber:#fe9339;
+  --magenta:#9050e9;--pink:#ea001e;--blue:#1b96ff;--sel:rgba(0,161,224,.16);
+}
+/* old-school Windows 98: teal desktop, gray beveled window, navy titlebar */
+[data-theme="win98"]{
+  --bg:#008080;--bg2:#008080;--surface:#c0c0c0;--surface2:#c0c0c0;--border:#808080;--border2:#dfdfdf;
+  --text:#000000;--dim:#404040;--faint:#555555;--green:#000080;--cyan:#000080;--amber:#000080;
+  --magenta:#000080;--pink:#7f0000;--blue:#000080;--sel:rgba(0,0,128,.18);
+}
+[data-theme="win98"] body{background:#008080}
+[data-theme="win98"] .win{border-radius:0;border:0;background:#c0c0c0;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+[data-theme="win98"] .titlebar{background:linear-gradient(90deg,#000080,#1084d0);border-bottom:0;padding:4px 6px}
+[data-theme="win98"] .tab,[data-theme="win98"] .tab b{color:#fff}
+[data-theme="win98"] .console{border-radius:0;background:#fff;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
+[data-theme="win98"] details.block>summary{border-top-color:#808080}
+[data-theme="win98"] .row{border-radius:0}
+[data-theme="win98"] .seg-count{border-radius:0;background:#000080;color:#fff;border-color:#000080}
+[data-theme="win98"] .theme-select{border-radius:0;background:#c0c0c0;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
+
+*{box-sizing:border-box}
+html,body{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--mono);-webkit-text-size-adjust:100%;transition:background-color .3s ease,color .3s ease}
+a{color:var(--cyan)}
+::selection{background:var(--sel)}
+#jones-theme-switch{position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));
+  z-index:99999;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;
+  font-family:var(--mono);font-size:12px;padding:5px 8px;cursor:pointer;opacity:.85}
+#jones-theme-switch:hover{opacity:1}

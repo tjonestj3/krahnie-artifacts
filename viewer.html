@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>viewer · tjonestj.com</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2213%22%20fill%3D%22%230f1016%22%2F%3E%3Cpath%20d%3D%22M14%2022l13%2010-13%2010%22%20fill%3D%22none%22%20stroke%3D%22%239ece6a%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Crect%20x%3D%2233%22%20y%3D%2240%22%20width%3D%2218%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%237dcfff%22%2F%3E%3C%2Fsvg%3E" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--mono)}
+  .vwin{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  .vbar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex:0 0 auto}
+  .dots{display:flex;gap:7px;flex:0 0 auto}
+  .dot{width:12px;height:12px;border-radius:50%}.dot.r{background:#f7768e}.dot.y{background:#e0af68}.dot.g{background:#9ece6a}
+  .vbtn{flex:0 0 auto;color:var(--cyan);text-decoration:none;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:3px 9px;background:var(--surface2)}
+  .vtitle{flex:1 1 auto;min-width:0;color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vtitle b{color:var(--text)}
+  iframe{flex:1 1 auto;width:100%;border:0;background:#fff}
+  #jones-theme-switch{bottom:auto;top:8px}
+</style>
+</head>
+<body>
+<div class="vwin">
+  <div class="vbar">
+    <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+    <a class="vbtn" href="/" title="Back to index">‹ index</a>
+    <div class="vtitle" id="vtitle"><b>viewer</b></div>
+    <a class="vbtn" id="vraw" href="#" target="_blank" rel="noopener" title="Open raw in a new tab">raw ↗</a>
+  </div>
+  <iframe id="vframe" title="artifact" referrerpolicy="no-referrer"></iframe>
+</div>
+<script>
+(function(){
+  function qp(n){ var m = new RegExp('[?&]' + n + '=([^&]+)').exec(location.search); return m ? decodeURIComponent(m[1]) : ''; }
+  var p = qp('p');
+  if(!p || /^([a-z]+:)?\/\//i.test(p) || p.indexOf('..') >= 0){ p = ''; }
+  var fr = document.getElementById('vframe'), t = document.getElementById('vtitle'), raw = document.getElementById('vraw');
+  if(p){ fr.src = p; raw.href = p; var safe = p.replace(/[&<>"]/g,''); t.innerHTML = '<b>' + safe + '</b>'; document.title = safe + ' · viewer'; }
+  else { t.textContent = 'no artifact specified — go back to index'; }
+})();
+</script>
+<script src="/theme.js" defer></script>
+</body>
+</html>
