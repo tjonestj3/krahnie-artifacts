@@ -334,6 +334,30 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
     addEventListener('resize', size, {once:true});
   }
 
+  function hearts(){
+    if(reduce) return;
+    const cv = el('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
+    const ctx = cv.getContext('2d'); let W, H;
+    function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+    size();
+    const EMO = ['❤️','💖','💕','💗','💘','🩷'];
+    const P = [];
+    for(let i=0;i<60;i++) P.push({ x:Math.random()*W, y:H+20+Math.random()*H*0.5, r:20+Math.random()*24,
+      vy:-(1.1+Math.random()*1.9), sway:Math.random()*Math.PI*2, sw:0.02+Math.random()*0.03,
+      e:EMO[(Math.random()*EMO.length)|0] });
+    const start = performance.now();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    (function frame(t){
+      const life = t - start; ctx.clearRect(0,0,W,H);
+      ctx.globalAlpha = Math.max(0, 1 - life/2800);
+      for(const p of P){ p.y += p.vy; p.sway += p.sw;
+        ctx.font = p.r + 'px serif'; ctx.fillText(p.e, p.x + Math.sin(p.sway)*18, p.y); }
+      ctx.globalAlpha = 1;
+      if(life < 3000) requestAnimationFrame(frame); else cv.remove();
+    })(start);
+    addEventListener('resize', size, {once:true});
+  }
+
   function loveSon(name){ confetti(); print("🎉 " + esc(name) + " — I love my sons! 🎉", 'ok'); }
 
   const FORTUNES = [
@@ -453,6 +477,8 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
     benny(){ loveSon("Benny"); },
     calvin(){ loveSon("Calvin"); },
     sons(){ confetti(); print("Tommy · Benny · Calvin — I love my sons! ❤️", 'ok'); },
+    // ---- the wife ----
+    sophia(){ hearts(); print("💖 Sophia — I love my wife so much! 💖", 'ok'); },
     // ---- the right-hand man ----
     q(){ confetti();
       print("&gt;&gt;&gt;  H U G H   C A R L O S   J O N E S   I  &lt;&lt;&lt;", 'ok');
@@ -632,7 +658,7 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
     ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
     hugh:'q', ggez:'gg', wp:'gg', themes:'theme', bennett:'benny',
-    typetest:'type', typing:'type', game:'snake' };
+    typetest:'type', typing:'type', game:'snake', soph:'sophia', wife:'sophia' };
 
   function run(raw){
     const cmd = raw.trim();
