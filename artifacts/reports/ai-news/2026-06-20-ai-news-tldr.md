@@ -1,0 +1,13 @@
+# Morning AI TL;DR — 2026-06-20
+
+Fresh, high-signal AI news was a bit thin in the last 24 hours, so this run focuses on the most relevant verified updates from the last ~48 hours.
+
+- **OpenAI added enterprise usage analytics and spend controls for ChatGPT Enterprise** — admins can now track credit use across ChatGPT/Codex by user, product, and model, a practical step toward managing agentic AI as metered infrastructure. [OpenAI](https://openai.com/index/chatgpt-enterprise-spend-controls/) / [Reuters](https://www.reuters.com/technology/openai-introduces-enhanced-usage-analytics-ai-spending-controls-chatgpt-2026-06-18/)
+- **GitHub exposed per-user AI credit consumption in the Copilot Usage Metrics API** — useful for engineering leaders trying to attribute Copilot/agent costs and govern heavy AI-coding usage. [GitHub Changelog](https://github.blog/changelog/2026-06-19-ai-credits-consumed-per-user-now-in-the-copilot-usage-metrics-api/)
+- **OpenAI says GPT-5.5 Instant improves ChatGPT health responses** — the update emphasizes better reasoning, context, communication, and physician-informed evaluations, showing vertical-specific model tuning becoming a product differentiator. [OpenAI](https://openai.com/index/improving-health-intelligence-in-chatgpt/)
+- **OpenAI highlighted AI-assisted rare-disease diagnosis work** — reported physician support for diagnosing rare genetic diseases in children points to frontier reasoning models moving from demos into specialist clinical workflows. [OpenAI News](https://openai.com/news/)
+- **ChatGPT release notes flag upcoming model retirements** — OpenAI says o3 leaves ChatGPT on Aug. 26 and GPT-4.5 on June 27, a reminder to audit workflows and prompts that depend on older model behavior. [OpenAI Help Center](https://help.openai.com/en/articles/6825453-chatgpt-release-notes)
+- **Reliance/Jio’s Ambani is pushing AI across calls, apps, and homes in India** — the strategic signal is distribution: national-scale telco and consumer platforms may become important AI agent surfaces outside the usual U.S. SaaS channels. [TechCrunch](https://techcrunch.com/2026/06/19/billionaire-ambani-wants-ai-in-every-call-app-and-home/)
+- **Salesforce Summer ’26 emphasizes out-of-the-box agents in Slack, Teams, and IT service workflows** — relevant for Salesforce builders because agent packaging and channel-native deployment are becoming default enterprise expectations. [Salesforce](https://www.salesforce.com/in/news/stories/summer-2026-product-release-announcement/)
+
+**Worth watching:** Cost governance is becoming the near-term bottleneck for enterprise agents; expect more platforms to ship usage attribution, caps, and per-agent ROI reporting before they ship splashy new model features.
