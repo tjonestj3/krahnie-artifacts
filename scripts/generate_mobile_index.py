@@ -349,7 +349,7 @@ img,svg,video{max-width:100%;height:auto}
 
 /* ---- neofetch header (the signature) ---- */
 .neofetch{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;padding:6px 2px 4px}
-.logo{margin:0;overflow-x:auto;font-size:clamp(6.5px,1.85vw,12.5px);line-height:1.05;white-space:pre;color:var(--green)}
+.logo{margin:0;flex:0 0 auto;font-size:clamp(6.5px,1.85vw,12.5px);line-height:1.05;white-space:pre;color:var(--green)}
 @supports ((-webkit-background-clip:text) or (background-clip:text)){
   .logo{background:linear-gradient(120deg,var(--cyan),var(--magenta) 70%,var(--pink));
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
