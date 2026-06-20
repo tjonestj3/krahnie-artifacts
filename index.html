@@ -501,20 +501,21 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
           if(y > H && Math.random() > 0.975) drops[i] = 0;
           drops[i]++;
         }
-        // a son's name falls through the rain, glowing
-        if(msgs.length < 2 && (frameN % 80 === 0 || (frameN === 4 && !msgs.length))){
-          msgs.push({ t: SONS[(sonIdx++) % SONS.length], col: ((Math.random()*(cols-2))|0)+1, row: -((Math.random()*8)|0) });
+        // a son's name streams down through the rain one letter at a time, so its
+        // trail fades like the rain (drawing the whole word every frame left an
+        // opaque block that faded into a dark rectangle behind it)
+        if(msgs.length < 2 && (frameN % 90 === 0 || (frameN === 4 && !msgs.length))){
+          msgs.push({ t: SONS[(sonIdx++) % SONS.length], col: ((Math.random()*(cols-2))|0)+1,
+                      base: ((Math.random()*(H/fs)*0.4)|0)+1, head: 0, age: 0 });
         }
-        ctx.save(); ctx.shadowColor = '#9effb8'; ctx.shadowBlur = 12; ctx.font = 'bold ' + (fs+2) + 'px monospace';
-        for(const m of msgs){
-          for(let k=0;k<m.t.length;k++){
-            const ry = m.row + k;
-            if(ry >= 0){ ctx.fillStyle = k === m.t.length-1 ? '#ffffff' : '#eafff1'; ctx.fillText(m.t[k], m.col*fs, ry*fs); }
+        if(frameN % 2 === 0){
+          ctx.font = 'bold ' + (fs+2) + 'px monospace'; ctx.fillStyle = '#ffffff';
+          for(const m of msgs){
+            if(m.head < m.t.length){ ctx.fillText(m.t[m.head], m.col*fs, (m.base + m.head)*fs); m.head++; }
           }
-          if(frameN % 2 === 0) m.row++;   // names linger: fall at half the rain's speed
         }
-        ctx.restore();
-        msgs = msgs.filter(m => m.row*fs < H + 40);
+        for(const m of msgs) m.age++;
+        msgs = msgs.filter(m => m.age < 120);
       }
       function loop(t){ if(!running) return; raf = requestAnimationFrame(loop); if(t-last < 33) return; last = t; draw(); }
       raf = requestAnimationFrame(loop);
