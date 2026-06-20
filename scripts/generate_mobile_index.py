@@ -6,12 +6,15 @@ from html import escape
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / "artifacts"
 
+USER = "thomas@jones.com"
+CWD = "~/artifacts"
+
 VIEW_EXTS = {".html", ".htm", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp3", ".wav", ".mp4", ".md"}
 BAD_PARTS = {"prompts", "__pycache__"}
 LABELS = {
     "prototypes": "Playable Prototypes",
     "inspo": "Inspiration Lab",
-    "game-dev-research": "Game Dev Research HTML Prototypes",
+    "game-dev-research": "Prototype Visions",
     "mtg-guides": "MTG Deck Guides",
     "html-sites": "HTML Sites",
     "reports": "Reports",
@@ -24,7 +27,7 @@ SECTION_DIR = {
     "mtg-guides": "html-sites/mtg-guides",
     "prototypes": "prototypes",
     "inspo": "inspo",
-    "game-dev-research": "inspo/indie-pvp-retro-inspo",
+    "game-dev-research": "inspo/game-dev/indie-pvp-retro-inspo",
     "html-sites": "html-sites",
     "reports": "reports",
     "comics": "comics",
@@ -122,10 +125,10 @@ files.sort(key=sort_key)
 cards_by_section = {}
 for p in files:
     rel = p.relative_to(ROOT)
-    if "inspo" in rel.parts:
-        section = "inspo"
-    elif is_game_dev_research_prototype(p):
+    if is_game_dev_research_prototype(p):
         section = "game-dev-research"
+    elif "inspo" in rel.parts:
+        section = "inspo"
     elif is_mtg_guide(p):
         section = "mtg-guides"
     else:
@@ -145,7 +148,7 @@ last_mtime = max((p.stat().st_mtime for p in files), default=0)
 last_date = datetime.date.fromtimestamp(last_mtime).isoformat() if last_mtime else "—"
 
 INFO = [
-    ("os", "KrahnieOS · Artifact Arcade"),
+    ("role", "Solution Architect"),
     ("host", "github.io · static pages"),
     ("shell", "bash 5.2"),
     ("artifacts", str(len(files))),
@@ -155,27 +158,30 @@ INFO = [
     ("theme", "tokyonight"),
 ]
 
-# Assembled ANSI-shadow banner: K R A H N I E
+# Assembled ANSI-shadow banner: T H O M A S
 LOGO = (
-    "██╗  ██╗ ██████╗  █████╗  ██╗  ██╗ ███╗   ██╗ ██╗ ███████╗\n"
-    "██║ ██╔╝ ██╔══██╗ ██╔══██╗ ██║  ██║ ████╗  ██║ ██║ ██╔════╝\n"
-    "█████╔╝  ██████╔╝ ███████║ ███████║ ██╔██╗ ██║ ██║ █████╗  \n"
-    "██╔═██╗  ██╔══██╗ ██╔══██║ ██╔══██║ ██║╚██╗██║ ██║ ██╔══╝  \n"
-    "██║  ██╗ ██║  ██║ ██║  ██║ ██║  ██║ ██║ ╚████║ ██║ ███████╗\n"
-    "╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝ ╚═╝ ╚══════╝"
+    "████████╗ ██╗  ██╗  ██████╗  ███╗   ███╗  █████╗  ███████╗\n"
+    "╚══██╔══╝ ██║  ██║ ██╔═══██╗ ████╗ ████║ ██╔══██╗ ██╔════╝\n"
+    "   ██║    ███████║ ██║   ██║ ██╔████╔██║ ███████║ ███████╗\n"
+    "   ██║    ██╔══██║ ██║   ██║ ██║╚██╔╝██║ ██╔══██║ ╚════██║\n"
+    "   ██║    ██║  ██║ ╚██████╔╝ ██║ ╚═╝ ██║ ██║  ██║ ███████║\n"
+    "   ╚═╝    ╚═╝  ╚═╝  ╚═════╝  ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚══════╝"
 )
 
 SWATCHES = ["#9ece6a", "#7dcfff", "#e0af68", "#bb9af7", "#f7768e", "#7aa2f7", "#cdd1e6", "#565b78"]
 
 
-def prompt(cmd: str, comment: str = "") -> str:
-    """One shell prompt line: user@host:cwd$ <cmd>  # comment"""
+def prompt_spans(cmd: str, comment: str = "") -> str:
     c = f'<span class="comment">{escape(comment)}</span>' if comment else ""
     return (
-        '<div class="cmdline"><span class="usr">thomas@krahnborn</span>'
-        '<span class="sep">:</span><span class="cwd">~/artifacts</span>'
-        f'<span class="dollar">$</span><span class="cmd">{escape(cmd)}</span>{c}</div>'
+        f'<span class="usr">{escape(USER)}</span><span class="sep">:</span>'
+        f'<span class="cwd">{escape(CWD)}</span><span class="dollar">$</span>'
+        f'<span class="cmd">{escape(cmd)}</span>{c}'
     )
+
+
+def prompt(cmd: str, comment: str = "") -> str:
+    return f'<div class="cmdline">{prompt_spans(cmd, comment)}</div>'
 
 
 def row_html(p: Path) -> str:
@@ -192,14 +198,19 @@ def row_html(p: Path) -> str:
     )
 
 
-def block_html(cmd: str, comment: str, items) -> str:
+def block_html(cmd: str, comment: str, items, is_open: bool = False) -> str:
     rows = "".join(row_html(p) for p in items)
-    return f'<section class="block">{prompt(cmd, comment)}<div class="listing">{rows}</div></section>'
+    op = " open" if is_open else ""
+    return (
+        f'<details class="block"{op}>'
+        f'<summary class="cmdline"><span class="caret">▸</span>{prompt_spans(cmd, comment)}</summary>'
+        f'<div class="listing">{rows}</div></details>'
+    )
 
 
-recent_block = block_html("ls -lt ~/artifacts | head", "# most recently touched", recent) if recent else ""
+recent_block = block_html("ls -lt ~/artifacts | head", "# most recently touched", recent, is_open=True) if recent else ""
 section_blocks = []
-for section in ["mtg-guides", "prototypes", "inspo", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
+for section in ["html-sites", "prototypes", "game-dev-research", "mtg-guides", "inspo", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
@@ -255,6 +266,8 @@ img,svg,video{max-width:100%;height:auto}
 .dollar{color:var(--magenta);margin:0 8px 0 3px}
 .cmd{color:var(--text)}
 .comment{color:var(--faint);margin-left:9px}
+.link{color:var(--cyan);margin:0 2px;border-bottom:1px dotted rgba(125,207,255,.4)}
+.link:hover{color:#fff;border-bottom-color:#fff}
 
 /* ---- neofetch header (the signature) ---- */
 .neofetch{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;padding:6px 2px 4px}
@@ -284,8 +297,17 @@ img,svg,video{max-width:100%;height:auto}
 @keyframes blink{50%{opacity:0}}
 .nomatch{color:var(--pink);padding:6px 0 2px}
 
+/* ---- collapsible section blocks ---- */
+details.block{margin:0}
+details.block>summary{list-style:none;cursor:pointer;outline:none;display:block}
+details.block>summary::-webkit-details-marker{display:none}
+details.block>summary:hover .cmd{color:#fff}
+details.block>summary:focus-visible{box-shadow:inset 2px 0 0 var(--cyan);border-radius:4px}
+.caret{color:var(--magenta);display:inline-block;width:1.1em;text-align:center;transition:transform .14s ease}
+details.block[open]>summary .caret{transform:rotate(90deg)}
+
 /* ---- listing rows ---- */
-.listing{display:flex;flex-direction:column;border-left:1px solid var(--border);margin:2px 0 6px}
+.listing{display:flex;flex-direction:column;border-left:1px solid var(--border);margin:2px 0 6px 6px}
 .row{display:flex;align-items:center;gap:11px;padding:7px 12px;border-radius:0 8px 8px 0;
   transition:background .12s ease}
 .row:hover,.row:focus-visible{background:var(--sel);outline:none}
@@ -303,15 +325,16 @@ img,svg,video{max-width:100%;height:auto}
 .foot code{color:var(--amber)}
 
 @media (min-width:760px){.screen{padding:22px 22px 26px}}
-@media (prefers-reduced-motion:reduce){.cur{animation:none}.row,.row-go{transition:none}}
+@media (prefers-reduced-motion:reduce){.cur{animation:none}.row,.row-go,.caret{transition:none}}
 """
 
 JS = """
 const q = document.getElementById('q');
 const rows = Array.from(document.querySelectorAll('.row'));
-const blocks = Array.from(document.querySelectorAll('.block'));
+const blocks = Array.from(document.querySelectorAll('details.block'));
 const nomatch = document.getElementById('nomatch');
 const count = document.getElementById('count');
+const defaultOpen = new Map(blocks.map(b => [b, b.open]));
 function apply(){
   const v = q.value.trim().toLowerCase();
   let shown = 0;
@@ -321,32 +344,37 @@ function apply(){
     if(m) shown++;
   }
   for(const b of blocks){
-    const any = Array.from(b.querySelectorAll('.row')).some(r => r.style.display !== 'none');
-    b.hidden = !any;
+    const has = Array.from(b.querySelectorAll('.row')).some(r => r.style.display !== 'none');
+    b.hidden = !has;
+    if(v){ if(has) b.open = true; }
+    else { b.open = defaultOpen.get(b); }
   }
-  if(nomatch) nomatch.hidden = shown !== 0 || !v;
-  if(count) count.textContent = v ? (shown + ' match' + (shown===1?'':'es')) : (rows.length + ' artifacts');
+  if(nomatch) nomatch.hidden = !(v && shown === 0);
+  if(count) count.textContent = v ? (shown + ' match' + (shown === 1 ? '' : 'es')) : (rows.length + ' artifacts');
 }
 q.addEventListener('input', apply);
 document.addEventListener('keydown', e => {
   if(e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
-  else if(e.key === 'Escape' && document.activeElement === q){ q.value=''; apply(); q.blur(); }
+  else if(e.key === 'Escape' && document.activeElement === q){ q.value = ''; apply(); q.blur(); }
 });
+const ex = document.getElementById('expand'), co = document.getElementById('collapse');
+if(ex) ex.addEventListener('click', e => { e.preventDefault(); blocks.forEach(b => { if(!b.hidden) b.open = true; }); });
+if(co) co.addEventListener('click', e => { e.preventDefault(); blocks.forEach(b => { b.open = false; }); });
 """
 
 body = f"""  <main class="term">
     <div class="win">
       <div class="titlebar">
         <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
-        <div class="tab"><b>thomas@krahnborn</b>: ~/artifacts — bash</div>
+        <div class="tab"><b>{escape(USER)}</b>: {escape(CWD)} — bash</div>
       </div>
       <div class="screen">
 
         {prompt("neofetch")}
         <div class="neofetch">
-          <pre class="logo" aria-label="KRAHNIE">{escape(LOGO)}</pre>
+          <pre class="logo" aria-label="THOMAS">{escape(LOGO)}</pre>
           <div class="nf-info">
-            <div class="nf-title">thomas@krahnborn</div>
+            <div class="nf-title">Thomas Jones III</div>
             <div class="nf-rule">------------------------</div>
             {info_rows}
             <div class="nf-colors">{swatch_html}</div>
@@ -354,15 +382,15 @@ body = f"""  <main class="term">
         </div>
 
         <div class="filter">
-          <span class="usr">thomas@krahnborn</span><span class="sep">:</span><span class="cwd">~/artifacts</span><span class="dollar">$</span><span class="cmd">grep -ri&nbsp;</span><span class="quote">'</span><input id="q" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter artifacts" placeholder="pattern" /><span class="quote">'</span><span class="cmd">&nbsp;.</span><span class="cur"></span>
+          <span class="usr">{escape(USER)}</span><span class="sep">:</span><span class="cwd">{escape(CWD)}</span><span class="dollar">$</span><span class="cmd">grep -ri&nbsp;</span><span class="quote">'</span><input id="q" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter artifacts" placeholder="pattern" /><span class="quote">'</span><span class="cmd">&nbsp;.</span><span class="cur"></span>
         </div>
-        <div class="cmdline" style="margin-top:2px"><span class="comment" id="count">{len(files)} artifacts</span><span class="comment"> · press / to search, Esc to clear</span></div>
+        <div class="cmdline" style="margin-top:2px"><span class="comment" id="count">{len(files)} artifacts</span><span class="comment"> · </span><a href="#" id="expand" class="link">expand all</a><span class="comment">/</span><a href="#" id="collapse" class="link">collapse all</a><span class="comment"> · / to search</span></div>
         <div id="nomatch" class="nomatch" hidden>grep: no matches in working tree</div>
 
         {recent_block}
         {''.join(section_blocks)}
 
-        <div class="foot"><span class="usr">thomas@krahnborn</span><span class="sep">:</span><span class="cwd">~/artifacts</span><span class="dollar">$</span> synced from <code>tjonestj3/krahnie-artifacts</code> · add to home screen for app feel <span class="cur"></span></div>
+        <div class="foot"><span class="usr">{escape(USER)}</span><span class="sep">:</span><span class="cwd">{escape(CWD)}</span><span class="dollar">$</span> synced from <code>tjonestj3/krahnie-artifacts</code> · add to home screen for app feel <span class="cur"></span></div>
       </div>
     </div>
   </main>"""
@@ -373,7 +401,7 @@ html = (
     "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" />\n"
     "  <meta name=\"color-scheme\" content=\"dark\" />\n"
     "  <meta name=\"theme-color\" content=\"#0f1016\" />\n"
-    "  <title>thomas@krahnborn: ~/artifacts</title>\n"
+    "  <title>Thomas Jones III · Solution Architect</title>\n"
     "  <style>\n" + CSS + "\n  </style>\n</head>\n<body>\n"
     + body +
     "\n  <script>\n" + JS + "\n  </script>\n</body>\n</html>\n"
