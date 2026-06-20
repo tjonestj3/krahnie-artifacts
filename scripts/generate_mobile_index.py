@@ -198,24 +198,27 @@ def row_html(p: Path) -> str:
     )
 
 
-def block_html(cmd: str, comment: str, items, is_open: bool = False) -> str:
+def block_html(label: str, cmd: str, items, is_open: bool = False) -> str:
     rows = "".join(row_html(p) for p in items)
     op = " open" if is_open else ""
     return (
         f'<details class="block"{op}>'
-        f'<summary class="cmdline"><span class="caret">▸</span>{prompt_spans(cmd, comment)}</summary>'
+        f'<summary><span class="caret">▸</span>'
+        f'<span class="seg-name">{escape(label)}</span>'
+        f'<span class="seg-count">{len(items)}</span>'
+        f'<span class="seg-cmd">$ {escape(cmd)}</span></summary>'
         f'<div class="listing">{rows}</div></details>'
     )
 
 
-recent_block = block_html("ls -lt ~/artifacts | head", "# most recently touched", recent, is_open=True) if recent else ""
+recent_block = block_html("Recently touched", "ls -lt | head", recent, is_open=True) if recent else ""
 section_blocks = []
 for section in ["html-sites", "prototypes", "game-dev-research", "mtg-guides", "inspo", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
     cmd = f"ls {SECTION_DIR.get(section, section)}/"
-    section_blocks.append(block_html(cmd, f"# {LABELS.get(section, section.title())} · {len(items)}", items))
+    section_blocks.append(block_html(LABELS.get(section, section.title()), cmd, items))
 
 info_rows = "".join(
     f'<div class="nf-row"><span class="nf-k">{escape(k)}</span>'
@@ -299,12 +302,18 @@ img,svg,video{max-width:100%;height:auto}
 
 /* ---- collapsible section blocks ---- */
 details.block{margin:0}
-details.block>summary{list-style:none;cursor:pointer;outline:none;display:block}
+details.block>summary{list-style:none;cursor:pointer;outline:none;display:flex;align-items:center;gap:10px;
+  padding:13px 6px;margin-top:4px;border-top:1px solid var(--border)}
 details.block>summary::-webkit-details-marker{display:none}
-details.block>summary:hover .cmd{color:#fff}
+details.block>summary:hover .seg-name,details.block>summary:focus-visible .seg-name{color:#fff}
 details.block>summary:focus-visible{box-shadow:inset 2px 0 0 var(--cyan);border-radius:4px}
-.caret{color:var(--magenta);display:inline-block;width:1.1em;text-align:center;transition:transform .14s ease}
+.caret{flex:0 0 auto;color:var(--magenta);width:1em;text-align:center;font-size:15px;transition:transform .14s ease}
 details.block[open]>summary .caret{transform:rotate(90deg)}
+.seg-name{flex:0 0 auto;color:var(--amber);font-weight:700;font-size:16px;letter-spacing:.01em}
+.seg-count{flex:0 0 auto;color:var(--green);font-size:12px;padding:1px 9px;border-radius:999px;
+  background:rgba(158,206,106,.12);border:1px solid rgba(158,206,106,.28)}
+.seg-cmd{flex:1 1 auto;min-width:0;text-align:right;color:var(--faint);font-size:12px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---- listing rows ---- */
 .listing{display:flex;flex-direction:column;border-left:1px solid var(--border);margin:2px 0 6px 6px}
