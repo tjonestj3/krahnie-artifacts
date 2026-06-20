@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime
+import json
 from pathlib import Path
 from html import escape
 
@@ -8,6 +9,9 @@ ARTIFACTS = ROOT / "artifacts"
 
 USER = "thomas@jones.com"
 CWD = "~/artifacts"
+
+# Single source of truth for selectable themes (drives the dropdown + the JS).
+THEME_NAMES = ["tokyonight", "gruvbox", "dracula", "nord", "matrix", "amber", "pokemon", "salesforce", "win98"]
 
 VIEW_EXTS = {".html", ".htm", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp3", ".wav", ".mp4", ".md"}
 BAD_PARTS = {"prompts", "__pycache__"}
@@ -237,6 +241,7 @@ def nf_row(k, v):
 
 
 info_rows = "".join(nf_row(k, v) for k, v in INFO)
+theme_options = "".join(f'<option value="{escape(t)}">{escape(t)}</option>' for t in THEME_NAMES)
 # swatches reference theme vars so they recolor when the theme changes
 swatch_html = "".join(f'<span style="background:var({v})"></span>'
                       for v in ['--green', '--cyan', '--amber', '--magenta', '--pink', '--blue', '--text', '--dim'])
@@ -276,6 +281,32 @@ CSS = """
   --text:#ffcc66;--dim:#b8860b;--faint:#8a6508;--green:#ffd479;--cyan:#ffb347;--amber:#ffcc33;
   --magenta:#ffa500;--pink:#ff8c00;--blue:#ffbf66;--sel:rgba(255,191,0,.12);
 }
+[data-theme="pokemon"]{
+  --bg:#0e1726;--bg2:#12203a;--surface:#15294a;--surface2:#1b3358;--border:#26416b;--border2:#345a8f;
+  --text:#f6f7fb;--dim:#9fb6d6;--faint:#5f7aa3;--green:#ffcb05;--cyan:#3da9fc;--amber:#ffcb05;
+  --magenta:#ff5350;--pink:#ee1515;--blue:#2a75bb;--sel:rgba(255,203,5,.16);
+}
+[data-theme="salesforce"]{
+  --bg:#021b3a;--bg2:#04274f;--surface:#063063;--surface2:#0a3b75;--border:#13497f;--border2:#1b5c9c;
+  --text:#eaf3fb;--dim:#9cc3e6;--faint:#5e87b3;--green:#4bca81;--cyan:#00a1e0;--amber:#fe9339;
+  --magenta:#9050e9;--pink:#ea001e;--blue:#1b96ff;--sel:rgba(0,161,224,.16);
+}
+/* old-school Windows 98: teal desktop, gray beveled window, navy titlebar */
+[data-theme="win98"]{
+  --bg:#008080;--bg2:#008080;--surface:#c0c0c0;--surface2:#c0c0c0;--border:#808080;--border2:#dfdfdf;
+  --text:#000000;--dim:#404040;--faint:#555555;--green:#000080;--cyan:#000080;--amber:#000080;
+  --magenta:#000080;--pink:#7f0000;--blue:#000080;--sel:rgba(0,0,128,.18);
+}
+[data-theme="win98"] body{background:#008080}
+[data-theme="win98"] .win{border-radius:0;border:0;background:#c0c0c0;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+[data-theme="win98"] .titlebar{background:linear-gradient(90deg,#000080,#1084d0);border-bottom:0;padding:4px 6px}
+[data-theme="win98"] .tab,[data-theme="win98"] .tab b{color:#fff}
+[data-theme="win98"] .console{border-radius:0;background:#fff;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
+[data-theme="win98"] details.block>summary{border-top-color:#808080}
+[data-theme="win98"] .row{border-radius:0}
+[data-theme="win98"] .seg-count{border-radius:0;background:#000080;color:#fff;border-color:#000080}
+[data-theme="win98"] .theme-select{border-radius:0;background:#c0c0c0;color:#000;border:2px solid;border-color:#808080 #fff #fff #808080}
 *{box-sizing:border-box}
 body,.win,.console,details.block>summary,.row,.nf-colors span,.seg-count{transition:background-color .3s ease,border-color .3s ease,color .3s ease}
 html,body{max-width:100%;overflow-x:hidden}
@@ -298,8 +329,11 @@ img,svg,video{max-width:100%;height:auto}
 .dots{display:flex;gap:7px;flex:0 0 auto}
 .dot{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .dot.r{background:#f7768e}.dot.y{background:#e0af68}.dot.g{background:#9ece6a}
-.tab{color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tab{flex:1 1 auto;color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tab b{color:var(--text);font-weight:600}
+.theme-select{flex:0 0 auto;background:var(--surface2);color:var(--text);border:1px solid var(--border);
+  border-radius:7px;font-family:var(--mono);font-size:12px;padding:3px 7px;cursor:pointer;max-width:42vw}
+.theme-select:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
 .screen{padding:18px 15px 22px}
 
 .cmdline{margin:22px 0 7px;overflow-wrap:anywhere}
@@ -493,10 +527,11 @@ JS = r"""
     ].join("\n");
   }
 
-  const THEMES = ['tokyonight','gruvbox','dracula','nord','matrix','amber'];
+  const THEMES = (window.__THEMES && window.__THEMES.length) ? window.__THEMES : ['tokyonight','gruvbox','dracula','nord','matrix','amber'];
   function applyTheme(name){
     document.documentElement.setAttribute('data-theme', name);
     const tv = document.getElementById('theme-val'); if(tv) tv.textContent = name;
+    const sel = document.getElementById('theme-select'); if(sel && sel.value !== name) sel.value = name;
     try { localStorage.setItem('jones-theme', name); } catch(e){}
   }
 
@@ -691,6 +726,8 @@ JS = r"""
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
   document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
 
+  const themeSel = document.getElementById('theme-select');
+  if(themeSel) themeSel.addEventListener('change', () => { applyTheme(themeSel.value); print("theme → "+themeSel.value+" ✨", 'ok'); scroll(); });
   try { const saved = localStorage.getItem('jones-theme'); if(saved && THEMES.includes(saved)) applyTheme(saved); } catch(e){}
   print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b>)</span>", 'info');
 })();
@@ -701,6 +738,7 @@ body = f"""  <main class="term">
       <div class="titlebar">
         <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
         <div class="tab"><b>{escape(USER)}</b>: {escape(CWD)} — bash</div>
+        <select class="theme-select" id="theme-select" aria-label="Switch theme" title="Switch theme">{theme_options}</select>
       </div>
       <div class="screen">
 
@@ -745,7 +783,8 @@ html = (
     "  <title>Thomas Jones III · Solution Architect</title>\n"
     "  <style>\n" + CSS + "\n  </style>\n</head>\n<body>\n"
     + body +
-    "\n  <script>\n" + JS + "\n  </script>\n</body>\n</html>\n"
+    "\n  <script>window.__THEMES = " + json.dumps(THEME_NAMES) + ";</script>\n"
+    "  <script>\n" + JS + "\n  </script>\n</body>\n</html>\n"
 )
 
 (ROOT / "index.html").write_text(html, encoding="utf-8")
