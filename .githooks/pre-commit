@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Auto-theme any artifact HTML being committed: inject /theme.css + /theme.js
+# (idempotent) so new pages inherit the site styling + theme switcher.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+# Only do work if HTML artifacts are part of this commit.
+if git diff --cached --name-only --diff-filter=ACM | grep -qiE '^artifacts/.*\.html?$'; then
+  python3 scripts/apply_theme_to_artifacts.py >/dev/null
+  git add -u -- artifacts
+fi

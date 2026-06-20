@@ -85,9 +85,14 @@ copy_file_if_exists "$WIKI_NOTE" "artifacts/docs/krahnie-process-orchestrator.md
   find artifacts -type f | sort | sed 's#^#- #'
 } > ARTIFACT_INDEX.md
 
+# Inject the shared theme hooks (/theme.css + /theme.js) into any new artifact
+# HTML so it inherits the site styling + theme switcher. Idempotent.
+./scripts/apply_theme_to_artifacts.py
+
 ./scripts/generate_mobile_index.py
 
-git add README.md ARTIFACT_INDEX.md index.html .nojekyll scripts/sync_artifacts.sh scripts/generate_mobile_index.py artifacts
+git add README.md ARTIFACT_INDEX.md index.html .nojekyll theme.css theme.js viewer.html 404.html og-image.png CNAME \
+  scripts/sync_artifacts.sh scripts/generate_mobile_index.py scripts/apply_theme_to_artifacts.py artifacts
 if git diff --cached --quiet; then
   echo "No artifact changes to commit."
   exit 0
