@@ -290,15 +290,25 @@ img,svg,video{max-width:100%;height:auto}
 .nf-colors{display:flex;gap:6px;margin-top:11px}
 .nf-colors span{width:17px;height:17px;border-radius:4px;border:1px solid rgba(255,255,255,.08)}
 
-/* ---- filter prompt ---- */
-.filter{display:flex;align-items:center;flex-wrap:wrap;margin:24px 0 6px}
-.filter .quote{color:var(--green)}
-.filter input{flex:1 1 130px;min-width:90px;background:transparent;border:none;outline:none;
+/* ---- interactive console ---- */
+.console{margin:22px 0 8px;border:1px solid var(--border);border-radius:11px;background:rgba(0,0,0,.28);
+  padding:12px 13px;max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#out{margin:0}
+#out .line{white-space:pre-wrap;overflow-wrap:anywhere;margin:1px 0}
+#out .line.pre{white-space:pre;overflow-x:auto;line-height:1.25}
+#out .line.ok{color:var(--green)}
+#out .line.err{color:var(--pink)}
+#out .line.dim{color:var(--faint)}
+#out .line.info{color:var(--cyan)}
+#out .line.warn{color:var(--amber)}
+#out .line .p{color:var(--green)}
+.in-line{display:flex;align-items:center;flex-wrap:wrap;margin-top:6px}
+#cmd-in{flex:1 1 140px;min-width:90px;background:transparent;border:none;outline:none;
   color:var(--amber);font:inherit;caret-color:var(--cyan);padding:0 2px}
-.filter input::placeholder{color:var(--faint)}
 .cur{display:inline-block;width:9px;height:1.05em;background:var(--cyan);margin-left:2px;vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+#cmd-in:focus + .cur{display:none}
 @keyframes blink{50%{opacity:0}}
-.nomatch{color:var(--pink);padding:6px 0 2px}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999}
 
 /* ---- collapsible section blocks ---- */
 details.block{margin:0}
@@ -337,38 +347,201 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
 @media (prefers-reduced-motion:reduce){.cur{animation:none}.row,.row-go,.caret{transition:none}}
 """
 
-JS = """
-const q = document.getElementById('q');
-const rows = Array.from(document.querySelectorAll('.row'));
-const blocks = Array.from(document.querySelectorAll('details.block'));
-const nomatch = document.getElementById('nomatch');
-const count = document.getElementById('count');
-const defaultOpen = new Map(blocks.map(b => [b, b.open]));
-function apply(){
-  const v = q.value.trim().toLowerCase();
-  let shown = 0;
-  for(const r of rows){
-    const m = !v || r.dataset.s.includes(v);
-    r.style.display = m ? '' : 'none';
-    if(m) shown++;
+JS = r"""
+(function(){
+  const consoleEl = document.getElementById('console');
+  const OUT = document.getElementById('out');
+  const IN  = document.getElementById('cmd-in');
+  const rows = Array.from(document.querySelectorAll('.row'));
+  const blocks = Array.from(document.querySelectorAll('details.block'));
+  const defaultOpen = new Map(blocks.map(b => [b, b.open]));
+  const listingTop = blocks[0] || null;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let hist = [], hpos = 0;
+
+  function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function print(html, cls){ OUT.appendChild(el('div','line'+(cls?' '+cls:''), html)); }
+  function pre(text){ OUT.appendChild(el('div','line pre', esc(text))); }
+  function scroll(){ consoleEl.scrollTop = consoleEl.scrollHeight; }
+  function echo(cmd){ print("<span class='usr'>thomas@jones.com</span><span class='sep'>:</span><span class='cwd'>~/artifacts</span><span class='dollar'>$</span> "+esc(cmd)); }
+  function sections(){ return blocks.map(b => ({el:b, name:b.querySelector('.seg-name').textContent.trim(), count:b.querySelector('.seg-count').textContent.trim()})); }
+  function nameOf(r){ return r.querySelector('.row-name').textContent.trim(); }
+
+  function setFilter(v){
+    v = (v||'').toLowerCase(); let shown = 0;
+    for(const r of rows){ const m = !v || r.dataset.s.includes(v); r.style.display = m ? '' : 'none'; if(m) shown++; }
+    for(const b of blocks){ const has = Array.from(b.querySelectorAll('.row')).some(r => r.style.display !== 'none'); b.hidden = !has; if(v){ if(has) b.open = true; } else { b.open = defaultOpen.get(b); } }
+    return shown;
   }
-  for(const b of blocks){
-    const has = Array.from(b.querySelectorAll('.row')).some(r => r.style.display !== 'none');
-    b.hidden = !has;
-    if(v){ if(has) b.open = true; }
-    else { b.open = defaultOpen.get(b); }
+
+  function confetti(){
+    if(reduce) return;
+    const cv = el('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
+    const ctx = cv.getContext('2d'); let W, H;
+    function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+    size();
+    const cols = ['#9ece6a','#7dcfff','#e0af68','#bb9af7','#f7768e','#7aa2f7','#ffffff'];
+    const P = [];
+    for(let i=0;i<160;i++) P.push({x:Math.random()*W, y:-20-Math.random()*H*0.4, r:5+Math.random()*7,
+      vx:(Math.random()-0.5)*3, vy:3+Math.random()*4, a:Math.random()*Math.PI, va:(Math.random()-0.5)*0.3,
+      c:cols[(Math.random()*cols.length)|0]});
+    const start = performance.now();
+    (function frame(t){
+      const life = t - start; ctx.clearRect(0,0,W,H);
+      for(const p of P){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.a+=p.va;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.c;
+        ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6); ctx.restore(); }
+      if(life < 2600) requestAnimationFrame(frame); else cv.remove();
+    })(start);
+    addEventListener('resize', size, {once:true});
   }
-  if(nomatch) nomatch.hidden = !(v && shown === 0);
-  if(count) count.textContent = v ? (shown + ' match' + (shown === 1 ? '' : 'es')) : (rows.length + ' artifacts');
-}
-q.addEventListener('input', apply);
-document.addEventListener('keydown', e => {
-  if(e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
-  else if(e.key === 'Escape' && document.activeElement === q){ q.value = ''; apply(); q.blur(); }
-});
-const ex = document.getElementById('expand'), co = document.getElementById('collapse');
-if(ex) ex.addEventListener('click', e => { e.preventDefault(); blocks.forEach(b => { if(!b.hidden) b.open = true; }); });
-if(co) co.addEventListener('click', e => { e.preventDefault(); blocks.forEach(b => { b.open = false; }); });
+
+  function loveSon(name){ confetti(); print("🎉 " + esc(name) + " — I love my sons! 🎉", 'ok'); }
+
+  const FORTUNES = [
+    "Weeks of coding can save you hours of planning.",
+    "There are 2 hard problems in CS: cache invalidation, naming things, and off-by-one errors.",
+    "It works on my machine. ship the machine.",
+    "A good architect leaves the codebase better than the deadline found it.",
+    "The best code is no code. The second best is code you deleted.",
+    "Premature optimization is the root of all evil — but so is shipping nothing.",
+    "Salesforce governor limits build character.",
+    "Commit early, commit often, blame git later."
+  ];
+  const COFFEE = ["      ) )","     ( (","   ........","   |      |]","   \\      /","    `----'"," ~ fresh brew ~"].join("\n");
+  const TRAIN = [
+    "      ====        ________                ___________",
+    "  _D _|  |_______/        \\__I_I_____===__|_________|",
+    "   |(_)---  |   H\\________/ |   |        =|___ ___|",
+    "   /     |  |   H  |  |     |   |         ||_| |_||",
+    "  |      |  |   H  |__--------------------| [___] |",
+    "  | ________|___H__/__|_____/[][]~\\_______|       |",
+    "  |/ |   |-----------I_____I [][] []  D   |=======|__"
+  ].join("\n");
+  function cowsay(t){
+    t = String(t).slice(0,42) || "moo";
+    return [
+      " " + "_".repeat(t.length+2),
+      "< " + t + " >",
+      " " + "-".repeat(t.length+2),
+      "        \\   ^__^",
+      "         \\  (oo)\\_______",
+      "            (__)\\       )\\/\\",
+      "                ||----w |",
+      "                ||     ||"
+    ].join("\n");
+  }
+
+  const cmds = {
+    help(){
+      print("<b>commands</b>", 'info');
+      [["help","this list"],
+       ["ls [section]","list sections, or files inside one"],
+       ["open <name>","open an artifact or section (alias: cd)"],
+       ["find <pattern>","filter the listing below (alias: grep, search)"],
+       ["expand / collapse","open or close every section"],
+       ["reset","clear the filter, restore sections"],
+       ["clear","clear the console  (Ctrl-L)"],
+       ["whoami / pwd / date","the usual"],
+       ["echo <text>","say something back"],
+       ["neofetch","jump to the banner"],
+       ["about / contact","what this is, where to find me"]
+      ].forEach(p => print("  <span class='info'>"+esc(p[0])+"</span>  <span class='dim'>"+esc(p[1])+"</span>"));
+      print("  <span class='dim'>…and a handful that aren't listed. go poke around 🥚</span>");
+    },
+    ls(a){
+      const s = sections();
+      if(!a.length){ s.forEach(x => print("  <span class='info'>"+esc(x.name)+"</span>  <span class='dim'>"+esc(x.count)+" items</span>")); print("<span class='dim'>ls &lt;section&gt; to list its files</span>"); return; }
+      const q = a.join(' ').toLowerCase(), hit = s.find(x => x.name.toLowerCase().includes(q));
+      if(!hit){ print("ls: no such section: "+esc(q), 'err'); return; }
+      Array.from(hit.el.querySelectorAll('.row')).forEach(r => print("  "+esc(nameOf(r))));
+    },
+    open(a){
+      if(!a.length){ print("usage: open &lt;name&gt;", 'warn'); return; }
+      const q = a.join(' ').toLowerCase(), sec = sections().find(x => x.name.toLowerCase().includes(q));
+      if(sec){ sec.el.open = true; sec.el.scrollIntoView({behavior:'smooth', block:'start'}); print("opened section "+esc(sec.name), 'ok'); return; }
+      const m = rows.filter(r => nameOf(r).toLowerCase().includes(q));
+      if(m.length === 1){ print("opening "+esc(nameOf(m[0]))+" …", 'ok'); setTimeout(() => { location.href = m[0].getAttribute('href'); }, 380); return; }
+      if(m.length > 1){ print(m.length+" matches — be more specific:", 'warn'); m.slice(0,8).forEach(r => print("  "+esc(nameOf(r)))); return; }
+      print("open: not found: "+esc(q), 'err');
+    },
+    find(a){
+      const pat = a.join(' ');
+      if(!pat){ setFilter(''); print("filter cleared", 'dim'); return; }
+      const n = setFilter(pat);
+      if(n && listingTop) listingTop.scrollIntoView({behavior:'smooth', block:'start'});
+      print(n+" match"+(n===1?'':'es')+" for '"+esc(pat)+"'", n ? 'ok' : 'err');
+    },
+    expand(){ blocks.forEach(b => { if(!b.hidden) b.open = true; }); print("expanded all", 'dim'); },
+    collapse(){ blocks.forEach(b => { b.open = false; }); print("collapsed all", 'dim'); },
+    reset(){ setFilter(''); blocks.forEach(b => { b.open = defaultOpen.get(b); }); print("reset", 'dim'); },
+    clear(){ OUT.innerHTML = ''; },
+    whoami(){ print("Thomas Jones III — Solution Architect", 'ok'); },
+    pwd(){ print("/home/thomas/artifacts"); },
+    date(){ print(new Date().toString()); },
+    echo(a, rest){ print(esc(rest)); },
+    neofetch(){ document.querySelector('.neofetch').scrollIntoView({behavior:'smooth', block:'center'}); },
+    about(){ print("My homelab of generated artifacts — sites, prototypes, comics, reports, and Krahnie experiments. Static, served from GitHub Pages, themed like the terminal I actually live in.", 'info'); },
+    contact(){ print("github :: <a href='https://github.com/tjonestj3' target='_blank' rel='noopener'>tjonestj3</a>", 'info'); print("repo   :: tjonestj3/krahnie-artifacts", 'dim'); },
+    theme(){ print("tokyonight", 'info'); },
+    history(){ hist.forEach((h,i) => print("  "+(i+1)+"  "+esc(h))); },
+    // ---- the kids ----
+    tommy(){ loveSon("Tommy"); },
+    benny(){ loveSon("Benny"); },
+    calvin(){ loveSon("Calvin"); },
+    sons(){ confetti(); print("Tommy · Benny · Calvin — I love my sons! ❤️", 'ok'); },
+    // ---- easter eggs ----
+    sudo(a, rest){
+      const s = rest.toLowerCase();
+      if(s.includes('rm -rf')){ print("nice try. this homelab has backups and a restraining order.", 'warn'); return; }
+      if(s.includes('sandwich')){ print("Okay.", 'ok'); pre(cowsay("one sandwich, coming up 🥪")); return; }
+      if(!s){ print("usage: sudo &lt;command&gt;", 'warn'); return; }
+      print("thomas is not in the sudoers file. This incident will be reported.", 'err');
+    },
+    rm(a, rest){ print(rest.includes('-rf') ? "I can't let you do that, Thomas." : "rm: permission denied (this is a museum)", 'err'); },
+    make(a, rest){ print(rest.includes('sandwich') ? "what? make it yourself." : "make: nothing to be done.", 'warn'); },
+    vim(){ print("you opened vim. you live here now. (try :q)", 'warn'); },
+    nano(){ print("nano? in this house we suffer in vim.", 'warn'); },
+    exit(){ print("there is no exit, only more side projects.", 'warn'); },
+    sl(){ pre(TRAIN); },
+    cowsay(a, rest){ pre(cowsay(rest || "moo")); },
+    coffee(){ print("brewing…", 'dim'); pre(COFFEE); print("☕ done.", 'ok'); },
+    fortune(){ print(esc(FORTUNES[(Math.random()*FORTUNES.length)|0]), 'info'); },
+    matrix(){ for(let i=0;i<7;i++){ let s=''; for(let j=0;j<44;j++) s += Math.random()<0.5?'0':'1'; print("<span style='color:#9ece6a'>"+s+"</span>"); } print("wake up, Thomas… 🐇", 'ok'); },
+    hi(){ print("hey thomas 👋", 'ok'); },
+    life(){ print("42.", 'ok'); }
+  };
+  const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
+    ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons' };
+
+  function run(raw){
+    const cmd = raw.trim();
+    echo(cmd);
+    if(cmd){ hist.push(cmd); hpos = hist.length; }
+    if(!cmd){ return; }
+    const parts = cmd.split(/\s+/);
+    const name = parts[0].toLowerCase();
+    const args = parts.slice(1);
+    const rest = cmd.slice(parts[0].length).trim();
+    const fn = cmds[name] || cmds[aliases[name]];
+    if(fn) { try { fn(args, rest); } catch(err){ print("error: "+esc(err.message), 'err'); } }
+    else print("command not found: "+esc(name)+" — type <b>help</b>", 'err');
+    scroll();
+  }
+
+  IN.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ run(IN.value); IN.value = ''; }
+    else if(e.key === 'ArrowUp'){ if(hist.length){ e.preventDefault(); hpos = Math.max(0, hpos-1); IN.value = hist[hpos] || ''; const n=IN.value.length; requestAnimationFrame(()=>IN.setSelectionRange(n,n)); } }
+    else if(e.key === 'ArrowDown'){ if(hist.length){ e.preventDefault(); hpos = Math.min(hist.length, hpos+1); IN.value = hist[hpos] || ''; } }
+    else if(e.key === 'Tab'){ e.preventDefault(); const cur = IN.value.trim().toLowerCase(); if(cur){ const hit = Object.keys(cmds).filter(c => c.startsWith(cur)); if(hit.length === 1) IN.value = hit[0] + ' '; else if(hit.length > 1){ echo(IN.value); print(hit.join('  '), 'dim'); scroll(); } } }
+    else if(e.key.toLowerCase() === 'l' && e.ctrlKey){ e.preventDefault(); OUT.innerHTML = ''; }
+  });
+  consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
+  document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
+
+  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes)</span>", 'info');
+})();
 """
 
 body = f"""  <main class="term">
@@ -390,11 +563,12 @@ body = f"""  <main class="term">
           </div>
         </div>
 
-        <div class="filter">
-          <span class="usr">{escape(USER)}</span><span class="sep">:</span><span class="cwd">{escape(CWD)}</span><span class="dollar">$</span><span class="cmd">grep -ri&nbsp;</span><span class="quote">'</span><input id="q" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter artifacts" placeholder="pattern" /><span class="quote">'</span><span class="cmd">&nbsp;.</span><span class="cur"></span>
+        <div class="console" id="console" aria-label="Interactive terminal">
+          <div id="out"></div>
+          <div class="in-line">
+            <span class="usr">{escape(USER)}</span><span class="sep">:</span><span class="cwd">{escape(CWD)}</span><span class="dollar">$</span><input id="cmd-in" type="text" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type a command" /><span class="cur"></span>
+          </div>
         </div>
-        <div class="cmdline" style="margin-top:2px"><span class="comment" id="count">{len(files)} artifacts</span><span class="comment"> · </span><a href="#" id="expand" class="link">expand all</a><span class="comment">/</span><a href="#" id="collapse" class="link">collapse all</a><span class="comment"> · / to search</span></div>
-        <div id="nomatch" class="nomatch" hidden>grep: no matches in working tree</div>
 
         {recent_block}
         {''.join(section_blocks)}
