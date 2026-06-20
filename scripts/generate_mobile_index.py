@@ -524,7 +524,9 @@ JS = r"""
       function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; cols = Math.ceil(W/fs); drops = Array(cols).fill(0).map(() => (Math.random()*(H/fs))|0); }
       size();
       let raf, last = 0, running = true;
+      const SONS = ['TOMMY','BENNY','CALVIN']; let msgs = [], sonIdx = 0, frameN = 0;
       function draw(){
+        frameN++;
         ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(0,0,W,H);
         ctx.font = fs+'px monospace';
         for(let i=0;i<cols;i++){
@@ -535,6 +537,20 @@ JS = r"""
           if(y > H && Math.random() > 0.975) drops[i] = 0;
           drops[i]++;
         }
+        // a son's name falls through the rain, glowing
+        if(msgs.length < 2 && (frameN % 80 === 0 || (frameN === 4 && !msgs.length))){
+          msgs.push({ t: SONS[(sonIdx++) % SONS.length], col: ((Math.random()*(cols-2))|0)+1, row: -((Math.random()*8)|0) });
+        }
+        ctx.save(); ctx.shadowColor = '#9effb8'; ctx.shadowBlur = 12; ctx.font = 'bold ' + (fs+2) + 'px monospace';
+        for(const m of msgs){
+          for(let k=0;k<m.t.length;k++){
+            const ry = m.row + k;
+            if(ry >= 0){ ctx.fillStyle = k === m.t.length-1 ? '#ffffff' : '#eafff1'; ctx.fillText(m.t[k], m.col*fs, ry*fs); }
+          }
+          if(frameN % 2 === 0) m.row++;   // names linger: fall at half the rain's speed
+        }
+        ctx.restore();
+        msgs = msgs.filter(m => m.row*fs < H + 40);
       }
       function loop(t){ if(!running) return; raf = requestAnimationFrame(loop); if(t-last < 33) return; last = t; draw(); }
       raf = requestAnimationFrame(loop);
