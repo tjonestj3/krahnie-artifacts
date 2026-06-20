@@ -230,12 +230,16 @@ for section in ["html-sites", "prototypes", "game-dev-research", "mtg-guides", "
     cmd = f"ls {SECTION_DIR.get(section, section)}/"
     section_blocks.append(block_html(LABELS.get(section, section.title()), cmd, items))
 
-info_rows = "".join(
-    f'<div class="nf-row"><span class="nf-k">{escape(k)}</span>'
-    f'<span class="nf-sep">::</span><span class="nf-v">{escape(v)}</span></div>'
-    for k, v in INFO
-)
-swatch_html = "".join(f'<span style="background:{c}"></span>' for c in SWATCHES)
+def nf_row(k, v):
+    vid = ' id="theme-val"' if k == "theme" else ''
+    return (f'<div class="nf-row"><span class="nf-k">{escape(k)}</span>'
+            f'<span class="nf-sep">::</span><span class="nf-v"{vid}>{escape(v)}</span></div>')
+
+
+info_rows = "".join(nf_row(k, v) for k, v in INFO)
+# swatches reference theme vars so they recolor when the theme changes
+swatch_html = "".join(f'<span style="background:var({v})"></span>'
+                      for v in ['--green', '--cyan', '--amber', '--magenta', '--pink', '--blue', '--text', '--dim'])
 
 CSS = """
 :root{
@@ -246,7 +250,34 @@ CSS = """
   --sel:rgba(125,207,255,.10);
   --mono:"JetBrains Mono","Cascadia Code",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
 }
+/* ---- switchable themes (type `theme <name>`) ---- */
+[data-theme="gruvbox"]{
+  --bg:#1d2021;--bg2:#282828;--surface:#32302f;--surface2:#3c3836;--border:#504945;--border2:#665c54;
+  --text:#ebdbb2;--dim:#a89984;--faint:#7c6f64;--green:#b8bb26;--cyan:#8ec07c;--amber:#fabd2f;
+  --magenta:#d3869b;--pink:#fb4934;--blue:#83a598;--sel:rgba(142,192,124,.12);
+}
+[data-theme="dracula"]{
+  --bg:#21222c;--bg2:#282a36;--surface:#2b2e3b;--surface2:#343746;--border:#3b3f51;--border2:#4d5168;
+  --text:#f8f8f2;--dim:#9aa0c0;--faint:#6272a4;--green:#50fa7b;--cyan:#8be9fd;--amber:#f1fa8c;
+  --magenta:#bd93f9;--pink:#ff79c6;--blue:#6272a4;--sel:rgba(139,233,253,.12);
+}
+[data-theme="nord"]{
+  --bg:#242933;--bg2:#2e3440;--surface:#323847;--surface2:#3b4252;--border:#434c5e;--border2:#4c566a;
+  --text:#eceff4;--dim:#9aa3b2;--faint:#6b7689;--green:#a3be8c;--cyan:#88c0d0;--amber:#ebcb8b;
+  --magenta:#b48ead;--pink:#bf616a;--blue:#81a1c1;--sel:rgba(136,192,208,.12);
+}
+[data-theme="matrix"]{
+  --bg:#000a00;--bg2:#001400;--surface:#021a02;--surface2:#032403;--border:#0c3a0c;--border2:#125512;
+  --text:#9bff9b;--dim:#3fae3f;--faint:#2a7a2a;--green:#39ff14;--cyan:#69ffb0;--amber:#b6ff6b;
+  --magenta:#aaffaa;--pink:#caffca;--blue:#5fffa0;--sel:rgba(57,255,20,.13);
+}
+[data-theme="amber"]{
+  --bg:#1a1200;--bg2:#211700;--surface:#291d00;--surface2:#322400;--border:#4a3700;--border2:#6b5000;
+  --text:#ffcc66;--dim:#b8860b;--faint:#8a6508;--green:#ffd479;--cyan:#ffb347;--amber:#ffcc33;
+  --magenta:#ffa500;--pink:#ff8c00;--blue:#ffbf66;--sel:rgba(255,191,0,.12);
+}
 *{box-sizing:border-box}
+body,.win,.console,details.block>summary,.row,.nf-colors span,.seg-count{transition:background-color .3s ease,border-color .3s ease,color .3s ease}
 html,body{max-width:100%;overflow-x:hidden}
 html{-webkit-text-size-adjust:100%}
 body{
@@ -370,7 +401,7 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
 .foot code{color:var(--amber)}
 
 @media (min-width:760px){.screen{padding:22px 22px 26px}}
-@media (prefers-reduced-motion:reduce){.cur{animation:none}.row,.row-go,.caret{transition:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.cur{animation:none}}
 """
 
 JS = r"""
@@ -407,7 +438,10 @@ JS = r"""
     const ctx = cv.getContext('2d'); let W, H;
     function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
     size();
-    const cols = ['#9ece6a','#7dcfff','#e0af68','#bb9af7','#f7768e','#7aa2f7','#ffffff'];
+    let cols = ['#9ece6a','#7dcfff','#e0af68','#bb9af7','#f7768e','#7aa2f7','#ffffff'];
+    try { const cs = getComputedStyle(document.documentElement);
+      const v = ['--green','--cyan','--amber','--magenta','--pink','--blue'].map(k => cs.getPropertyValue(k).trim()).filter(Boolean);
+      if(v.length) cols = v.concat('#ffffff'); } catch(e){}
     const P = [];
     for(let i=0;i<160;i++) P.push({x:Math.random()*W, y:-20-Math.random()*H*0.4, r:5+Math.random()*7,
       vx:(Math.random()-0.5)*3, vy:3+Math.random()*4, a:Math.random()*Math.PI, va:(Math.random()-0.5)*0.3,
@@ -457,6 +491,13 @@ JS = r"""
       "                ||----w |",
       "                ||     ||"
     ].join("\n");
+  }
+
+  const THEMES = ['tokyonight','gruvbox','dracula','nord','matrix','amber'];
+  function applyTheme(name){
+    document.documentElement.setAttribute('data-theme', name);
+    const tv = document.getElementById('theme-val'); if(tv) tv.textContent = name;
+    try { localStorage.setItem('jones-theme', name); } catch(e){}
   }
 
   const cmds = {
@@ -510,7 +551,21 @@ JS = r"""
     neofetch(){ document.querySelector('.neofetch').scrollIntoView({behavior:'smooth', block:'center'}); },
     about(){ print("My homelab of generated artifacts — sites, prototypes, comics, reports, and Krahnie experiments. Static, served from GitHub Pages, themed like the terminal I actually live in.", 'info'); },
     contact(){ print("github :: <a href='https://github.com/tjonestj3' target='_blank' rel='noopener'>tjonestj3</a>", 'info'); print("repo   :: tjonestj3/krahnie-artifacts", 'dim'); },
-    theme(){ print("tokyonight", 'info'); },
+    theme(a){
+      const cur = document.documentElement.getAttribute('data-theme') || 'tokyonight';
+      if(!a.length){
+        print("themes:", 'info');
+        THEMES.forEach(t => print((t === cur ? "  ● " : "  ○ ") + t + (t === cur ? "  (active)" : ""), t === cur ? 'ok' : 'dim'));
+        print("usage: theme &lt;name&gt;  ·  theme next  ·  theme random", 'dim');
+        return;
+      }
+      let name = a[0].toLowerCase();
+      if(name === 'next') name = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+      else if(name === 'random') name = THEMES[(Math.random() * THEMES.length) | 0];
+      if(!THEMES.includes(name)){ print("theme: unknown '"+esc(name)+"' — try: "+THEMES.join(', '), 'err'); return; }
+      applyTheme(name);
+      print("theme set to "+name+" ✨", 'ok');
+    },
     history(){ hist.forEach((h,i) => print("  "+(i+1)+"  "+esc(h))); },
     // ---- the kids ----
     tommy(){ loveSon("Tommy"); },
@@ -609,7 +664,7 @@ JS = r"""
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
     ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
-    hugh:'q', ggez:'gg', wp:'gg' };
+    hugh:'q', ggez:'gg', wp:'gg', themes:'theme' };
 
   function run(raw){
     const cmd = raw.trim();
@@ -636,7 +691,8 @@ JS = r"""
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
   document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
 
-  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes)</span>", 'info');
+  try { const saved = localStorage.getItem('jones-theme'); if(saved && THEMES.includes(saved)) applyTheme(saved); } catch(e){}
+  print("jonesOS ready · "+rows.length+" artifacts. type <b>help</b> to start, or scroll to browse. <span class='dim'>(/ focuses · ↑ history · Tab completes · try <b>theme</b>)</span>", 'info');
 })();
 """
 
