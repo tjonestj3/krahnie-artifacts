@@ -858,6 +858,8 @@ JS = r"""
   const themeSel = document.getElementById('theme-select');
   if(themeSel) themeSel.addEventListener('change', () => { applyTheme(themeSel.value); print("theme → "+themeSel.value+" ✨", 'ok'); scroll(); });
   try { const saved = localStorage.getItem('jones-theme'); if(saved && THEMES.includes(saved)) applyTheme(saved); } catch(e){}
+  // live-sync if the theme is changed in another tab / the viewer
+  window.addEventListener('storage', e => { if(e.key === 'jones-theme' && e.newValue && THEMES.includes(e.newValue)){ document.documentElement.setAttribute('data-theme', e.newValue); if(themeSel) themeSel.value = e.newValue; const tv = document.getElementById('theme-val'); if(tv) tv.textContent = e.newValue; } });
 
   // idle screensaver: launch cmatrix after 60s of no input
   let idleTimer;
@@ -943,15 +945,19 @@ def head_meta(title, desc, url):
 THEME_JS = (
     "(function(){\n"
     "  var THEMES = " + json.dumps(THEME_NAMES) + ";\n"
+    "  var inFrame = false; try { inFrame = window.self !== window.top; } catch(e){ inFrame = true; }\n"
     "  var sel = document.getElementById('theme-select');\n"
-    "  if(!sel){\n"
+    "  if(!sel && !inFrame){\n"  # framed pages defer to the parent's switcher (no duplicate)
     "    sel = document.createElement('select'); sel.id = 'jones-theme-switch'; sel.setAttribute('aria-label','Theme');\n"
     "    for(var i=0;i<THEMES.length;i++){ var o=document.createElement('option'); o.value=THEMES[i]; o.textContent=THEMES[i]; sel.appendChild(o); }\n"
     "    (document.body||document.documentElement).appendChild(sel);\n"
     "  }\n"
-    "  function applyTheme(n){ if(THEMES.indexOf(n)<0) return; document.documentElement.setAttribute('data-theme', n); try{localStorage.setItem('jones-theme', n);}catch(e){} if(sel.value!==n) sel.value=n; }\n"
-    "  sel.addEventListener('change', function(){ applyTheme(sel.value); });\n"
-    "  try{ var s = localStorage.getItem('jones-theme'); if(s && THEMES.indexOf(s)>=0){ document.documentElement.setAttribute('data-theme', s); sel.value = s; } }catch(e){}\n"
+    "  function setTheme(n){ if(THEMES.indexOf(n)<0) return; document.documentElement.setAttribute('data-theme', n); if(sel && sel.value!==n) sel.value = n; }\n"
+    "  function pick(n){ setTheme(n); try{localStorage.setItem('jones-theme', n);}catch(e){} }\n"
+    "  if(sel) sel.addEventListener('change', function(){ pick(sel.value); });\n"
+    "  try{ var s = localStorage.getItem('jones-theme'); if(s) setTheme(s); }catch(e){}\n"
+    # live-sync across the viewer chrome <-> framed artifact (and other tabs)
+    "  window.addEventListener('storage', function(e){ if(e.key === 'jones-theme' && e.newValue) setTheme(e.newValue); });\n"
     "})();\n"
 )
 

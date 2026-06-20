@@ -318,8 +318,8 @@
     <div class="grp">
       <h3>🤖 Codex first-pass</h3>
       <ul>
-        <li>An autonomous attempt at a card that opens a <b>draft</b> PR (<code>codexwork.py</code>, runs <code>codex exec</code> in the managed clone).</li>
-        <li>Deliberately conservative: repo allowlist, each repo pinned to a SF <b>sandbox</b>, hard prod denylist, draft-only, wall-clock timeout.</li>
+        <li>An autonomous attempt at a card that opens a <b>draft</b> PR. Krahnie spins up a <b>locked-down Docker container</b> (<code>docker/codex-runner/</code>) and runs <code>codex exec</code> against the repo clone <i>inside</i> it (<code>codexwork.py</code>).</li>
+        <li>The container <b>is</b> the isolation boundary: only the repo clone + scoped ChatGPT/Salesforce-sandbox auth are mounted — never host secrets. Deliberately conservative: repo allowlist, each repo pinned to a SF <b>sandbox</b>, hard prod denylist, draft-only, wall-clock timeout.</li>
       </ul>
     </div>
     <div class="grp">
