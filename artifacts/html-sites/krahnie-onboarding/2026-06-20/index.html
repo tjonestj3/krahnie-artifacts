@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krahnie — Onboarding</title>
+<style>
+  :root{
+    --ink:#10151c; --muted:#5b6573; --line:#e3e8ef; --bg:#f7f9fc; --card:#fff;
+    --accent:#4a154b;       /* Slack aubergine */
+    --accent2:#1264a3;      /* Slack blue */
+    --good:#1a7f5a; --warn:#b25e00;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:40px 22px 80px}
+  header.hero{margin-bottom:14px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2)}
+  h1{font-size:34px; line-height:1.15; margin:.25em 0 .15em; letter-spacing:-.02em}
+  h1 .em{color:var(--accent)}
+  .sub{font-size:18px; color:var(--muted); max-width:72ch}
+  .pills{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 6px}
+  .pill{font-size:12.5px; font-weight:600; background:#eef2f8; color:#33465c; padding:5px 11px; border-radius:999px; border:1px solid var(--line)}
+  .pill.good{background:#e7f5ee; color:var(--good); border-color:#cfe9dd}
+
+  h2{font-size:22px; margin:46px 0 4px; letter-spacing:-.01em}
+  h2 .num{color:var(--accent2); font-variant-numeric:tabular-nums}
+  .lead{color:var(--muted); margin:0 0 18px}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:0 1px 2px rgba(16,21,28,.04)}
+
+  /* ---- table of contents ---- */
+  .toc{display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 4px}
+  .toc a{font-size:13px; font-weight:600; text-decoration:none; color:#33465c; background:#eef2f8; border:1px solid var(--line); padding:6px 12px; border-radius:999px}
+  .toc a:hover{background:#e4ebf5; color:var(--accent2)}
+
+  /* ---- flow diagram (reused from demo) ---- */
+  .diagram{overflow-x:auto}
+  .flow{min-width:560px; display:flex; flex-direction:column; gap:0}
+  .node{border:1.5px solid var(--line); border-radius:12px; padding:13px 16px; background:#fff}
+  .node .t{font-weight:700; font-size:15px}
+  .node .d{font-size:13px; color:var(--muted); margin-top:2px}
+  .node code{font-size:12.5px; background:#f0f3f8; padding:1px 6px; border-radius:6px; color:#33465c}
+  .node.slack{border-color:#e7d6e8; background:#fbf6fb}
+  .node.gw{border-color:#cfe0f0; background:#f3f8fd}
+  .node.rts{border-color:#cfe9dd; background:#f1faf5}
+  .node.out{border-color:#e7d6e8; background:#fbf6fb}
+  .arrow{align-self:center; color:#9aa6b4; font-size:13px; padding:7px 0; text-align:center}
+  .arrow b{color:#33465c; font-weight:600}
+  .tag{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--accent2); margin-bottom:7px}
+
+  /* ---- tool groups ---- */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px}
+  .grp{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px 20px; box-shadow:0 1px 2px rgba(16,21,28,.04)}
+  .grp h3{margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:8px}
+  .grp ul{margin:0; padding-left:0; list-style:none}
+  .grp li{margin:.42em 0; font-size:14px; padding-left:1.1em; position:relative}
+  .grp li::before{content:"›"; position:absolute; left:0; color:var(--accent2); font-weight:700}
+  .grp code{font-size:12.5px; background:#f0f3f8; padding:1px 6px; border-radius:6px; color:#33465c}
+  .grp .new{font-size:10px; font-weight:800; letter-spacing:.04em; color:var(--good); background:#e7f5ee; border:1px solid #cfe9dd; border-radius:999px; padding:1px 6px; margin-left:5px; vertical-align:middle}
+
+  /* ---- say / try chips ---- */
+  .say{margin:6px 0; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; background:#10151c; color:#e6edf5; padding:4px 10px; border-radius:7px; display:inline-block}
+
+  ul.plain{margin:.4em 0; padding-left:1.2em} ul.plain li{margin:.25em 0; font-size:14.5px}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .mini{font-size:14px}
+  .mini h4{margin:0 0 6px; font-size:14px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+
+  pre{background:#10151c; color:#e6edf5; border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:13px; line-height:1.5; margin:12px 0}
+  pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre .c{color:#7e8c9e} /* comment */
+  p code, li code{font-size:12.5px; background:#eef2f8; padding:1px 6px; border-radius:6px; color:#33465c}
+
+  .callout{border-left:3px solid var(--accent2); background:#f3f8fd; padding:12px 16px; border-radius:0 8px 8px 0; font-size:14px; margin:14px 0}
+  .callout.good{border-color:var(--good); background:#f1faf5}
+
+  footer{margin-top:48px; color:var(--muted); font-size:13px; text-align:center}
+  @media(max-width:620px){
+    h1{font-size:27px} .grid{grid-template-columns:1fr} .two{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Team onboarding · Krahnborn delivery ops</div>
+    <h1>Meet <span class="em">Krahnie</span></h1>
+    <p class="sub">Krahnie is our conversation-first Slack assistant for Salesforce delivery
+    work. Talk to it in plain English in the assistant pane, a DM, or with a mention — a fast
+    orchestrator routes your ask to one of ~40 in-process tools that read and write Salesforce,
+    search Slack, and render the answer back as a Block Kit card. This page is the fastest way
+    to get oriented.</p>
+    <div class="pills">
+      <span class="pill">Slack Socket Mode</span>
+      <span class="pill">Pydantic-AI agent loop</span>
+      <span class="pill">Claude Haiku + Sonnet</span>
+      <span class="pill">Salesforce REST (read + write)</span>
+      <span class="pill good">searches only what you can see</span>
+      <span class="pill good">stores nothing externally</span>
+    </div>
+  </header>
+
+  <div class="toc">
+    <a href="#what">What it is</a>
+    <a href="#how">How it works</a>
+    <a href="#tools">What you can ask</a>
+    <a href="#surfaces">Where to use it</a>
+    <a href="#subsystems">Bigger machinery</a>
+    <a href="#start">Run it locally</a>
+    <a href="#extend">Add a tool</a>
+  </div>
+
+  <!-- WHAT IT IS -->
+  <h2 id="what">What it is</h2>
+  <p class="lead">A standalone agent that owns its own Slack app — not a plugin.</p>
+  <div class="card">
+    <ul class="plain">
+      <li>Krahnie is the successor to the Hermes <code>krahnie-slack</code> plugin: <b>same business
+      logic, but it now owns its own agent loop</b> instead of running inside Hermes. The two
+      coexist — Hermes keeps Discord; Krahnie owns the Slack app.</li>
+      <li>The loop is <b>provider-agnostic</b> (Pydantic-AI). It defaults to <b>Claude Haiku</b> for
+      orchestration (cheap, fast routing) and <b>Claude Sonnet</b> for the parts that write prose —
+      summaries, card enrichment, status reports.</li>
+      <li>Its edge is <b>conversation</b>: beyond Salesforce records, Krahnie grounds answers in
+      Slack threads via Slack's <b>Real-Time Search (RTS)</b> API — so it reasons over where
+      blockers, decisions, and client asks actually live, not just card fields.</li>
+      <li>Everything it tells you is rendered as a <b>Slack Block Kit card</b> with buttons —
+      refresh, confirm/edit/cancel on writes, per-card ⋯ menus, and modals.</li>
+    </ul>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <h2 id="how">How it works</h2>
+  <p class="lead">One message → routed → a tool runs → a card comes back.</p>
+  <div class="card diagram">
+    <div class="flow">
+      <div class="node slack">
+        <span class="tag">Slack</span>
+        <div class="t">You type in the assistant pane / DM / @mention</div>
+        <div class="d">Assistant-pane events also carry a short-lived <code>action_token</code> — your personal, scoped search credential.</div>
+      </div>
+      <div class="arrow">▼&nbsp; <b>message event</b></div>
+
+      <div class="node gw">
+        <span class="tag">Gateway · slack_gateway.py</span>
+        <div class="t">Socket Mode transport → builds RequestContext</div>
+        <div class="d">Fast-ack, slash commands, modals, all button/select interactivity. Captures your action_token for this turn.</div>
+      </div>
+      <div class="arrow">▼&nbsp; <b>agent.run_turn(text, ctx)</b></div>
+
+      <div class="node gw">
+        <span class="tag">Orchestrator · Pydantic-AI (Haiku)</span>
+        <div class="t">Routes your plain-English ask to one tool</div>
+        <div class="d">Built-in tools stripped, thinking disabled — a lean ~3K-token context for cheap, fast routing.</div>
+      </div>
+      <div class="arrow">▼</div>
+
+      <div class="node rts">
+        <span class="tag">krahnie/tools/* · in-process MCP tools</span>
+        <div class="t">The tool does the work</div>
+        <div class="d">Queries / writes Salesforce over REST, optionally searches Slack via RTS, and writes prose with Sonnet where needed.</div>
+      </div>
+      <div class="arrow">▼&nbsp; <b>Block Kit</b></div>
+
+      <div class="node out">
+        <span class="tag">Slack</span>
+        <div class="t">Card posted back to your thread / DM / Home</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <b>Why RTS is safe &amp; cheap:</b> searches are scoped to <b>what you can already see</b> (the
+    action_token), RTS stores <b>no customer data</b> externally, and the search call itself costs
+    <b>zero LLM tokens</b> — only re-feeding hits to Sonnet costs anything, and most tools either
+    reuse an existing call or feed none.
+  </div>
+
+  <!-- WHAT YOU CAN ASK -->
+  <h2 id="tools">What you can ask</h2>
+  <p class="lead">Just talk naturally — Krahnie figures out the rest. Or type <span class="say">help</span> in Slack for the live version of this. Try the chips below verbatim.</p>
+
+  <div class="grid">
+
+    <div class="grp">
+      <h3>🗓️ Your work</h3>
+      <ul>
+        <li>Your week-at-a-glance digest (load bar + Refresh/Snooze) — <span class="say">what's my week</span></li>
+        <li>Your full assigned backlog — <span class="say">all my cards</span></li>
+        <li>Time you've logged — <span class="say">how am I looking this week</span></li>
+        <li>This week's individual work-log entries — <span class="say">show my logs</span></li>
+        <li>Days you forgot to log to, with a one-click Log-time button — <span class="say">what days am I missing time</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>🔎 Find cards</h3>
+      <ul>
+        <li>A client / project / board's cards — <span class="say">what's going on with &lt;client&gt;</span></li>
+        <li>Filtered views — <span class="say">overdue cards I haven't logged to</span></li>
+        <li>By creator / assignee — <span class="say">cards assigned to &lt;name&gt;</span></li>
+        <li>One card's full detail — <span class="say">show me CARD-001234</span></li>
+        <li>Ranked "what next" shortlist — <span class="say">what should I work on</span></li>
+        <li>Cards gone quiet, so nothing rots <span class="new">new</span> — <span class="say">what cards are stale</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>✍️ Do things <span style="font-weight:500;font-size:12px;color:var(--muted)">(writes always confirm first)</span></h3>
+      <ul>
+        <li>Log time (confident match → confirm card; else picker) — <span class="say">log 90 min to &lt;card&gt;</span></li>
+        <li>Correct/move an entry (before→after diff) — <span class="say">that should've been Tuesday</span></li>
+        <li>Create a card — <span class="say">new card for &lt;client&gt;: &lt;task&gt;</span></li>
+        <li>Edit one — <span class="say">close the &lt;x&gt; card</span> · <span class="say">move &lt;card&gt; to Test</span></li>
+        <li>Comment on a card <span class="new">new</span> — <span class="say">add a note to &lt;card&gt;: …</span></li>
+        <li>Reassign / re-status many at once — <span class="say">reassign these to me</span></li>
+        <li>Spin a request into draft cards <span class="new">new</span> — <span class="say">draft cards from this</span></li>
+        <li>Personal reminders — <span class="say">remind me in an hour to email Dan</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>📈 Leadership &amp; metrics</h3>
+      <ul>
+        <li>Throughput + request→done time — <span class="say">team velocity</span> · <span class="say">cycle time</span></li>
+        <li>Hours per person vs capacity — <span class="say">utilization</span></li>
+        <li>On-time delivery % by client — <span class="say">are we hitting due dates</span></li>
+        <li>Client KPI scorecard — <span class="say">how's &lt;client&gt; doing</span></li>
+        <li>Team rollups — <span class="say">what's outstanding this week</span> · <span class="say">who logged time yesterday</span></li>
+        <li>How busy the team is right now <span class="new">new</span> — <span class="say">team capacity</span></li>
+        <li>One client's heartbeat <span class="new">new</span> — <span class="say">client pulse for &lt;client&gt;</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>💬 Search the conversation</h3>
+      <ul>
+        <li><b>Topical RTS</b> — workspace-wide semantic search, grounded answer + linked sources — <span class="say">search slack for what we decided about &lt;X&gt;</span></li>
+        <li><b>Channel catch-up</b> — recent activity in one channel (bot must be in it) — <span class="say">what's happening in #channel lately</span></li>
+        <li>Card recaps fold in Slack context — <span class="say">summarize the work on &lt;card&gt;</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>🚀 Handoff &amp; version control</h3>
+      <ul>
+        <li>Hand a card to a coding agent (Claude Code deep link, or autonomous Codex draft-PR), brief grounded in Slack — <span class="say">hand off &lt;card&gt; to an agent</span></li>
+        <li>Move a card to <b>Test</b> → pick the metadata you changed → Krahnie opens a PR with AI-written QA notes.</li>
+        <li>Move a card to <b>Done</b> → Krahnie drafts functional + technical docs.</li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>📊 Usage &amp; admin</h3>
+      <ul>
+        <li>Top users by activity — <span class="say">leaderboard</span></li>
+        <li>Krahnie spend — <span class="say">show me my cost</span></li>
+        <li>Paste-ready client update — <span class="say">status report for &lt;client&gt;</span></li>
+        <li><i>Admins:</i> <span class="say">map @person to &lt;SF name&gt;</span> · <span class="say">set &lt;name&gt;'s capacity to 30</span></li>
+      </ul>
+    </div>
+
+    <div class="grp">
+      <h3>🎉 Ops &amp; fun</h3>
+      <ul>
+        <li>Tell the team what went sideways so we sharpen the tools — <span class="say">log feedback</span></li>
+        <li>Send a teammate some appreciation — <span class="say">warm fuzzy for @person</span></li>
+        <li>The RTS-powered swear-jar leaderboard (fines in 🌮) — <span class="say">swear jar</span></li>
+        <li>A couple of easter eggs hide in here. Try <span class="say">tell me about yourself</span>.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- WHERE TO USE IT -->
+  <h2 id="surfaces">Where to use it</h2>
+  <p class="lead">Krahnie meets you on Slack's native surfaces — not just one chat box.</p>
+  <div class="two">
+    <div class="card mini">
+      <h4>Conversational surfaces</h4>
+      <ul class="plain">
+        <li><b>Assistant pane</b> — opens with suggested prompts; the only surface with RTS (carries your action_token).</li>
+        <li><b>DMs &amp; @mentions</b> — including <b>group DMs</b>, where it stays mention-gated.</li>
+        <li><b>App Home tab</b> — your personal dashboard: a "Start here" priority band + open cards, each with a ⋯ menu (Log time / Summarize / Edit) and quick-action buttons.</li>
+      </ul>
+    </div>
+    <div class="card mini">
+      <h4>Commands &amp; shortcuts</h4>
+      <ul class="plain">
+        <li><b>Slash:</b> <code>/my-week</code>, <code>/logtime</code>, <code>/newcard</code>, <code>/document</code>, <code>/metrics</code>, <code>/krahnie-feedback</code>.</li>
+        <li><b>Message shortcuts</b> (right-click a message): <i>Summarize this thread</i> and <i>Create card from message</i>.</li>
+        <li><b>Modals</b> with searchable pickers for guided log-time, new-card, feedback, and handoff flows.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- BIGGER MACHINERY -->
+  <h2 id="subsystems">The bigger machinery</h2>
+  <p class="lead">A few subsystems do more than answer a single question.</p>
+  <div class="grid">
+    <div class="grp">
+      <h3>🔁 VC capture → PR pipeline</h3>
+      <ul>
+        <li>Card enters <b>Test</b> → "Track metadata changes" card. Dev ticks the components changed, confirms a feature branch.</li>
+        <li><code>gitops.py</code> keeps a clean managed clone, cuts <code>feature/CARD-####-slug</code> from the client's base branch, retrieves only the tracked components, and opens a PR via <code>gh</code>.</li>
+      </ul>
+    </div>
+    <div class="grp">
+      <h3>🤖 Codex first-pass</h3>
+      <ul>
+        <li>An autonomous attempt at a card that opens a <b>draft</b> PR (<code>codexwork.py</code>, runs <code>codex exec</code> in the managed clone).</li>
+        <li>Deliberately conservative: repo allowlist, each repo pinned to a SF <b>sandbox</b>, hard prod denylist, draft-only, wall-clock timeout.</li>
+      </ul>
+    </div>
+    <div class="grp">
+      <h3>🔗 Cross-org ticket sync</h3>
+      <ul>
+        <li><code>ticketsync.py</code> — pulls client tickets → idempotently upserts <code>Card__c</code>, pushes crosswalked status + a client-visible note back. No middleware/Apex in the client org; has a loop guard.</li>
+      </ul>
+    </div>
+    <div class="grp">
+      <h3>🔎 Real-Time Search</h3>
+      <ul>
+        <li><code>slacksearch.py</code> wraps <code>assistant.search.context</code>. Powers topical search and enriches card summaries + handoff briefs.</li>
+        <li>Recent work: hybrid retrieval (channel history around hits), Haiku query-expansion, and context-window prioritization so windows survive the synthesis cap.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RUN IT LOCALLY -->
+  <h2 id="start">Run it locally</h2>
+  <p class="lead">Krahnie runs in production as a systemd <i>user</i> service. Here's setup + the day-to-day commands.</p>
+
+  <div class="card">
+    <p style="margin-top:0"><b>1 · Setup</b></p>
+    <pre><code>cd ~/krahnie
+python3 -m venv .venv
+./.venv/bin/python -m pip install -r requirements.txt
+<span class="c"># .env (gitignored) holds: SLACK_BOT_TOKEN, SLACK_APP_TOKEN, SLACK_ALLOWED_USERS,</span>
+<span class="c"># ANTHROPIC_API_KEY, KRAHNIE_SF_ORG, KRAHNIE_SF_INSTANCE</span></code></pre>
+
+    <p><b>2 · Slack scopes</b> — standard bot scopes plus, for RTS: <code>search:read.public</code>,
+    <code>search:read.files</code>, <code>search:read.users</code>. Add in the app's OAuth &amp; Permissions and
+    <b>reinstall</b> — Slack only injects the <code>action_token</code> once these are installed. Semantic
+    search needs a Business+ / Enterprise+ workspace.</p>
+
+    <p><b>3 · Run as the service</b> (it coexists with Hermes — Hermes's Slack platform is off, so the two never contend for the connection):</p>
+    <pre><code>systemctl --user status krahnie.service        <span class="c"># health</span>
+journalctl --user -u krahnie.service -f         <span class="c"># live logs</span>
+systemctl --user restart krahnie.service        <span class="c"># after a code change</span></code></pre>
+
+    <p><b>Manual run</b> (debugging) — stop the service first so two clients don't both hold the socket:</p>
+    <pre><code>systemctl --user stop krahnie.service
+~/krahnie/.venv/bin/python ~/krahnie/run.py</code></pre>
+
+    <p><b>Checks:</b></p>
+    <pre><code>PYTHONPATH=~/krahnie ./.venv/bin/python scripts/smoke_sdk.py          <span class="c"># SDK headless go/no-go</span>
+PYTHONPATH=~/krahnie ./.venv/bin/python scripts/test_context_flow.py  <span class="c"># context delivery (no Slack spam)</span>
+PYTHONPATH=~/krahnie ./.venv/bin/python scripts/test_prewarm.py       <span class="c"># warm-client pool</span></code></pre>
+
+    <div class="callout"><code>clients.yaml</code> is re-read fresh per use, so client-registry edits (nicknames,
+    channels, default boards, repo/ticketing config) <b>don't</b> need a restart. Everything else does.</div>
+  </div>
+
+  <!-- ADD A TOOL -->
+  <h2 id="extend">Add a tool</h2>
+  <p class="lead">The architecture's payoff: a new workflow is small and local — the gateway/agent core stays untouched.</p>
+  <div class="card">
+    <ul class="plain">
+      <li><b>1.</b> Write a new module in <code>krahnie/tools/</code> — a factory <code>make_&lt;x&gt;_tool(get_ctx)</code>
+      that returns an <code>@tool(...)</code> handler. It reads the turn's context via <code>get_ctx()</code>, does its
+      work, and posts Block Kit via <code>slackio</code>.</li>
+      <li><b>2.</b> Add one line to the list in <code>krahnie/tools/__init__.py</code>.</li>
+      <li><b>3.</b> Add a routing hint in <code>prompts.py</code> so the orchestrator knows when to pick it.</li>
+    </ul>
+    <p style="margin-bottom:0">Tools are exposed as <code>mcp__krahnie__&lt;tool_name&gt;</code> and are framework-portable:
+    the same objects run under the Claude Agent SDK MCP server <i>and</i> the Pydantic-AI loop. See an existing
+    module like <code>tools/week.py</code> or one of the recent five (<code>cardcomment</code>, <code>clientpulse</code>,
+    <code>capacity</code>, <code>stalecards</code>, <code>draftcards</code>) as a template.</p>
+  </div>
+
+  <footer>Krahnie · team onboarding · pair this with <a href="rts-demo.html" style="color:var(--accent2)">rts-demo.html</a> for the Real-Time Search deep-dive · see <code>README.md</code> for full reference</footer>
+</div>
+</body>
+</html>
