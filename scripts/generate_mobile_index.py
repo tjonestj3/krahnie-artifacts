@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import datetime
 from pathlib import Path
 from html import escape
 
@@ -17,6 +18,18 @@ LABELS = {
     "comics": "Comics",
     "media": "Media",
     "docs": "Docs",
+}
+# Path shown after `ls` in each section's command line.
+SECTION_DIR = {
+    "mtg-guides": "html-sites/mtg-guides",
+    "prototypes": "prototypes",
+    "inspo": "inspo",
+    "game-dev-research": "inspo/indie-pvp-retro-inspo",
+    "html-sites": "html-sites",
+    "reports": "reports",
+    "comics": "comics",
+    "media": "media",
+    "docs": "docs",
 }
 
 
@@ -119,82 +132,253 @@ for p in files:
         section = rel.parts[1] if len(rel.parts) > 1 else "other"
     cards_by_section.setdefault(section, []).append(p)
 
-featured = cards_by_section.get("mtg-guides", [])[:2] + cards_by_section.get("prototypes", [])[:3] + cards_by_section.get("inspo", [])[:2] + cards_by_section.get("game-dev-research", [])[:1]
-if len(featured) < 8:
-    featured += [p for p in files if p not in featured][: 8 - len(featured)]
+# Most recently touched, for the `ls -lt | head` block.
+recent = sorted(files, key=lambda p: -int(p.stat().st_mtime))[:6]
+
+# ---- archive stats (these become the neofetch "specs") ----
+num_sections = sum(1 for v in cards_by_section.values() if v)
+top_section, top_count = max(
+    ((s, len(v)) for s, v in cards_by_section.items() if v),
+    key=lambda x: x[1], default=("—", 0),
+)
+last_mtime = max((p.stat().st_mtime for p in files), default=0)
+last_date = datetime.date.fromtimestamp(last_mtime).isoformat() if last_mtime else "—"
+
+INFO = [
+    ("os", "KrahnieOS · Artifact Arcade"),
+    ("host", "github.io · static pages"),
+    ("shell", "bash 5.2"),
+    ("artifacts", str(len(files))),
+    ("sections", str(num_sections)),
+    ("largest", f"{LABELS.get(top_section, top_section)} ({top_count})"),
+    ("updated", last_date),
+    ("theme", "tokyonight"),
+]
+
+# Assembled ANSI-shadow banner: K R A H N I E
+LOGO = (
+    "██╗  ██╗ ██████╗  █████╗  ██╗  ██╗ ███╗   ██╗ ██╗ ███████╗\n"
+    "██║ ██╔╝ ██╔══██╗ ██╔══██╗ ██║  ██║ ████╗  ██║ ██║ ██╔════╝\n"
+    "█████╔╝  ██████╔╝ ███████║ ███████║ ██╔██╗ ██║ ██║ █████╗  \n"
+    "██╔═██╗  ██╔══██╗ ██╔══██║ ██╔══██║ ██║╚██╗██║ ██║ ██╔══╝  \n"
+    "██║  ██╗ ██║  ██║ ██║  ██║ ██║  ██║ ██║ ╚████║ ██║ ███████╗\n"
+    "╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝ ╚═╝ ╚══════╝"
+)
+
+SWATCHES = ["#9ece6a", "#7dcfff", "#e0af68", "#bb9af7", "#f7768e", "#7aa2f7", "#cdd1e6", "#565b78"]
 
 
-def card_html(p: Path) -> str:
+def prompt(cmd: str, comment: str = "") -> str:
+    """One shell prompt line: user@host:cwd$ <cmd>  # comment"""
+    c = f'<span class="comment">{escape(comment)}</span>' if comment else ""
+    return (
+        '<div class="cmdline"><span class="usr">thomas@krahnborn</span>'
+        '<span class="sep">:</span><span class="cwd">~/artifacts</span>'
+        f'<span class="dollar">$</span><span class="cmd">{escape(cmd)}</span>{c}</div>'
+    )
+
+
+def row_html(p: Path) -> str:
     rel = p.relative_to(ROOT).as_posix()
     subtitle = "/".join(p.relative_to(ARTIFACTS).parts[:-1]) if ARTIFACTS in p.parents else str(p.parent)
-    return f"""
-      <a class="card" href="{escape(rel)}">
-        <div class="card-icon">{icon(p)}</div>
-        <div class="card-body">
-          <div class="card-title">{escape(titleize(p))}</div>
-          <div class="card-subtitle">{escape(subtitle)}</div>
-        </div>
-        <div class="chev">›</div>
-      </a>"""
+    title = titleize(p)
+    search = escape(f"{title} {subtitle} {rel}".lower())
+    return (
+        f'<a class="row" href="{escape(rel)}" data-s="{search}">'
+        f'<span class="row-ico">{icon(p)}</span>'
+        f'<span class="row-main"><span class="row-name">{escape(title)}</span>'
+        f'<span class="row-path">{escape(subtitle)}/</span></span>'
+        f'<span class="row-go">→</span></a>'
+    )
 
 
-featured_html = "\n".join(card_html(p) for p in featured) or '<p class="empty">No artifacts yet.</p>'
-sections_html = []
+def block_html(cmd: str, comment: str, items) -> str:
+    rows = "".join(row_html(p) for p in items)
+    return f'<section class="block">{prompt(cmd, comment)}<div class="listing">{rows}</div></section>'
+
+
+recent_block = block_html("ls -lt ~/artifacts | head", "# most recently touched", recent) if recent else ""
+section_blocks = []
 for section in ["mtg-guides", "prototypes", "inspo", "game-dev-research", "html-sites", "reports", "comics", "media", "docs"]:
     items = cards_by_section.get(section, [])
     if not items:
         continue
-    sections_html.append(f'<section><h2>{LABELS.get(section, section.title())}</h2><div class="grid">' + "\n".join(card_html(p) for p in items) + '</div></section>')
+    cmd = f"ls {SECTION_DIR.get(section, section)}/"
+    section_blocks.append(block_html(cmd, f"# {LABELS.get(section, section.title())} · {len(items)}", items))
 
-html = f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#15122b" />
-  <title>Krahnie Artifacts</title>
-  <style>
-    :root {{ color-scheme: dark; --bg:#15122b; --panel:#211a45; --card:#2d235f; --ink:#fff6cf; --muted:#bdb4e8; --pink:#ff5c8a; --cyan:#67e8f9; --gold:#ffe66d; }}
-    * {{ box-sizing: border-box; }}
-    html, body {{ max-width:100%; overflow-x:hidden; }}
-    body {{ margin:0; font-family: ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at top left, #51318f 0, transparent 34rem), linear-gradient(180deg, #15122b, #090817); color:var(--ink); -webkit-text-size-adjust:100%; }}
-    img, svg, video {{ max-width:100%; height:auto; }}
-    .wrap {{ width:min(960px, 100%); margin:0 auto; padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 44px max(16px, env(safe-area-inset-left)); }}
-    header {{ padding: 22px 0 12px; }}
-    .badge {{ display:inline-flex; gap:8px; align-items:center; border:1px solid rgba(103,232,249,.35); background:rgba(103,232,249,.10); color:var(--cyan); padding:8px 12px; border-radius:999px; font-weight:800; font-size:13px; letter-spacing:.03em; }}
-    h1 {{ margin:16px 0 8px; font-size: clamp(34px, 11vw, 74px); line-height:.9; letter-spacing:-.06em; text-shadow: 0 3px 0 #000; overflow-wrap:anywhere; }}
-    .lede {{ margin:0; color:var(--muted); font-size:18px; line-height:1.45; max-width: 42rem; }}
-    .hero {{ margin:18px 0 20px; padding:18px; border-radius:28px; background:linear-gradient(135deg, rgba(255,92,138,.18), rgba(103,232,249,.12)); border:1px solid rgba(255,230,109,.22); box-shadow:0 18px 60px rgba(0,0,0,.35); }}
-    h2 {{ margin:28px 0 12px; font-size:24px; color:var(--gold); }}
-    .grid {{ display:grid; gap:12px; }}
-    .card {{ min-height:76px; display:flex; align-items:center; gap:14px; padding:14px; border-radius:20px; text-decoration:none; color:var(--ink); background:rgba(45,35,95,.88); border:1px solid rgba(255,255,255,.10); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 28px rgba(0,0,0,.22); }}
-    .card:active {{ transform: translateY(1px) scale(.995); }}
-    .card-icon {{ width:48px; height:48px; display:grid; place-items:center; flex:0 0 auto; border-radius:16px; background:#181431; font-size:25px; border:1px solid rgba(255,255,255,.10); }}
-    .card-body {{ min-width:0; flex:1 1 auto; }}
-    .card-title {{ font-size:17px; font-weight:900; line-height:1.2; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }}
-    .card-subtitle {{ margin-top:5px; color:var(--muted); font-size:12px; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }}
-    .chev {{ flex:0 0 auto; color:var(--cyan); font-size:34px; line-height:1; padding-left:4px; }}
-    footer {{ margin-top:34px; color:#8d83c6; font-size:13px; text-align:center; }}
-    @media (min-width: 760px) {{ .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
-  </style>
-</head>
-<body>
-  <main class="wrap">
-    <header>
-      <span class="badge">⚡ Krahnie Artifact Arcade</span>
-      <h1>Krahnie<br/>Artifacts</h1>
-      <p class="lede">Tap-friendly dashboard for generated HTML sites, reports, comics, media, and docs. Open this on iPhone Safari and use <b>Share → Add to Home Screen</b>.</p>
-    </header>
-    <section class="hero">
-      <h2>Latest / Featured</h2>
-      <div class="grid">{featured_html}</div>
-    </section>
-    {''.join(sections_html)}
-    <footer>Synced from <code>tjonestj3/krahnie-artifacts</code>. Built for phone viewing by Krahnie.</footer>
-  </main>
-</body>
-</html>
+info_rows = "".join(
+    f'<div class="nf-row"><span class="nf-k">{escape(k)}</span>'
+    f'<span class="nf-sep">::</span><span class="nf-v">{escape(v)}</span></div>'
+    for k, v in INFO
+)
+swatch_html = "".join(f'<span style="background:{c}"></span>' for c in SWATCHES)
+
+CSS = """
+:root{
+  --bg:#0f1016; --bg2:#14151f; --surface:#171823; --surface2:#1c1d2b;
+  --border:#2a2c3c; --border2:#3a3d57;
+  --text:#cdd1e6; --dim:#7b80a0; --faint:#565b78;
+  --green:#9ece6a; --cyan:#7dcfff; --amber:#e0af68; --magenta:#bb9af7; --pink:#f7768e; --blue:#7aa2f7;
+  --sel:rgba(125,207,255,.10);
+  --mono:"JetBrains Mono","Cascadia Code",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--text);font-family:var(--mono);font-size:14px;line-height:1.65;background:var(--bg);
+  background-image:radial-gradient(900px 520px at 82% -12%,rgba(122,162,247,.10),transparent 60%),
+                   radial-gradient(720px 520px at -12% 112%,rgba(187,154,247,.08),transparent 60%);
+  background-attachment:fixed;
+}
+::selection{background:rgba(125,207,255,.25);color:#fff}
+a{color:inherit;text-decoration:none}
+img,svg,video{max-width:100%;height:auto}
+
+.term{width:min(1000px,100%);margin:0 auto;padding:max(14px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 44px max(12px,env(safe-area-inset-left))}
+.win{border:1px solid var(--border);border-radius:13px;overflow:hidden;
+  background:linear-gradient(180deg,var(--surface),var(--bg2));
+  box-shadow:0 28px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.03)}
+.titlebar{display:flex;align-items:center;gap:11px;padding:10px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
+.dots{display:flex;gap:7px;flex:0 0 auto}
+.dot{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.dot.r{background:#f7768e}.dot.y{background:#e0af68}.dot.g{background:#9ece6a}
+.tab{color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tab b{color:var(--text);font-weight:600}
+.screen{padding:18px 15px 22px}
+
+.cmdline{margin:22px 0 7px;overflow-wrap:anywhere}
+.cmdline:first-child{margin-top:2px}
+.usr{color:var(--green)}
+.sep{color:var(--dim)}
+.cwd{color:var(--blue)}
+.dollar{color:var(--magenta);margin:0 8px 0 3px}
+.cmd{color:var(--text)}
+.comment{color:var(--faint);margin-left:9px}
+
+/* ---- neofetch header (the signature) ---- */
+.neofetch{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;padding:6px 2px 4px}
+.logo{margin:0;overflow-x:auto;font-size:clamp(6.5px,1.85vw,12.5px);line-height:1.05;white-space:pre;color:var(--green)}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .logo{background:linear-gradient(120deg,var(--cyan),var(--magenta) 70%,var(--pink));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    filter:drop-shadow(0 0 16px rgba(125,207,255,.22))}
+}
+.nf-info{flex:1 1 240px;min-width:210px}
+.nf-title{color:var(--green);font-weight:700}
+.nf-rule{color:var(--border2);letter-spacing:1px}
+.nf-row{display:flex;gap:8px}
+.nf-k{color:var(--cyan);flex:0 0 76px}
+.nf-sep{color:var(--faint)}
+.nf-v{color:var(--text);min-width:0;overflow-wrap:anywhere}
+.nf-colors{display:flex;gap:6px;margin-top:11px}
+.nf-colors span{width:17px;height:17px;border-radius:4px;border:1px solid rgba(255,255,255,.08)}
+
+/* ---- filter prompt ---- */
+.filter{display:flex;align-items:center;flex-wrap:wrap;margin:24px 0 6px}
+.filter .quote{color:var(--green)}
+.filter input{flex:1 1 130px;min-width:90px;background:transparent;border:none;outline:none;
+  color:var(--amber);font:inherit;caret-color:var(--cyan);padding:0 2px}
+.filter input::placeholder{color:var(--faint)}
+.cur{display:inline-block;width:9px;height:1.05em;background:var(--cyan);margin-left:2px;vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.nomatch{color:var(--pink);padding:6px 0 2px}
+
+/* ---- listing rows ---- */
+.listing{display:flex;flex-direction:column;border-left:1px solid var(--border);margin:2px 0 6px}
+.row{display:flex;align-items:center;gap:11px;padding:7px 12px;border-radius:0 8px 8px 0;
+  transition:background .12s ease}
+.row:hover,.row:focus-visible{background:var(--sel);outline:none}
+.row:focus-visible{box-shadow:inset 2px 0 0 var(--cyan)}
+.row-ico{flex:0 0 auto;width:1.5em;text-align:center}
+.row-main{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;line-height:1.3}
+.row-name{color:var(--cyan);font-weight:600;overflow-wrap:anywhere}
+.row:hover .row-name,.row:focus-visible .row-name{color:#fff}
+.row-path{color:var(--faint);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-go{flex:0 0 auto;color:var(--green);opacity:.45;transition:transform .12s ease,opacity .12s ease}
+.row:hover .row-go,.row:focus-visible .row-go{opacity:1;transform:translateX(3px)}
+.block[hidden]{display:none}
+
+.foot{margin-top:22px;color:var(--dim);font-size:12.5px;overflow-wrap:anywhere}
+.foot code{color:var(--amber)}
+
+@media (min-width:760px){.screen{padding:22px 22px 26px}}
+@media (prefers-reduced-motion:reduce){.cur{animation:none}.row,.row-go{transition:none}}
 """
+
+JS = """
+const q = document.getElementById('q');
+const rows = Array.from(document.querySelectorAll('.row'));
+const blocks = Array.from(document.querySelectorAll('.block'));
+const nomatch = document.getElementById('nomatch');
+const count = document.getElementById('count');
+function apply(){
+  const v = q.value.trim().toLowerCase();
+  let shown = 0;
+  for(const r of rows){
+    const m = !v || r.dataset.s.includes(v);
+    r.style.display = m ? '' : 'none';
+    if(m) shown++;
+  }
+  for(const b of blocks){
+    const any = Array.from(b.querySelectorAll('.row')).some(r => r.style.display !== 'none');
+    b.hidden = !any;
+  }
+  if(nomatch) nomatch.hidden = shown !== 0 || !v;
+  if(count) count.textContent = v ? (shown + ' match' + (shown===1?'':'es')) : (rows.length + ' artifacts');
+}
+q.addEventListener('input', apply);
+document.addEventListener('keydown', e => {
+  if(e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+  else if(e.key === 'Escape' && document.activeElement === q){ q.value=''; apply(); q.blur(); }
+});
+"""
+
+body = f"""  <main class="term">
+    <div class="win">
+      <div class="titlebar">
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+        <div class="tab"><b>thomas@krahnborn</b>: ~/artifacts — bash</div>
+      </div>
+      <div class="screen">
+
+        {prompt("neofetch")}
+        <div class="neofetch">
+          <pre class="logo" aria-label="KRAHNIE">{escape(LOGO)}</pre>
+          <div class="nf-info">
+            <div class="nf-title">thomas@krahnborn</div>
+            <div class="nf-rule">------------------------</div>
+            {info_rows}
+            <div class="nf-colors">{swatch_html}</div>
+          </div>
+        </div>
+
+        <div class="filter">
+          <span class="usr">thomas@krahnborn</span><span class="sep">:</span><span class="cwd">~/artifacts</span><span class="dollar">$</span><span class="cmd">grep -ri&nbsp;</span><span class="quote">'</span><input id="q" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter artifacts" placeholder="pattern" /><span class="quote">'</span><span class="cmd">&nbsp;.</span><span class="cur"></span>
+        </div>
+        <div class="cmdline" style="margin-top:2px"><span class="comment" id="count">{len(files)} artifacts</span><span class="comment"> · press / to search, Esc to clear</span></div>
+        <div id="nomatch" class="nomatch" hidden>grep: no matches in working tree</div>
+
+        {recent_block}
+        {''.join(section_blocks)}
+
+        <div class="foot"><span class="usr">thomas@krahnborn</span><span class="sep">:</span><span class="cwd">~/artifacts</span><span class="dollar">$</span> synced from <code>tjonestj3/krahnie-artifacts</code> · add to home screen for app feel <span class="cur"></span></div>
+      </div>
+    </div>
+  </main>"""
+
+html = (
+    "<!doctype html>\n<html lang=\"en\">\n<head>\n"
+    "  <meta charset=\"utf-8\" />\n"
+    "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" />\n"
+    "  <meta name=\"color-scheme\" content=\"dark\" />\n"
+    "  <meta name=\"theme-color\" content=\"#0f1016\" />\n"
+    "  <title>thomas@krahnborn: ~/artifacts</title>\n"
+    "  <style>\n" + CSS + "\n  </style>\n</head>\n<body>\n"
+    + body +
+    "\n  <script>\n" + JS + "\n  </script>\n</body>\n</html>\n"
+)
+
 (ROOT / "index.html").write_text(html, encoding="utf-8")
 (ROOT / ".nojekyll").write_text("", encoding="utf-8")
 print(f"Wrote {ROOT / 'index.html'} with {len(files)} artifact links")
