@@ -168,6 +168,16 @@ LOGO = (
     "   ╚═╝    ╚═╝  ╚═╝  ╚═════╝  ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚══════╝"
 )
 
+# Hugh's gamer-tag banner: H U G H
+HUGH_LOGO = (
+    "██╗  ██╗ ██╗   ██╗  ██████╗  ██╗  ██╗\n"
+    "██║  ██║ ██║   ██║ ██╔════╝  ██║  ██║\n"
+    "███████║ ██║   ██║ ██║  ███╗ ███████║\n"
+    "██╔══██║ ██║   ██║ ██║   ██║ ██╔══██║\n"
+    "██║  ██║ ╚██████╔╝ ╚██████╔╝ ██║  ██║\n"
+    "╚═╝  ╚═╝  ╚═════╝   ╚═════╝  ╚═╝  ╚═╝"
+)
+
 SWATCHES = ["#9ece6a", "#7dcfff", "#e0af68", "#bb9af7", "#f7768e", "#7aa2f7", "#cdd1e6", "#565b78"]
 
 
@@ -344,6 +354,17 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
 .row-go{flex:0 0 auto;color:var(--green);opacity:.45;transition:transform .12s ease,opacity .12s ease}
 .row:hover .row-go,.row:focus-visible .row-go{opacity:1;transform:translateX(3px)}
 .block[hidden]{display:none}
+
+/* ---- Hugh's gamer-tag banner ---- */
+.gamertag{margin:6px 0 6px}
+.logo-hugh{color:var(--green)}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .logo.logo-hugh{background:linear-gradient(120deg,#35d36a,var(--cyan) 55%,var(--blue));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    filter:drop-shadow(0 0 16px rgba(53,211,106,.28))}
+}
+.gt-sub{color:var(--green);font-size:12.5px;letter-spacing:.04em;margin-top:7px;overflow-wrap:anywhere}
+.gt-hint{color:var(--faint)}
 
 .foot{margin-top:22px;color:var(--dim);font-size:12.5px;overflow-wrap:anywhere}
 .foot code{color:var(--amber)}
@@ -570,12 +591,25 @@ JS = r"""
       cv.addEventListener('click', exit); cv.addEventListener('touchstart', exit, {passive:true});
       window.addEventListener('resize', size);
     },
+    gg(){
+      confetti();
+      pre([
+        " ██████╗  ██████╗     ███████╗███████╗",
+        "██╔════╝ ██╔════╝     ██╔════╝╚══███╔╝",
+        "██║  ███╗██║  ███╗    █████╗    ███╔╝ ",
+        "██║   ██║██║   ██║    ██╔══╝  ███╔╝   ",
+        "╚██████╔╝╚██████╔╝    ███████╗███████╗",
+        " ╚═════╝  ╚═════╝     ╚══════╝╚══════╝"
+      ].join("\n"));
+      print("g00d g4m3. wp, no re. 🏆", 'ok');
+      print("shoutout Hugh — carried as always. 🎮", 'dim');
+    },
     hi(){ print("hey thomas 👋", 'ok'); },
     life(){ print("42.", 'ok'); }
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
     ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix',
-    hugh:'q' };
+    hugh:'q', ggez:'gg', wp:'gg' };
 
   function run(raw){
     const cmd = raw.trim();
@@ -634,6 +668,12 @@ body = f"""  <main class="term">
 
         {recent_block}
         {''.join(section_blocks)}
+
+        {prompt("cat ~/.gamertag", "# my right-hand man")}
+        <div class="gamertag">
+          <pre class="logo logo-hugh" aria-label="HUGH">{escape(HUGH_LOGO)}</pre>
+          <div class="gt-sub">HUGH CARLOS JONES I · l33t gamer · right-hand man · 1337 · <span class="gt-hint">type 'q' to hype him</span></div>
+        </div>
 
         <div class="foot"><span class="usr">{escape(USER)}</span><span class="sep">:</span><span class="cwd">{escape(CWD)}</span><span class="dollar">$</span> synced from <code>tjonestj3/krahnie-artifacts</code> · add to home screen for app feel <span class="cur"></span></div>
       </div>
