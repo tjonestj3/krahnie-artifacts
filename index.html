@@ -675,11 +675,42 @@ details.block[open]>summary .caret{transform:rotate(90deg)}
     scroll();
   }
 
+  // bash-style Tab completion: complete the current token, extend to the longest
+  // common prefix when several match, and list candidates only when already at it.
+  function lcp(arr){ if(!arr.length) return ''; let p = arr[0]; for(const s of arr){ let i = 0; while(i < p.length && i < s.length && p[i].toLowerCase() === s[i].toLowerCase()) i++; p = p.slice(0, i); } return p; }
+  function applyComplete(cur, hits, prefix){
+    if(!hits.length) return;
+    if(hits.length === 1){ IN.value = prefix + hits[0] + ' '; return; }
+    const p = lcp(hits);
+    if(p.length > cur.length){ IN.value = prefix + p; }
+    else { echo(IN.value); print(hits.join('   '), 'dim'); scroll(); }
+  }
+  function complete(){
+    const val = IN.value;
+    const sp = val.indexOf(' ');
+    if(sp === -1){
+      const cur = val.toLowerCase();
+      const names = Object.keys(cmds).concat(Object.keys(aliases)).sort();
+      applyComplete(cur, names.filter(n => n.startsWith(cur)), '');
+      return;
+    }
+    const cmdTok = val.slice(0, sp);
+    const cmd = aliases[cmdTok.toLowerCase()] || cmdTok.toLowerCase();
+    const rest = val.slice(sp + 1);
+    let cands = [];
+    if(cmd === 'theme') cands = THEMES.concat(['next','random']);
+    else if(cmd === 'ls') cands = sections().map(s => s.name);
+    else if(['open','cd','find','grep','search'].includes(cmd)) cands = sections().map(s => s.name).concat(rows.map(nameOf));
+    if(!cands.length) return;
+    const rl = rest.toLowerCase();
+    applyComplete(rest, cands.filter(c => c.toLowerCase().startsWith(rl)), cmdTok + ' ');
+  }
+
   IN.addEventListener('keydown', e => {
     if(e.key === 'Enter'){ run(IN.value); IN.value = ''; }
     else if(e.key === 'ArrowUp'){ if(hist.length){ e.preventDefault(); hpos = Math.max(0, hpos-1); IN.value = hist[hpos] || ''; const n=IN.value.length; requestAnimationFrame(()=>IN.setSelectionRange(n,n)); } }
     else if(e.key === 'ArrowDown'){ if(hist.length){ e.preventDefault(); hpos = Math.min(hist.length, hpos+1); IN.value = hist[hpos] || ''; } }
-    else if(e.key === 'Tab'){ e.preventDefault(); const cur = IN.value.trim().toLowerCase(); if(cur){ const hit = Object.keys(cmds).filter(c => c.startsWith(cur)); if(hit.length === 1) IN.value = hit[0] + ' '; else if(hit.length > 1){ echo(IN.value); print(hit.join('  '), 'dim'); scroll(); } } }
+    else if(e.key === 'Tab'){ e.preventDefault(); complete(); }
     else if(e.key.toLowerCase() === 'l' && e.ctrlKey){ e.preventDefault(); OUT.innerHTML = ''; }
   });
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
