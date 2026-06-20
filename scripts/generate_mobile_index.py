@@ -309,6 +309,11 @@ img,svg,video{max-width:100%;height:auto}
 #cmd-in:focus + .cur{display:none}
 @keyframes blink{50%{opacity:0}}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+#matrix{position:fixed;inset:0;width:100%;height:100%;z-index:9998;background:#000;cursor:pointer}
+.matrix-hint{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:9999;color:#9effb8;font-family:var(--mono);font-size:13px;background:rgba(0,0,0,.5);
+  border:1px solid rgba(158,255,184,.35);border-radius:999px;padding:6px 14px;pointer-events:none;
+  text-shadow:0 0 8px rgba(53,211,106,.8)}
 
 /* ---- collapsible section blocks ---- */
 details.block{margin:0}
@@ -508,12 +513,45 @@ JS = r"""
     cowsay(a, rest){ pre(cowsay(rest || "moo")); },
     coffee(){ print("brewing…", 'dim'); pre(COFFEE); print("☕ done.", 'ok'); },
     fortune(){ print(esc(FORTUNES[(Math.random()*FORTUNES.length)|0]), 'info'); },
-    matrix(){ for(let i=0;i<7;i++){ let s=''; for(let j=0;j<44;j++) s += Math.random()<0.5?'0':'1'; print("<span style='color:#9ece6a'>"+s+"</span>"); } print("wake up, Thomas… 🐇", 'ok'); },
+    cmatrix(){
+      if(reduce){ print("the matrix has you… (reduced-motion is on, so picture the green rain) 🟩", 'ok'); return; }
+      if(document.getElementById('matrix')) return;
+      const cv = el('canvas'); cv.id = 'matrix'; document.body.appendChild(cv);
+      const hint = el('div','matrix-hint','press any key or tap to exit'); document.body.appendChild(hint);
+      const ctx = cv.getContext('2d'); const fs = 16;
+      const chars = 'アァカサタナハマヤラワンゴ0123456789ABCDEFZ:.=*+<>¦|'.split('');
+      let W, H, cols, drops;
+      function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; cols = Math.ceil(W/fs); drops = Array(cols).fill(0).map(() => (Math.random()*(H/fs))|0); }
+      size();
+      let raf, last = 0, running = true;
+      function draw(){
+        ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(0,0,W,H);
+        ctx.font = fs+'px monospace';
+        for(let i=0;i<cols;i++){
+          const ch = chars[(Math.random()*chars.length)|0];
+          const x = i*fs, y = drops[i]*fs;
+          ctx.fillStyle = Math.random() > 0.97 ? '#d8ffe4' : '#35d36a';
+          ctx.fillText(ch, x, y);
+          if(y > H && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+      }
+      function loop(t){ if(!running) return; raf = requestAnimationFrame(loop); if(t-last < 33) return; last = t; draw(); }
+      raf = requestAnimationFrame(loop);
+      print("entering the matrix… press any key or tap to exit", 'ok');
+      function exit(e){ if(!running) return; if(e){ e.preventDefault && e.preventDefault(); e.stopPropagation && e.stopPropagation(); }
+        running = false; cancelAnimationFrame(raf); cv.remove(); hint.remove();
+        document.removeEventListener('keydown', exit, true); window.removeEventListener('resize', size);
+        print("…follow the white rabbit. 🐇", 'dim'); scroll(); }
+      document.addEventListener('keydown', exit, true);
+      cv.addEventListener('click', exit); cv.addEventListener('touchstart', exit, {passive:true});
+      window.addEventListener('resize', size);
+    },
     hi(){ print("hey thomas 👋", 'ok'); },
     life(){ print("42.", 'ok'); }
   };
   const aliases = { cd:'open', grep:'find', search:'find', vi:'vim', emacs:'vim', hello:'hi', hey:'hi',
-    ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons' };
+    ll:'ls', cls:'clear', ':q':'vim', ':q!':'vim', ':wq':'vim', '42':'life', kids:'sons', matrix:'cmatrix' };
 
   function run(raw){
     const cmd = raw.trim();
