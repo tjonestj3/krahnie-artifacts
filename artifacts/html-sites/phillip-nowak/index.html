@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/theme.css" />
+  <script src="/theme.js" defer></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phillip Nowak — Medical Device Engineer</title>
+<meta name="description" content="Personal site for Phillip Nowak — medical device engineering, Boston Scientific, Minneapolis–St. Paul." />
+<style>
+  :root {
+    --bg: #07090d;
+    --bg-2: #0d1117;
+    --panel: #11161f;
+    --line: rgba(255,255,255,0.08);
+    --ink: #e8edf4;
+    --muted: #93a1b5;
+    --accent: #38e1c4;
+    --accent-2: #5b8cff;
+    --warm: #ffb05c;
+    --maxw: 1040px;
+    --r: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* animated aurora backdrop */
+  .aurora {
+    position: fixed; inset: -20% -20% auto -20%; height: 70vh; z-index: 0;
+    background:
+      radial-gradient(40% 60% at 20% 30%, rgba(56,225,196,0.18), transparent 70%),
+      radial-gradient(45% 55% at 80% 20%, rgba(91,140,255,0.20), transparent 70%),
+      radial-gradient(40% 50% at 60% 70%, rgba(255,176,92,0.10), transparent 70%);
+    filter: blur(20px);
+    animation: drift 18s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes drift {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(0,-4%,0) scale(1.08); }
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+
+  /* nav */
+  nav {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(12px);
+    background: rgba(7,9,13,0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { font-weight: 700; letter-spacing: -0.02em; font-size: 17px; }
+  .brand b { color: var(--accent); }
+  .navlinks { display: flex; gap: 22px; font-size: 14px; color: var(--muted); }
+  .navlinks a { transition: color .2s; }
+  .navlinks a:hover { color: var(--ink); }
+  @media (max-width: 620px){ .navlinks { display: none; } }
+
+  /* hero */
+  header { padding: 90px 0 60px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--accent); letter-spacing: .14em; text-transform: uppercase;
+    border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px; margin-bottom: 26px;
+    background: rgba(56,225,196,0.06);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  h1 {
+    font-size: clamp(40px, 8vw, 76px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 800;
+    margin-bottom: 22px;
+  }
+  h1 .grad {
+    background: linear-gradient(110deg, var(--accent), var(--accent-2) 60%, var(--warm));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lede { font-size: clamp(17px, 2.4vw, 21px); color: var(--muted); max-width: 600px; }
+  .cta { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  .btn {
+    padding: 13px 22px; border-radius: 12px; font-weight: 600; font-size: 15px;
+    border: 1px solid var(--line); transition: transform .15s, border-color .2s, background .2s;
+  }
+  .btn.primary { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #04110f; border: none; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost:hover { border-color: var(--accent); }
+
+  /* sections */
+  section { padding: 64px 0; }
+  .kicker { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 14px; }
+  h2 { font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.025em; margin-bottom: 28px; }
+
+  .grid { display: grid; gap: 16px; }
+  .stats { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 720px){ .stats { grid-template-columns: repeat(2, 1fr); } }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 24px;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(56,225,196,0.35); }
+  .stat .num { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+  .stat .lbl { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* timeline */
+  .timeline { position: relative; padding-left: 26px; }
+  .timeline::before { content:""; position:absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--accent), var(--accent-2), transparent); }
+  .tl-item { position: relative; padding: 0 0 30px 0; }
+  .tl-item::before { content:""; position:absolute; left:-26px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+  .tl-when { font-size: 13px; color: var(--accent); font-weight: 600; }
+  .tl-role { font-size: 18px; font-weight: 700; margin: 2px 0; }
+  .tl-org { color: var(--muted); font-size: 15px; }
+
+  .two { grid-template-columns: 1.3fr 1fr; }
+  @media (max-width: 800px){ .two { grid-template-columns: 1fr; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--bg-2); }
+  .chip:hover { color: var(--ink); border-color: var(--accent-2); }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 70px; color: var(--muted); font-size: 14px; }
+  .footrow { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .social { display: flex; gap: 14px; }
+  .social a { padding: 9px 16px; border: 1px solid var(--line); border-radius: 10px; transition: border-color .2s, color .2s; }
+  .social a:hover { border-color: var(--accent); color: var(--ink); }
+
+  .note { margin-top: 28px; font-size: 12.5px; color: #5e6b7d; border: 1px dashed var(--line); border-radius: 12px; padding: 14px 16px; background: rgba(255,255,255,0.015); }
+
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Phillip <b>Nowak</b></div>
+    <div class="navlinks">
+      <a href="#about">About</a>
+      <a href="#work">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span> Minneapolis – St. Paul, MN</span>
+    <h1>Engineering things that<br><span class="grad">keep people alive.</span></h1>
+    <p class="lede">Medical device engineer at Boston Scientific. Wisconsin-trained, Twin-Cities based — turning hard problems in healthcare hardware into things that ship and save lives.</p>
+    <div class="cta">
+      <a class="btn primary" href="#work">See my work</a>
+      <a class="btn ghost" href="#contact">Get in touch</a>
+    </div>
+  </div>
+</header>
+
+<section id="about" class="reveal">
+  <div class="wrap">
+    <div class="kicker">By the numbers</div>
+    <div class="grid stats">
+      <div class="card stat"><div class="num">Boston<br>Scientific</div><div class="lbl">Current team</div></div>
+      <div class="card stat"><div class="num">UW–Madison</div><div class="lbl">B.S. · 2016–2019</div></div>
+      <div class="card stat"><div class="num">2×</div><div class="lbl">Dean's Honor List</div></div>
+      <div class="card stat"><div class="num">MN + WI</div><div class="lbl">Where I've built</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="story" class="reveal">
+  <div class="wrap">
+    <div class="grid two">
+      <div class="card">
+        <div class="kicker">About</div>
+        <h2 style="margin-bottom:14px;">Precision is the whole job.</h2>
+        <p style="color:var(--muted);">I work in the medical device world, where a tolerance of a few microns is the line between a product that helps a patient and one that doesn't. I came up through the University of Wisconsin–Madison, cut my teeth across the upper-Midwest's medtech corridor — Madison, Arden Hills, and now Brooklyn Park — and I care about the unglamorous discipline that makes life-critical hardware actually dependable.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Right now</div>
+        <h2 style="margin-bottom:14px;">@ Boston Scientific</h2>
+        <p style="color:var(--muted);">Part of one of the world's leading medical device companies, contributing to products in the cardiovascular and broader interventional medicine space. Focused on the engineering rigor — design, test, validate, repeat — that regulated hardware demands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work" class="reveal">
+  <div class="wrap">
+    <div class="kicker">Experience</div>
+    <h2>The path so far</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">Present</div>
+        <div class="tl-role">Engineer</div>
+        <div class="tl-org">Boston Scientific · Brooklyn Park, MN</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Earlier</div>
+        <div class="tl-role">Engineering Role</div>
+        <div class="tl-org">Arden Hills, MN — Minnesota's medtech hub</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Starting out</div>
+        <div class="tl-role">Engineering Role</div>
+        <div class="tl-org">Madison, WI</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">2016 – 2019</div>
+        <div class="tl-role">B.S., University of Wisconsin–Madison</div>
+        <div class="tl-org">2× Dean's Honor List · On, Wisconsin 🦡</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="reveal">
+  <div class="wrap">
+    <div class="kicker">Toolkit</div>
+    <h2>What I bring to the bench</h2>
+    <div class="chips">
+      <span class="chip">Medical Device Engineering</span>
+      <span class="chip">Design Controls</span>
+      <span class="chip">Design Verification &amp; Validation</span>
+      <span class="chip">Root-Cause Analysis</span>
+      <span class="chip">Manufacturing &amp; Process</span>
+      <span class="chip">CAD</span>
+      <span class="chip">Regulated (FDA / ISO 13485) Environments</span>
+      <span class="chip">Cross-functional Collaboration</span>
+      <span class="chip">Test Method Development</span>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap footrow">
+    <div>
+      <div class="brand" style="font-size:20px; margin-bottom:6px;">Phillip <b>Nowak</b></div>
+      <div>Minneapolis – St. Paul, Minnesota · Open to a good conversation.</div>
+    </div>
+    <div class="social">
+      <a href="https://www.linkedin.com/in/phillip-nowak-1a218025a" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a href="mailto:hello@example.com">Email</a>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="note">
+      ⚙️ <b>Mock-up draft.</b> Built from a public LinkedIn snapshot. Titles, dates, the email, and the skills/about copy are placeholders — Phillip, send me the real details and I'll lock them in. Hand-coded over an SSH/mosh session from a phone, btw. 📱
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
