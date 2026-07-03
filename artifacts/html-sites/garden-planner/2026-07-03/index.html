@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#4c8c3f" />
+  <title>Garden Planner · plan & lay out your garden</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%234c8c3f%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2245%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%3E%F0%9F%8C%B1%3C%2Ftext%3E%3C%2Fsvg%3E" />
+  <meta name="description" content="A robust, visual garden planner and organizer — lay out beds square-foot style, browse a plant library, track to-dos, and keep a garden journal. Everything saves to your device." />
+<style>
+:root{
+  --bg:#eef1e6; --bg2:#e4e9d7; --panel:#ffffff; --panel2:#f6f8ef; --panel3:#eef2e3;
+  --ink:#243019; --ink2:#4a5b38; --dim:#77855f; --faint:#9aa683;
+  --line:#dfe4cf; --line2:#cdd6b6;
+  --green:#4c8c3f; --green2:#6aa84f; --leaf:#8bc34a; --soil:#8a6d3b; --soil2:#b08d57;
+  --sun:#e8b23a; --sky:#5aa9cf; --berry:#c65a7a; --violet:#8a6bc4;
+  --sel:rgba(76,140,63,.14); --shadow:0 10px 34px rgba(40,55,25,.12);
+  --radius:16px; --radius-sm:10px;
+  --font:"Nunito","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+}
+[data-mode="dark"]{
+  --bg:#13180f; --bg2:#0f130b; --panel:#1b2214; --panel2:#212a18; --panel3:#28331d;
+  --ink:#e7efd8; --ink2:#c2cfa9; --dim:#96a67c; --faint:#6d7a55;
+  --line:#2f3a22; --line2:#3d4a2c;
+  --green:#7cc35f; --green2:#8bcf6c; --leaf:#a7d96a; --soil:#c19a63; --soil2:#a67f4c;
+  --sun:#f0c65a; --sky:#6fc0e6; --berry:#e07a9a; --violet:#a98be0;
+  --sel:rgba(124,195,95,.18); --shadow:0 10px 34px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:
+    radial-gradient(1100px 600px at 88% -8%,color-mix(in srgb,var(--leaf) 22%,transparent),transparent 60%),
+    radial-gradient(900px 600px at -6% 108%,color-mix(in srgb,var(--sky) 16%,transparent),transparent 60%),
+    var(--bg);
+  color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;
+  -webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--green)}
+img,svg{max-width:100%}
+h1,h2,h3{margin:0;line-height:1.2}
+
+/* ---------- layout shell ---------- */
+.app{max-width:1280px;margin:0 auto;padding:14px clamp(10px,2.4vw,24px) 60px}
+header.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand .mark{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:linear-gradient(150deg,var(--green),var(--green2));
+  display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow)}
+.brand .ttl{min-width:0}
+.gname{font-weight:800;font-size:clamp(18px,2.6vw,24px);letter-spacing:-.01em;background:transparent;border:0;color:var(--ink);
+  padding:2px 4px;border-radius:8px;max-width:min(60vw,420px);width:auto}
+.gname:hover{background:var(--panel2)}
+.gname:focus{outline:2px solid var(--green);background:var(--panel)}
+.tag{color:var(--dim);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.spacer{flex:1 1 auto}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line2);background:var(--panel);color:var(--ink);border-radius:11px;padding:8px 13px;
+  font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:7px;transition:.14s;white-space:nowrap}
+.btn:hover{border-color:var(--green);color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn.primary{background:linear-gradient(150deg,var(--green),var(--green2));color:#fff;border-color:transparent}
+.btn.primary:hover{color:#fff;filter:brightness(1.05)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 9px;font-size:12.5px;border-radius:9px}
+.btn.icon{padding:8px 10px}
+
+/* ---------- tabs ---------- */
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 16px;padding:5px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:14px;width:max-content;max-width:100%}
+nav.tabs button{border:0;background:transparent;color:var(--ink2);font-weight:800;font-size:13.5px;
+  padding:8px 15px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;transition:.14s}
+nav.tabs button:hover{background:var(--panel)}
+nav.tabs button.active{background:var(--panel);color:var(--green);box-shadow:var(--shadow)}
+.view{display:none;animation:fade .2s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:16px}
+.muted{color:var(--dim)}
+.tiny{font-size:12px}
+
+/* ---------- layout view grid ---------- */
+.layout-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media (max-width:900px){.layout-wrap{grid-template-columns:1fr}}
+
+/* bed tabs + toolbar */
+.bedbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.bedtabs{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.bedtab{border:1px solid var(--line2);background:var(--panel);border-radius:10px;padding:6px 12px;font-weight:800;
+  font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.14s;color:var(--ink2)}
+.bedtab:hover{border-color:var(--green)}
+.bedtab.active{background:var(--green);color:#fff;border-color:transparent}
+.bedtab .dim{opacity:.75;font-weight:700;font-size:11px}
+
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tools{display:flex;gap:4px;padding:4px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+.tool{border:0;background:transparent;padding:7px 12px;border-radius:9px;font-weight:800;font-size:13px;color:var(--ink2);
+  display:inline-flex;align-items:center;gap:6px;transition:.12s}
+.tool:hover{background:var(--panel)}
+.tool.active{background:var(--panel);box-shadow:var(--shadow);color:var(--green)}
+.chosen{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:var(--ink2);
+  background:var(--panel2);border:1px solid var(--line);padding:6px 10px;border-radius:11px}
+.chosen .sw{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:13px}
+.zoom{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);font-weight:700}
+.zoom input{width:120px;accent-color:var(--green)}
+
+/* the bed canvas */
+.bedstage{overflow:auto;padding:14px;border-radius:var(--radius);background:
+  linear-gradient(var(--panel3),var(--panel3));border:1px solid var(--line);position:relative}
+.bed{--cell:52px;position:relative;margin:0 auto;display:grid;gap:3px;padding:14px;border-radius:12px;width:max-content;
+  background:
+    repeating-linear-gradient(45deg,color-mix(in srgb,var(--soil) 30%,transparent) 0 2px,transparent 2px 9px),
+    linear-gradient(150deg,color-mix(in srgb,var(--soil) 46%,var(--panel)),color-mix(in srgb,var(--soil) 26%,var(--panel)));
+  box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--soil) 55%,transparent),0 6px 20px rgba(0,0,0,.14)}
+.cell{width:var(--cell);height:var(--cell);border-radius:8px;background:color-mix(in srgb,var(--soil2) 26%,var(--panel));
+  border:1px solid color-mix(in srgb,var(--soil) 30%,transparent);position:relative;display:grid;place-items:center;
+  cursor:pointer;transition:transform .06s,box-shadow .12s;user-select:none;-webkit-user-select:none;touch-action:none}
+.cell:hover{box-shadow:0 0 0 2px var(--green)}
+.cell.filled{background:var(--cellbg,var(--panel))}
+.cell .emo{font-size:calc(var(--cell) * .5);line-height:1;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
+.cell .cnt{position:absolute;right:2px;bottom:1px;font-size:10px;font-weight:800;color:#fff;background:rgba(0,0,0,.5);
+  border-radius:6px;padding:0 4px;pointer-events:none}
+.cell.paint{transform:scale(.94)}
+.bed .rowlabel,.bed .collabel{position:absolute;color:var(--dim);font-size:10px;font-weight:800}
+
+/* palette / sidebar */
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:10px}
+@media (max-width:900px){.side{position:static}}
+.search{width:100%;border:1px solid var(--line2);background:var(--panel2);border-radius:11px;padding:9px 12px;font-weight:600}
+.search:focus{outline:2px solid var(--green)}
+.catrow{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0}
+.cat{border:1px solid var(--line2);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:800;
+  color:var(--ink2);transition:.12s}
+.cat:hover{border-color:var(--green)}
+.cat.active{background:var(--ink);color:var(--panel);border-color:transparent}
+.palette{max-height:min(52vh,520px);overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-right:2px}
+.pchip{display:flex;align-items:center;gap:8px;border:1px solid var(--line2);background:var(--panel2);border-radius:11px;
+  padding:7px 9px;text-align:left;transition:.12s;min-width:0}
+.pchip:hover{border-color:var(--green);transform:translateY(-1px)}
+.pchip.sel{outline:2px solid var(--green);background:var(--sel)}
+.pchip .sw{width:26px;height:26px;flex:0 0 auto;border-radius:8px;display:grid;place-items:center;font-size:16px}
+.pchip .nm{font-weight:800;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pchip .mt{font-size:10.5px;color:var(--dim);font-weight:700}
+
+/* summary */
+.sumhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.sumrow{display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px dashed var(--line)}
+.sumrow:first-of-type{border-top:0}
+.sumrow .sw{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:14px;flex:0 0 auto}
+.sumrow .nm{font-weight:800;font-size:13px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sumrow .num{font-weight:800;color:var(--green);background:var(--sel);border-radius:8px;padding:1px 9px;font-size:12.5px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:22px;font-weight:800;color:var(--green);line-height:1}
+.stat span{font-size:11.5px;color:var(--dim);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- plant guide ---------- */
+.guidegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 14px;box-shadow:var(--shadow);position:relative}
+.card .top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.card .sw{width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:grid;place-items:center;font-size:21px}
+.card .nm{font-weight:800;font-size:15px}
+.card .cat{font-size:11px;color:var(--dim);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.fact{font-size:11.5px;font-weight:800;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:3px 8px;color:var(--ink2)}
+.comp{font-size:12px;color:var(--dim);line-height:1.45}
+.comp b{color:var(--ink2)}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin:9px 0 2px}
+.mo{height:16px;border-radius:4px;background:var(--panel3);display:grid;place-items:center;font-size:8px;font-weight:800;color:var(--faint)}
+.mo.on{background:var(--leaf);color:#173a05}
+.card .del{position:absolute;top:9px;right:9px;border:0;background:transparent;color:var(--faint);font-size:15px;padding:2px 6px;border-radius:8px}
+.card .del:hover{background:var(--sel);color:var(--berry)}
+
+/* ---------- tasks ---------- */
+.addbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.addbar input,.addbar select,.addbar textarea{border:1px solid var(--line2);background:var(--panel2);border-radius:11px;padding:9px 12px}
+.addbar input[type=text]{flex:1 1 240px}
+.addbar input:focus,.addbar select:focus,.addbar textarea:focus{outline:2px solid var(--green)}
+.tasklist{display:flex;flex-direction:column;gap:8px}
+.task{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;transition:.12s}
+.task:hover{border-color:var(--line2)}
+.task.done{opacity:.55}
+.task.done .txt{text-decoration:line-through}
+.task .chk{width:22px;height:22px;flex:0 0 auto;border:2px solid var(--line2);border-radius:7px;display:grid;place-items:center;
+  background:var(--panel2);color:transparent;font-weight:900;transition:.12s}
+.task.done .chk{background:var(--green);border-color:var(--green);color:#fff}
+.task .txt{flex:1 1 auto;font-weight:700;min-width:0}
+.task .meta{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:800;border-radius:7px;padding:2px 8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2)}
+.pill.due{background:color-mix(in srgb,var(--sun) 22%,var(--panel));border-color:transparent;color:var(--ink)}
+.pill.over{background:color-mix(in srgb,var(--berry) 22%,var(--panel));border-color:transparent}
+.pill.bed{background:var(--sel);border-color:transparent;color:var(--green)}
+.task .x{border:0;background:transparent;color:var(--faint);font-size:16px;padding:2px 7px;border-radius:8px}
+.task .x:hover{background:var(--sel);color:var(--berry)}
+
+/* ---------- journal ---------- */
+.jentry{padding:13px 15px;background:var(--panel);border:1px solid var(--line);border-radius:13px;margin-bottom:10px;position:relative}
+.jentry .date{font-size:12px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.jentry .body{white-space:pre-wrap;overflow-wrap:anywhere;font-weight:600;color:var(--ink)}
+.jentry .x{position:absolute;top:10px;right:10px;border:0;background:transparent;color:var(--faint);font-size:15px;padding:2px 6px;border-radius:8px}
+.jentry .x:hover{background:var(--sel);color:var(--berry)}
+
+/* ---------- modal / popover ---------- */
+.modal{position:fixed;inset:0;z-index:200;background:rgba(20,25,12,.5);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.sheet{width:min(460px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 30px 90px rgba(0,0,0,.4);padding:20px 22px}
+.sheet h3{font-size:18px;margin-bottom:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-weight:800;font-size:12.5px;color:var(--ink2);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line2);background:var(--panel2);border-radius:11px;padding:9px 12px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--green)}
+.field .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.emojipick{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.emojipick button{border:1px solid var(--line);background:var(--panel2);border-radius:9px;font-size:18px;padding:4px 7px}
+.emojipick button.on{outline:2px solid var(--green);background:var(--sel)}
+.swatchpick{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.swatchpick button{width:26px;height:26px;border-radius:8px;border:2px solid transparent}
+.swatchpick button.on{border-color:var(--ink)}
+.sheet .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+
+/* cell popover */
+.pop{position:absolute;z-index:60;width:220px;background:var(--panel);border:1px solid var(--line2);border-radius:13px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:12px 13px;display:none}
+.pop.open{display:block}
+.pop .top{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.pop .sw{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:18px}
+.pop .facts{margin-bottom:8px}
+
+.empty{text-align:center;color:var(--dim);padding:34px 16px;font-weight:700}
+.empty .big{font-size:40px;margin-bottom:8px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:300;
+  background:var(--ink);color:var(--panel);font-weight:800;font-size:13.5px;padding:10px 18px;border-radius:12px;
+  box-shadow:0 14px 40px rgba(0,0,0,.35);opacity:0;transition:.22s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+footer.foot{margin-top:26px;text-align:center;color:var(--dim);font-size:12.5px;font-weight:600}
+footer.foot b{color:var(--ink2)}
+
+@media print{
+  body{background:#fff;color:#000}
+  header.top .hbtns,nav.tabs,.toolbar .tools,.zoom,.side .palette,.catrow,.search,.bedbar .btn,.card .del,.task .x,.jentry .x{display:none!important}
+  .panel,.card,.jentry,.task{box-shadow:none;border-color:#bbb}
+  .view{display:block!important}
+  .layout-wrap{grid-template-columns:1fr}
+  .app{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">🌱</div>
+      <div class="ttl">
+        <input class="gname" id="gname" value="Our Garden" aria-label="Garden name" />
+        <div class="tag">Garden Planner &amp; Organizer</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="hbtns">
+      <button class="btn ghost icon" id="modeBtn" title="Toggle light/dark">🌙</button>
+      <button class="btn ghost" id="printBtn" title="Print / Save as PDF">🖨️ Print</button>
+      <button class="btn ghost" id="exportBtn" title="Download a backup file">⬇️ Backup</button>
+      <button class="btn ghost" id="importBtn" title="Load a backup file">⬆️ Restore</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden />
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button data-view="layout" class="active">🪴 Layout</button>
+    <button data-view="tasks">✅ To-Do</button>
+    <button data-view="journal">📖 Journal</button>
+    <button data-view="guide">🌿 Plant Guide</button>
+  </nav>
+
+  <!-- ============ LAYOUT ============ -->
+  <section class="view active" id="view-layout">
+    <div class="bedbar">
+      <div class="bedtabs" id="bedtabs"></div>
+      <button class="btn sm" id="addBed">＋ Bed</button>
+      <button class="btn sm ghost" id="editBed">✎ Edit</button>
+      <button class="btn sm ghost" id="clearBed">Clear</button>
+      <button class="btn sm ghost" id="delBed">🗑</button>
+    </div>
+
+    <div class="layout-wrap">
+      <div>
+        <div class="toolbar">
+          <div class="tools" role="group" aria-label="Tools">
+            <button class="tool active" data-tool="plant">🌱 Plant</button>
+            <button class="tool" data-tool="erase">🧹 Erase</button>
+            <button class="tool" data-tool="inspect">🔍 Inspect</button>
+          </div>
+          <div class="chosen" id="chosen"><span class="sw">🌱</span><span id="chosenName">pick a plant →</span></div>
+          <div class="spacer"></div>
+          <div class="zoom">🔎<input type="range" id="zoom" min="34" max="86" value="52" /></div>
+        </div>
+        <div class="bedstage">
+          <div class="bed" id="bed"></div>
+        </div>
+        <p class="muted tiny" style="margin:10px 2px 0">Each square = 1 sq ft. Pick a plant, then click or drag across the bed to plant. The count shows how many fit per square (square-foot gardening spacing).</p>
+      </div>
+
+      <aside class="side">
+        <div class="panel pad">
+          <input class="search" id="palSearch" placeholder="🔍 Search plants…" />
+          <div class="catrow" id="catrow"></div>
+          <div class="palette" id="palette"></div>
+          <button class="btn sm ghost" id="addPlant" style="width:100%;margin-top:10px;justify-content:center">＋ Add custom plant</button>
+        </div>
+
+        <div class="panel pad">
+          <div class="sumhead"><h3 style="font-size:15px">🧺 Planting Summary</h3><span class="tiny muted" id="sumScope"></span></div>
+          <div class="statgrid">
+            <div class="stat"><b id="statSquares">0</b><span>squares used</span></div>
+            <div class="stat"><b id="statKinds">0</b><span>plant types</span></div>
+          </div>
+          <div id="summary"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ TASKS ============ -->
+  <section class="view" id="view-tasks">
+    <div class="panel pad">
+      <h2 style="font-size:18px;margin-bottom:12px">✅ Garden To-Do</h2>
+      <div class="addbar">
+        <input type="text" id="taskText" placeholder="e.g. Water the tomatoes, start pepper seeds…" />
+        <input type="date" id="taskDue" title="Due date (optional)" />
+        <select id="taskBed" title="Related bed (optional)"></select>
+        <button class="btn primary" id="addTask">Add task</button>
+      </div>
+      <div class="tasklist" id="tasklist"></div>
+    </div>
+  </section>
+
+  <!-- ============ JOURNAL ============ -->
+  <section class="view" id="view-journal">
+    <div class="panel pad">
+      <h2 style="font-size:18px;margin-bottom:12px">📖 Garden Journal</h2>
+      <div class="addbar">
+        <input type="date" id="jDate" style="flex:0 0 auto" />
+        <textarea id="jText" rows="2" style="flex:1 1 260px" placeholder="What happened in the garden today? Sowed, transplanted, harvested, pests, weather…"></textarea>
+        <button class="btn primary" id="addJournal">Save entry</button>
+      </div>
+      <div id="journallist"></div>
+    </div>
+  </section>
+
+  <!-- ============ PLANT GUIDE ============ -->
+  <section class="view" id="view-guide">
+    <div class="panel pad" style="margin-bottom:14px">
+      <div class="addbar" style="margin:0">
+        <input type="text" id="guideSearch" placeholder="🔍 Search the plant library…" style="flex:1 1 240px" />
+        <select id="guideCat"></select>
+        <button class="btn ghost" id="addPlant2">＋ Add custom plant</button>
+      </div>
+    </div>
+    <div class="guidegrid" id="guidegrid"></div>
+  </section>
+
+  <footer class="foot">🌻 <b id="footName">Our Garden</b> · everything saves automatically to this device · use <b>Backup</b> to keep a copy safe</footer>
+</div>
+
+<!-- cell popover -->
+<div class="pop" id="pop"></div>
+
+<!-- bed modal -->
+<div class="modal" id="bedModal">
+  <div class="sheet">
+    <h3 id="bedModalTitle">New bed</h3>
+    <div class="field"><label>Bed name</label><input id="bedName" placeholder="e.g. Raised Bed A, Herb Spiral" /></div>
+    <div class="field"><label>Size (in feet)</label>
+      <div class="two">
+        <div><input type="number" id="bedW" min="1" max="30" value="4" /><div class="tiny muted" style="margin-top:3px">width (columns)</div></div>
+        <div><input type="number" id="bedH" min="1" max="30" value="4" /><div class="tiny muted" style="margin-top:3px">length (rows)</div></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="bedCancel">Cancel</button>
+      <button class="btn primary" id="bedSave">Save bed</button>
+    </div>
+  </div>
+</div>
+
+<!-- custom plant modal -->
+<div class="modal" id="plantModal">
+  <div class="sheet">
+    <h3>Add a custom plant</h3>
+    <div class="field"><label>Name</label><input id="cpName" placeholder="e.g. Purple Basil" /></div>
+    <div class="field"><label>Icon</label><div class="emojipick" id="cpEmoji"></div></div>
+    <div class="field"><label>Color</label><div class="swatchpick" id="cpColor"></div></div>
+    <div class="field two">
+      <div><label>Category</label><select id="cpCat"></select></div>
+      <div><label>Per square</label><input type="number" id="cpSfg" min="1" max="36" value="1" /></div>
+    </div>
+    <div class="field two">
+      <div><label>Sun</label><select id="cpSun"><option>Full sun</option><option>Part sun</option><option>Shade</option></select></div>
+      <div><label>Days to harvest</label><input type="number" id="cpDtm" min="0" max="365" value="60" /></div>
+    </div>
+    <div class="field"><label>Companions / notes</label><input id="cpComp" placeholder="e.g. Great near tomatoes" /></div>
+    <div class="actions">
+      <button class="btn ghost" id="cpCancel">Cancel</button>
+      <button class="btn primary" id="cpSave">Add plant</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+(function(){
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+
+  /* ---------------- plant catalog ----------------
+     n=name e=emoji c=color cat sun sfg(per sq ft) dtm(days) sow(month #s 1-12) comp */
+  const CATALOG = [
+    {id:"tomato",   n:"Tomato",       e:"🍅", c:"#e0503a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:75, sow:[3,4,5],      comp:"Basil, marigold, carrots. Keep away from potatoes & fennel."},
+    {id:"pepper",   n:"Pepper",       e:"🫑", c:"#3aa05a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:70, sow:[3,4,5],      comp:"Basil, onions, carrots. Loves warmth."},
+    {id:"chili",    n:"Hot Pepper",   e:"🌶️", c:"#d23b2f", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:80, sow:[3,4,5],      comp:"Basil, tomatoes. Water evenly."},
+    {id:"cucumber", n:"Cucumber",     e:"🥒", c:"#4c9a3a", cat:"Vegetable", sun:"Full sun", sfg:2,  dtm:55, sow:[4,5,6],      comp:"Beans, peas, radish, sunflower. Trellis to save space."},
+    {id:"zucchini", n:"Zucchini",     e:"🥬", c:"#5aa73f", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:50, sow:[5,6],        comp:"Nasturtium, beans, corn. Needs elbow room."},
+    {id:"squash",   n:"Winter Squash",e:"🎃", c:"#d98a2b", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:95, sow:[5,6],        comp:"Corn, beans (three sisters). Sprawls a lot."},
+    {id:"eggplant", n:"Eggplant",     e:"🍆", c:"#8a5bb0", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:80, sow:[3,4,5],      comp:"Beans, peppers, marigold."},
+    {id:"beans",    n:"Bush Beans",   e:"🫘", c:"#7a9a45", cat:"Vegetable", sun:"Full sun", sfg:9,  dtm:55, sow:[5,6,7],      comp:"Carrots, cucumbers, corn. Fixes nitrogen."},
+    {id:"peas",     n:"Peas",         e:"🌱", c:"#6cae4f", cat:"Vegetable", sun:"Part sun", sfg:8,  dtm:60, sow:[3,4,9],      comp:"Carrots, radish, cucumber. Cool-season, trellis."},
+    {id:"corn",     n:"Corn",         e:"🌽", c:"#e6b93a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:80, sow:[5,6],        comp:"Beans, squash. Plant in blocks for pollination."},
+    {id:"broccoli", n:"Broccoli",     e:"🥦", c:"#3f7a4a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:65, sow:[3,4,8],      comp:"Onion, beets, dill. Cool-season."},
+    {id:"cabbage",  n:"Cabbage",      e:"🥬", c:"#7bb04f", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:70, sow:[3,4,8],      comp:"Dill, onion, beets. Watch cabbage worms."},
+    {id:"lettuce",  n:"Lettuce",      e:"🥗", c:"#8bc34a", cat:"Green",     sun:"Part sun", sfg:4,  dtm:45, sow:[3,4,5,8,9],  comp:"Carrots, radish. Succession-sow every 2 wks."},
+    {id:"spinach",  n:"Spinach",      e:"🥬", c:"#3f8a4a", cat:"Green",     sun:"Part sun", sfg:9,  dtm:40, sow:[3,4,9,10],   comp:"Strawberries, peas. Bolts in heat."},
+    {id:"kale",     n:"Kale",         e:"🥬", c:"#4a7a3a", cat:"Green",     sun:"Full sun", sfg:1,  dtm:55, sow:[3,4,8],      comp:"Beets, onion, herbs. Sweetens after frost."},
+    {id:"chard",    n:"Swiss Chard",  e:"🌿", c:"#c65a3a", cat:"Green",     sun:"Part sun", sfg:4,  dtm:55, sow:[3,4,5,8],    comp:"Beans, cabbage. Cut-and-come-again."},
+    {id:"carrot",   n:"Carrot",       e:"🥕", c:"#e08a2b", cat:"Root",      sun:"Full sun", sfg:16, dtm:70, sow:[3,4,5,6,7],  comp:"Onion, leek, rosemary. Loosen soil deep."},
+    {id:"radish",   n:"Radish",       e:"🔴", c:"#d1495b", cat:"Root",      sun:"Full sun", sfg:16, dtm:28, sow:[3,4,5,8,9],  comp:"Carrots, cucumber, lettuce. Super fast."},
+    {id:"beet",     n:"Beet",         e:"🟣", c:"#a03a6a", cat:"Root",      sun:"Full sun", sfg:9,  dtm:55, sow:[3,4,5,8],    comp:"Onion, cabbage, lettuce."},
+    {id:"onion",    n:"Onion",        e:"🧅", c:"#c9a24a", cat:"Root",      sun:"Full sun", sfg:9,  dtm:100,sow:[3,4],        comp:"Carrots, beets, lettuce. Repels many pests."},
+    {id:"garlic",   n:"Garlic",       e:"🧄", c:"#d9c9a3", cat:"Root",      sun:"Full sun", sfg:9,  dtm:240,sow:[10,11],      comp:"Roses, tomatoes. Plant in fall, harvest summer."},
+    {id:"potato",   n:"Potato",       e:"🥔", c:"#b58a4a", cat:"Root",      sun:"Full sun", sfg:1,  dtm:90, sow:[3,4],        comp:"Beans, corn, cabbage. Hill as it grows."},
+    {id:"basil",    n:"Basil",        e:"🌿", c:"#5aa73f", cat:"Herb",      sun:"Full sun", sfg:1,  dtm:50, sow:[4,5,6],      comp:"Tomatoes, peppers. Pinch to keep bushy."},
+    {id:"parsley",  n:"Parsley",      e:"🌿", c:"#4c9a4a", cat:"Herb",      sun:"Part sun", sfg:4,  dtm:70, sow:[3,4,5],      comp:"Tomatoes, asparagus. Slow to germinate."},
+    {id:"cilantro", n:"Cilantro",     e:"🌿", c:"#6cae5f", cat:"Herb",      sun:"Part sun", sfg:4,  dtm:45, sow:[3,4,9],      comp:"Spinach, beans. Bolts fast in heat."},
+    {id:"mint",     n:"Mint",         e:"🌿", c:"#3faa7a", cat:"Herb",      sun:"Part sun", sfg:1,  dtm:60, sow:[4,5],        comp:"Cabbage, tomatoes. Grow in a pot — spreads!"},
+    {id:"thyme",    n:"Thyme",        e:"🌿", c:"#7aa05a", cat:"Herb",      sun:"Full sun", sfg:4,  dtm:70, sow:[4,5],        comp:"Cabbage, strawberries. Drought-tolerant."},
+    {id:"rosemary", n:"Rosemary",     e:"🌿", c:"#5a8a6a", cat:"Herb",      sun:"Full sun", sfg:1,  dtm:80, sow:[4,5],        comp:"Beans, cabbage, carrots. Perennial."},
+    {id:"oregano",  n:"Oregano",      e:"🌿", c:"#6a9a4a", cat:"Herb",      sun:"Full sun", sfg:1,  dtm:80, sow:[4,5],        comp:"Peppers, tomatoes. Perennial ground cover."},
+    {id:"sage",     n:"Sage",         e:"🌿", c:"#8aa07a", cat:"Herb",      sun:"Full sun", sfg:1,  dtm:75, sow:[4,5],        comp:"Cabbage, carrots, strawberries."},
+    {id:"dill",     n:"Dill",         e:"🌿", c:"#9ab04a", cat:"Herb",      sun:"Full sun", sfg:1,  dtm:60, sow:[4,5,6],      comp:"Cabbage, cucumber. Attracts good bugs."},
+    {id:"chives",   n:"Chives",       e:"🌱", c:"#7aa05f", cat:"Herb",      sun:"Full sun", sfg:9,  dtm:80, sow:[3,4],        comp:"Carrots, tomatoes, roses. Perennial."},
+    {id:"strawberry",n:"Strawberry",  e:"🍓", c:"#d94060", cat:"Fruit",     sun:"Full sun", sfg:1,  dtm:120,sow:[3,4,9],      comp:"Spinach, lettuce, borage. Perennial."},
+    {id:"blueberry",n:"Blueberry",    e:"🫐", c:"#5a6ac4", cat:"Fruit",     sun:"Full sun", sfg:1,  dtm:365,sow:[3,4,10],     comp:"Needs acidic soil. Perennial shrub."},
+    {id:"melon",    n:"Melon",        e:"🍈", c:"#8ab04a", cat:"Fruit",     sun:"Full sun", sfg:1,  dtm:85, sow:[5,6],        comp:"Corn, radish, nasturtium. Sprawls."},
+    {id:"watermelon",n:"Watermelon",  e:"🍉", c:"#3f9a4a", cat:"Fruit",     sun:"Full sun", sfg:1,  dtm:90, sow:[5,6],        comp:"Corn, radish. Needs lots of space & heat."},
+    {id:"pumpkin",  n:"Pumpkin",      e:"🎃", c:"#e08a2b", cat:"Fruit",     sun:"Full sun", sfg:1,  dtm:110,sow:[5,6],        comp:"Corn, beans. Give it room to roam."},
+    {id:"marigold", n:"Marigold",     e:"🌼", c:"#e8a72b", cat:"Flower",    sun:"Full sun", sfg:4,  dtm:50, sow:[4,5,6],      comp:"Plant everywhere — repels nematodes & pests."},
+    {id:"sunflower",n:"Sunflower",    e:"🌻", c:"#e8b93a", cat:"Flower",    sun:"Full sun", sfg:1,  dtm:80, sow:[4,5,6],      comp:"Cucumbers, corn. Attracts pollinators & birds."},
+    {id:"nasturtium",n:"Nasturtium",  e:"🌺", c:"#e0603a", cat:"Flower",    sun:"Full sun", sfg:1,  dtm:55, sow:[4,5,6],      comp:"Squash, beans, cukes. Edible trap crop."},
+    {id:"zinnia",   n:"Zinnia",       e:"🌸", c:"#d95a8a", cat:"Flower",    sun:"Full sun", sfg:4,  dtm:60, sow:[4,5,6],      comp:"Great cut flower, draws pollinators."},
+    {id:"lavender", n:"Lavender",     e:"💜", c:"#8a6bc4", cat:"Flower",    sun:"Full sun", sfg:1,  dtm:100,sow:[4,5],        comp:"Roses, cabbage. Perennial, loves dry soil."},
+    {id:"cosmos",   n:"Cosmos",       e:"🌸", c:"#e07aa0", cat:"Flower",    sun:"Full sun", sfg:4,  dtm:70, sow:[4,5,6],      comp:"Pollinator magnet, tolerant of poor soil."},
+    {id:"calendula",n:"Calendula",    e:"🌼", c:"#e8952b", cat:"Flower",    sun:"Full sun", sfg:4,  dtm:50, sow:[3,4,5],      comp:"Edible, pest-deterrent, self-seeds."},
+    {id:"asparagus",n:"Asparagus",    e:"🌿", c:"#7aa05a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:730,sow:[3,4],        comp:"Tomatoes, parsley. Perennial — plant once."},
+    {id:"celery",   n:"Celery",       e:"🥬", c:"#8ab04a", cat:"Vegetable", sun:"Part sun", sfg:4,  dtm:100,sow:[3,4],        comp:"Beans, tomatoes, cabbage. Thirsty."},
+    {id:"cauliflower",n:"Cauliflower",e:"🥦", c:"#e6e0c9", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:75, sow:[3,4,8],      comp:"Beans, celery, onion. Cool-season."},
+    {id:"leek",     n:"Leek",         e:"🌱", c:"#9ab07a", cat:"Root",      sun:"Full sun", sfg:9,  dtm:120,sow:[3,4],        comp:"Carrots, celery. Long season."},
+    {id:"turnip",   n:"Turnip",       e:"🟣", c:"#b08aa0", cat:"Root",      sun:"Full sun", sfg:9,  dtm:50, sow:[3,4,8,9],    comp:"Peas, beans. Fast fall crop."},
+    {id:"okra",     n:"Okra",         e:"🌿", c:"#6a9a3a", cat:"Vegetable", sun:"Full sun", sfg:1,  dtm:60, sow:[5,6],        comp:"Peppers, basil. Loves heat."}
+  ];
+  const CATS = ["Vegetable","Green","Root","Herb","Fruit","Flower"];
+  const EMOJI_CHOICES = ["🌱","🌿","🍅","🫑","🥕","🥬","🥦","🌽","🥒","🍓","🫐","🌻","🌼","🌸","🌺","💜","🧄","🧅","🥔","🌶️","🍆","🎃","🍈","🫘"];
+  const COLOR_CHOICES = ["#4c8c3f","#6aa84f","#e0503a","#d23b2f","#e08a2b","#e8b93a","#e8a72b","#8bc34a","#3faa7a","#5a6ac4","#8a6bc4","#d95a8a","#c65a3a","#b58a4a","#7aa05a","#3f8a4a"];
+
+  /* ---------------- state ---------------- */
+  const KEY = "garden-planner-v1";
+  let state = load();
+  let ui = { tool:"plant", plantId:"tomato", cat:"All", search:"", painting:false, paintVal:null, guideCat:"All", guideSearch:"" };
+
+  function blankBed(name, w, h){ return { id:uid(), name:name||"New Bed", cols:w||4, rows:h||4, cells:{} }; }
+  function defaultState(){
+    const b1 = blankBed("Raised Bed A", 4, 4);
+    const b2 = blankBed("Herb Corner", 3, 2);
+    return {
+      version:1, name:"Our Garden", mode:null,
+      beds:[b1,b2], activeBed:b1.id,
+      custom:[], tasks:[], journal:[], cell:52
+    };
+  }
+  function load(){
+    try{ const raw = localStorage.getItem(KEY); if(raw){ const s = JSON.parse(raw); if(s&&s.beds&&s.beds.length) return s; } }catch(e){}
+    return defaultState();
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+
+  function allPlants(){ return CATALOG.concat(state.custom||[]); }
+  function plant(id){ return allPlants().find(p=>p.id===id); }
+  function activeBed(){ return state.beds.find(b=>b.id===state.activeBed) || state.beds[0]; }
+
+  /* ---------------- toast ---------------- */
+  let toastT;
+  function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1900); }
+
+  /* ---------------- mode ---------------- */
+  function applyMode(){
+    let m = state.mode;
+    if(m==null){ m = (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark":"light"; }
+    document.documentElement.setAttribute("data-mode", m);
+    $("#modeBtn").textContent = m==="dark" ? "☀️" : "🌙";
+  }
+  $("#modeBtn").onclick = ()=>{ const cur = document.documentElement.getAttribute("data-mode"); state.mode = cur==="dark"?"light":"dark"; applyMode(); save(); };
+
+  /* ---------------- tabs ---------------- */
+  $$("nav.tabs button").forEach(b=>b.onclick=()=>{
+    $$("nav.tabs button").forEach(x=>x.classList.toggle("active",x===b));
+    $$(".view").forEach(v=>v.classList.remove("active"));
+    $("#view-"+b.dataset.view).classList.add("active");
+    if(b.dataset.view==="guide") renderGuide();
+    if(b.dataset.view==="tasks") renderTasks();
+    if(b.dataset.view==="journal") renderJournal();
+  });
+
+  /* ---------------- garden name ---------------- */
+  const gname = $("#gname");
+  gname.value = state.name;
+  $("#footName").textContent = state.name;
+  gname.oninput = ()=>{ state.name = gname.value || "Our Garden"; $("#footName").textContent = state.name; save(); };
+
+  /* ---------------- bed tabs ---------------- */
+  function renderBedTabs(){
+    const c = $("#bedtabs"); c.innerHTML="";
+    state.beds.forEach(b=>{
+      const used = Object.keys(b.cells).length, total = b.cols*b.rows;
+      const el = document.createElement("button");
+      el.className = "bedtab"+(b.id===state.activeBed?" active":"");
+      el.innerHTML = `<span>${esc(b.name)}</span><span class="dim">${b.cols}×${b.rows} · ${used}/${total}</span>`;
+      el.onclick = ()=>{ state.activeBed=b.id; save(); renderBedTabs(); renderBed(); renderSummary(); };
+      c.appendChild(el);
+    });
+    // keep task bed selector fresh
+    fillBedSelect();
+  }
+
+  /* ---------------- bed grid ---------------- */
+  function renderBed(){
+    const bed = activeBed(); if(!bed){ $("#bed").innerHTML=""; return; }
+    const el = $("#bed");
+    el.style.setProperty("--cell", state.cell+"px");
+    el.style.gridTemplateColumns = `repeat(${bed.cols}, var(--cell))`;
+    el.innerHTML="";
+    for(let r=0;r<bed.rows;r++){
+      for(let col=0;col<bed.cols;col++){
+        const key = r+","+col;
+        const cell = document.createElement("div");
+        cell.className="cell"; cell.dataset.key=key;
+        paintCellDom(cell, bed.cells[key]);
+        el.appendChild(cell);
+      }
+    }
+  }
+  function paintCellDom(cell, data){
+    if(data){
+      const p = plant(data.plantId);
+      cell.classList.add("filled");
+      cell.style.setProperty("--cellbg", p ? `color-mix(in srgb, ${p.c} 30%, var(--panel))` : "var(--panel)");
+      cell.innerHTML = `<span class="emo">${p?p.e:"❓"}</span>` + (data.count>1?`<span class="cnt">×${data.count}</span>`:"");
+    }else{
+      cell.classList.remove("filled"); cell.style.removeProperty("--cellbg"); cell.innerHTML="";
+    }
+  }
+
+  function applyTool(cell){
+    const bed = activeBed(); const key = cell.dataset.key; if(!key) return;
+    if(ui.tool==="erase"){
+      if(bed.cells[key]){ delete bed.cells[key]; paintCellDom(cell,null); dirty(); }
+    }else if(ui.tool==="plant"){
+      const p = plant(ui.plantId); if(!p){ toast("Pick a plant first"); return; }
+      bed.cells[key] = { plantId:p.id, count:p.sfg };
+      paintCellDom(cell, bed.cells[key]); dirty();
+    }else if(ui.tool==="inspect"){
+      showPop(cell, bed.cells[key], key);
+    }
+  }
+  let dirtyT;
+  function dirty(){ clearTimeout(dirtyT); dirtyT=setTimeout(()=>{ save(); renderBedTabs(); renderSummary(); },120); }
+
+  // painting interactions (mouse + touch)
+  const bedEl = $("#bed");
+  bedEl.addEventListener("mousedown", e=>{
+    const cell = e.target.closest(".cell"); if(!cell) return;
+    if(ui.tool==="inspect"){ applyTool(cell); return; }
+    ui.painting=true; applyTool(cell); e.preventDefault();
+  });
+  bedEl.addEventListener("mouseover", e=>{ if(!ui.painting) return; const cell=e.target.closest(".cell"); if(cell) applyTool(cell); });
+  window.addEventListener("mouseup", ()=>{ ui.painting=false; });
+  bedEl.addEventListener("touchstart", e=>{
+    const cell = e.target.closest(".cell"); if(!cell) return;
+    if(ui.tool==="inspect"){ applyTool(cell); return; }
+    ui.painting=true; applyTool(cell); e.preventDefault();
+  }, {passive:false});
+  bedEl.addEventListener("touchmove", e=>{
+    if(!ui.painting || ui.tool==="inspect") return;
+    const t=e.touches[0]; const cell=document.elementFromPoint(t.clientX,t.clientY);
+    if(cell && cell.classList.contains("cell")) applyTool(cell);
+    e.preventDefault();
+  }, {passive:false});
+  window.addEventListener("touchend", ()=>{ ui.painting=false; });
+
+  /* ---------------- cell popover ---------------- */
+  function showPop(cell, data, key){
+    const pop = $("#pop");
+    if(!data){ pop.classList.remove("open"); toast("Empty square — pick a plant to fill it"); return; }
+    const p = plant(data.plantId);
+    pop.innerHTML = `
+      <div class="top"><span class="sw" style="background:color-mix(in srgb,${p.c} 32%,var(--panel))">${p.e}</span>
+        <div><div style="font-weight:800">${esc(p.n)}</div><div class="tiny muted">${esc(p.cat)} · ${data.count} per sq ft</div></div></div>
+      <div class="facts">
+        <span class="fact">☀️ ${esc(p.sun)}</span>
+        <span class="fact">⏳ ${p.dtm}d</span>
+      </div>
+      <div class="comp" style="margin-bottom:9px"><b>Tip:</b> ${esc(p.comp)}</div>
+      <button class="btn sm ghost" style="width:100%;justify-content:center" id="popRemove">🧹 Remove from square</button>`;
+    const rect = cell.getBoundingClientRect();
+    pop.style.left = Math.min(window.innerWidth-232, rect.left+window.scrollX) + "px";
+    pop.style.top = (rect.bottom+window.scrollY+6) + "px";
+    pop.classList.add("open");
+    $("#popRemove").onclick = ()=>{ delete activeBed().cells[key]; paintCellDom(cell,null); pop.classList.remove("open"); dirty(); };
+  }
+  document.addEventListener("click", e=>{
+    if(!e.target.closest("#pop") && !e.target.closest(".cell")) $("#pop").classList.remove("open");
+  });
+
+  /* ---------------- tools ---------------- */
+  $$(".tool").forEach(t=>t.onclick=()=>{ ui.tool=t.dataset.tool; $$(".tool").forEach(x=>x.classList.toggle("active",x===t)); if(ui.tool!=="inspect") $("#pop").classList.remove("open"); });
+  $("#zoom").value = state.cell;
+  $("#zoom").oninput = e=>{ state.cell = +e.target.value; $("#bed").style.setProperty("--cell", state.cell+"px"); };
+  $("#zoom").onchange = ()=>save();
+
+  /* ---------------- palette ---------------- */
+  function renderCatRow(){
+    const c=$("#catrow"); c.innerHTML="";
+    ["All"].concat(CATS).forEach(cat=>{
+      const b=document.createElement("button"); b.className="cat"+(ui.cat===cat?" active":""); b.textContent=cat;
+      b.onclick=()=>{ ui.cat=cat; renderCatRow(); renderPalette(); };
+      c.appendChild(b);
+    });
+  }
+  function renderPalette(){
+    const c=$("#palette"); c.innerHTML="";
+    const q = ui.search.toLowerCase();
+    let list = allPlants().filter(p=> (ui.cat==="All"||p.cat===ui.cat) && (!q || p.n.toLowerCase().includes(q)));
+    if(!list.length){ c.innerHTML=`<div class="tiny muted" style="grid-column:1/-1;padding:8px">No matches.</div>`; return; }
+    list.forEach(p=>{
+      const b=document.createElement("button"); b.className="pchip"+(ui.plantId===p.id?" sel":"");
+      b.innerHTML=`<span class="sw" style="background:color-mix(in srgb,${p.c} 32%,var(--panel))">${p.e}</span>
+        <span style="min-width:0"><span class="nm">${esc(p.n)}</span><br><span class="mt">${p.sfg}/sq · ${p.dtm}d</span></span>`;
+      b.onclick=()=>{ ui.plantId=p.id; ui.tool="plant"; $$(".tool").forEach(x=>x.classList.toggle("active",x.dataset.tool==="plant"));
+        $$(".pchip").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); updateChosen(); };
+      c.appendChild(b);
+    });
+    updateChosen();
+  }
+  function updateChosen(){
+    const p = plant(ui.plantId);
+    $("#chosen").querySelector(".sw").textContent = p?p.e:"🌱";
+    $("#chosen").querySelector(".sw").style.background = p?`color-mix(in srgb,${p.c} 32%,var(--panel))`:"transparent";
+    $("#chosenName").textContent = p?p.n:"pick a plant →";
+  }
+  $("#palSearch").oninput = e=>{ ui.search=e.target.value; renderPalette(); };
+
+  /* ---------------- summary ---------------- */
+  function renderSummary(){
+    const bed = activeBed();
+    // per-active-bed tallies drive stats; full-garden totals in list
+    const tally = {}; let squares=0;
+    Object.values(bed.cells).forEach(d=>{ tally[d.plantId]=(tally[d.plantId]||0)+d.count; squares++; });
+    $("#statSquares").textContent = squares;
+    $("#statKinds").textContent = Object.keys(tally).length;
+    $("#sumScope").textContent = bed.name;
+    const rows = Object.entries(tally).sort((a,b)=>b[1]-a[1]);
+    const box = $("#summary");
+    if(!rows.length){ box.innerHTML=`<div class="tiny muted" style="padding:6px 0">Nothing planted here yet. Pick a plant and click the bed →</div>`; return; }
+    box.innerHTML = rows.map(([id,n])=>{ const p=plant(id); if(!p) return "";
+      return `<div class="sumrow"><span class="sw" style="background:color-mix(in srgb,${p.c} 32%,var(--panel))">${p.e}</span>
+        <span class="nm">${esc(p.n)}</span><span class="num">${n}</span></div>`;
+    }).join("");
+  }
+
+  /* ---------------- bed modal ---------------- */
+  let editingBed=null;
+  function openBedModal(bed){
+    editingBed = bed||null;
+    $("#bedModalTitle").textContent = bed?"Edit bed":"New bed";
+    $("#bedName").value = bed?bed.name:"";
+    $("#bedW").value = bed?bed.cols:4;
+    $("#bedH").value = bed?bed.rows:4;
+    $("#bedModal").classList.add("open");
+    setTimeout(()=>$("#bedName").focus(),50);
+  }
+  $("#addBed").onclick = ()=>openBedModal(null);
+  $("#editBed").onclick = ()=>openBedModal(activeBed());
+  $("#bedCancel").onclick = ()=>$("#bedModal").classList.remove("open");
+  $("#bedSave").onclick = ()=>{
+    const name = $("#bedName").value.trim()||"New Bed";
+    const w = Math.max(1,Math.min(30, +$("#bedW").value||4));
+    const h = Math.max(1,Math.min(30, +$("#bedH").value||4));
+    if(editingBed){
+      editingBed.name=name; editingBed.cols=w; editingBed.rows=h;
+      // drop cells now outside bounds
+      Object.keys(editingBed.cells).forEach(k=>{ const [r,c]=k.split(",").map(Number); if(r>=h||c>=w) delete editingBed.cells[k]; });
+    }else{
+      const b = blankBed(name,w,h); state.beds.push(b); state.activeBed=b.id;
+    }
+    $("#bedModal").classList.remove("open"); save(); renderBedTabs(); renderBed(); renderSummary();
+    toast(editingBed?"Bed updated":"Bed added 🌱");
+  };
+  $("#clearBed").onclick = ()=>{ const b=activeBed(); if(!Object.keys(b.cells).length){ toast("Bed is already empty"); return; }
+    if(confirm(`Clear all plants from "${b.name}"?`)){ b.cells={}; save(); renderBed(); renderBedTabs(); renderSummary(); toast("Bed cleared"); } };
+  $("#delBed").onclick = ()=>{ if(state.beds.length<=1){ toast("Keep at least one bed"); return; }
+    const b=activeBed(); if(confirm(`Delete bed "${b.name}"? This can't be undone.`)){
+      state.beds=state.beds.filter(x=>x.id!==b.id); state.activeBed=state.beds[0].id;
+      save(); renderBedTabs(); renderBed(); renderSummary(); toast("Bed deleted"); } };
+
+  /* ---------------- custom plant modal ---------------- */
+  let cpEmojiSel=EMOJI_CHOICES[0], cpColorSel=COLOR_CHOICES[0];
+  function openPlantModal(){
+    cpEmojiSel=EMOJI_CHOICES[0]; cpColorSel=COLOR_CHOICES[0];
+    $("#cpName").value=""; $("#cpSfg").value=1; $("#cpDtm").value=60; $("#cpComp").value=""; $("#cpSun").selectedIndex=0;
+    const ce=$("#cpEmoji"); ce.innerHTML=""; EMOJI_CHOICES.forEach(em=>{ const b=document.createElement("button"); b.textContent=em; b.className=em===cpEmojiSel?"on":"";
+      b.onclick=()=>{ cpEmojiSel=em; $$("#cpEmoji button").forEach(x=>x.classList.toggle("on",x.textContent===em)); }; ce.appendChild(b); });
+    const cc=$("#cpColor"); cc.innerHTML=""; COLOR_CHOICES.forEach(col=>{ const b=document.createElement("button"); b.style.background=col; b.className=col===cpColorSel?"on":"";
+      b.onclick=()=>{ cpColorSel=col; $$("#cpColor button").forEach((x,i)=>x.classList.toggle("on",COLOR_CHOICES[i]===col)); }; cc.appendChild(b); });
+    const sel=$("#cpCat"); sel.innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");
+    $("#plantModal").classList.add("open"); setTimeout(()=>$("#cpName").focus(),50);
+  }
+  $("#addPlant").onclick = openPlantModal;
+  $("#addPlant2").onclick = openPlantModal;
+  $("#cpCancel").onclick = ()=>$("#plantModal").classList.remove("open");
+  $("#cpSave").onclick = ()=>{
+    const n=$("#cpName").value.trim(); if(!n){ toast("Give the plant a name"); return; }
+    const p = { id:"c-"+uid(), n, e:cpEmojiSel, c:cpColorSel, cat:$("#cpCat").value,
+      sun:$("#cpSun").value, sfg:Math.max(1,+$("#cpSfg").value||1), dtm:Math.max(0,+$("#cpDtm").value||0),
+      sow:[3,4,5], comp:$("#cpComp").value.trim()||"Custom plant.", custom:true };
+    state.custom.push(p); save(); ui.plantId=p.id; ui.cat="All"; ui.search="";
+    $("#plantModal").classList.remove("open"); renderCatRow(); renderPalette(); if($("#view-guide").classList.contains("active")) renderGuide();
+    toast(`Added ${n} 🌿`);
+  };
+
+  /* ---------------- plant guide ---------------- */
+  function renderGuide(){
+    const sel=$("#guideCat");
+    if(!sel.options.length){ sel.innerHTML=["All"].concat(CATS).map(c=>`<option>${c}</option>`).join(""); }
+    const q=ui.guideSearch.toLowerCase();
+    const list = allPlants().filter(p=>(ui.guideCat==="All"||p.cat===ui.guideCat)&&(!q||p.n.toLowerCase().includes(q)));
+    const g=$("#guidegrid");
+    if(!list.length){ g.innerHTML=`<div class="empty"><div class="big">🌱</div>No plants match.</div>`; return; }
+    g.innerHTML = list.map(p=>{
+      const mos = MONTHS.map((m,i)=>`<div class="mo${p.sow.includes(i+1)?" on":""}">${m}</div>`).join("");
+      return `<div class="card">
+        ${p.custom?`<button class="del" data-del="${p.id}" title="Delete custom plant">✕</button>`:""}
+        <div class="top"><span class="sw" style="background:color-mix(in srgb,${p.c} 32%,var(--panel))">${p.e}</span>
+          <div><div class="nm">${esc(p.n)}</div><div class="cat">${esc(p.cat)}</div></div></div>
+        <div class="facts">
+          <span class="fact">☀️ ${esc(p.sun)}</span>
+          <span class="fact">🌱 ${p.sfg}/sq ft</span>
+          <span class="fact">⏳ ${p.dtm} days</span>
+        </div>
+        <div class="comp"><b>Companions:</b> ${esc(p.comp)}</div>
+        <div class="tiny muted" style="margin-top:9px;font-weight:800">Sow / plant window</div>
+        <div class="months">${mos}</div>
+      </div>`;
+    }).join("");
+    $$("#guidegrid .del").forEach(b=>b.onclick=()=>{
+      const id=b.dataset.del; if(confirm("Delete this custom plant?")){ state.custom=state.custom.filter(p=>p.id!==id);
+        if(ui.plantId===id) ui.plantId="tomato"; save(); renderGuide(); renderPalette(); toast("Custom plant removed"); } });
+  }
+  $("#guideSearch").oninput = e=>{ ui.guideSearch=e.target.value; renderGuide(); };
+  $("#guideCat").onchange = e=>{ ui.guideCat=e.target.value; renderGuide(); };
+
+  /* ---------------- tasks ---------------- */
+  function fillBedSelect(){
+    const sel=$("#taskBed"); if(!sel) return; const cur=sel.value;
+    sel.innerHTML=`<option value="">— any bed —</option>`+state.beds.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join("");
+    if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+  }
+  function addTask(){
+    const text=$("#taskText").value.trim(); if(!text){ toast("Type a task first"); return; }
+    state.tasks.push({ id:uid(), text, due:$("#taskDue").value||"", bed:$("#taskBed").value||"", done:false });
+    $("#taskText").value=""; $("#taskDue").value=""; save(); renderTasks(); toast("Task added ✅");
+  }
+  $("#addTask").onclick = addTask;
+  $("#taskText").addEventListener("keydown",e=>{ if(e.key==="Enter") addTask(); });
+  function renderTasks(){
+    fillBedSelect();
+    const list=$("#tasklist");
+    const items = state.tasks.slice().sort((a,b)=>{
+      if(a.done!==b.done) return a.done?1:-1;
+      if(!!a.due!==!!b.due) return a.due?-1:1;
+      return (a.due||"").localeCompare(b.due||"");
+    });
+    if(!items.length){ list.innerHTML=`<div class="empty"><div class="big">🌤️</div>No tasks yet — add watering, sowing, or harvest reminders above.</div>`; return; }
+    const today = new Date().toISOString().slice(0,10);
+    list.innerHTML = items.map(t=>{
+      const bed = t.bed ? state.beds.find(b=>b.id===t.bed) : null;
+      let duePill="";
+      if(t.due){ const over = !t.done && t.due<today; duePill=`<span class="pill ${over?"over":"due"}">${over?"⚠ ":"📅 "}${fmtDate(t.due)}</span>`; }
+      const bedPill = bed?`<span class="pill bed">🪴 ${esc(bed.name)}</span>`:"";
+      return `<div class="task${t.done?" done":""}" data-id="${t.id}">
+        <button class="chk" data-chk="${t.id}">✓</button>
+        <span class="txt">${esc(t.text)}</span>
+        <span class="meta">${duePill}${bedPill}</span>
+        <button class="x" data-x="${t.id}">✕</button></div>`;
+    }).join("");
+    $$("#tasklist .chk").forEach(b=>b.onclick=()=>{ const t=state.tasks.find(x=>x.id===b.dataset.chk); t.done=!t.done; save(); renderTasks(); });
+    $$("#tasklist .x").forEach(b=>b.onclick=()=>{ state.tasks=state.tasks.filter(x=>x.id!==b.dataset.x); save(); renderTasks(); });
+  }
+
+  /* ---------------- journal ---------------- */
+  function addJournal(){
+    const text=$("#jText").value.trim(); if(!text){ toast("Write something first"); return; }
+    const date=$("#jDate").value || new Date().toISOString().slice(0,10);
+    state.journal.push({ id:uid(), date, text }); $("#jText").value="";
+    save(); renderJournal(); toast("Journal entry saved 📖");
+  }
+  $("#addJournal").onclick = addJournal;
+  function renderJournal(){
+    if(!$("#jDate").value) $("#jDate").value = new Date().toISOString().slice(0,10);
+    const box=$("#journallist");
+    const items = state.journal.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+    if(!items.length){ box.innerHTML=`<div class="empty"><div class="big">🌼</div>No entries yet — jot down what you planted or noticed today.</div>`; return; }
+    box.innerHTML = items.map(j=>`<div class="jentry"><button class="x" data-x="${j.id}">✕</button>
+      <div class="date">${fmtDate(j.date)}</div><div class="body">${esc(j.text)}</div></div>`).join("");
+    $$("#journallist .x").forEach(b=>b.onclick=()=>{ state.journal=state.journal.filter(x=>x.id!==b.dataset.x); save(); renderJournal(); });
+  }
+
+  /* ---------------- export / import / print ---------------- */
+  $("#printBtn").onclick = ()=>window.print();
+  $("#exportBtn").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download = (state.name||"garden").toLowerCase().replace(/[^a-z0-9]+/g,"-")+"-backup.json";
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); toast("Backup downloaded ⬇️");
+  };
+  $("#importBtn").onclick = ()=>$("#importFile").click();
+  $("#importFile").onchange = e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload = ()=>{ try{ const s=JSON.parse(r.result);
+      if(!s.beds||!s.beds.length) throw 0;
+      state=s; save(); boot(); toast("Garden restored ⬆️");
+    }catch(err){ toast("Couldn't read that backup file"); } };
+    r.readAsText(f); e.target.value="";
+  };
+
+  /* ---------------- helpers ---------------- */
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  function fmtDate(d){ if(!d) return ""; const [y,m,day]=d.split("-"); const M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${M[+m-1]} ${+day}, ${y}`; }
+
+  /* ---------------- close modals on backdrop / esc ---------------- */
+  $$(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ $$(".modal").forEach(m=>m.classList.remove("open")); $("#pop").classList.remove("open"); } });
+
+  /* ---------------- boot ---------------- */
+  function boot(){
+    applyMode();
+    gname.value = state.name; $("#footName").textContent=state.name;
+    if(state.cell) $("#zoom").value=state.cell; else state.cell=52;
+    if(!state.custom) state.custom=[]; if(!state.tasks) state.tasks=[]; if(!state.journal) state.journal=[];
+    renderCatRow(); renderPalette(); renderBedTabs(); renderBed(); renderSummary();
+    renderTasks(); renderJournal();
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
