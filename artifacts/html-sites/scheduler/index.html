@@ -89,6 +89,9 @@
         <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ critTone }}" dot="{{ true }}" hint-size="auto,24px">{{ critLabel }}</x-import>
         <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ gapTone }}" hint-size="auto,24px">{{ gapLabel }}</x-import>
         <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="accent" hint-size="auto,24px">{{ ftLabel }}</x-import>
+        <sc-if value="{{ ptoAlert }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="danger" dot="{{ true }}" hint-size="auto,24px">{{ ptoAlertLabel }}</x-import>
+        </sc-if>
       </div>
 
       <div class="noprint" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:16px">
@@ -352,6 +355,87 @@
             </sc-for>
           </tbody>
         </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= PTO ================= -->
+    <sc-if value="{{ isPTO }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:980px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">Time off (PTO)</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:2px">{{ ptoSummary }}</div>
+        </div>
+      </div>
+
+      <!-- add a request -->
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);padding:15px 16px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Employee</span>
+          <select class="nat" value="{{ ptoEmpVal }}" onChange="{{ onPtoEmp }}" style="width:190px">
+            <sc-for list="{{ ptoOptions }}" as="po" hint-placeholder-count="6">
+              <option value="{{ po.value }}">{{ po.label }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">First day off</span>
+          <input type="date" class="nat" value="{{ ptoStart }}" onChange="{{ onPtoStart }}" style="width:160px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Last day off</span>
+          <input type="date" class="nat" value="{{ ptoEnd }}" onChange="{{ onPtoEnd }}" style="width:160px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px">
+          <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Note (optional)</span>
+          <input class="nat" value="{{ ptoNote }}" onChange="{{ onPtoNote }}" placeholder="e.g. vacation, appt" style="width:100%">
+        </div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="primary" on-click="{{ addPTO }}" hint-size="auto,40px">Add request</x-import>
+      </div>
+
+      <!-- coverage flags -->
+      <sc-if value="{{ ptoHasFlags }}" hint-placeholder-val="{{ true }}">
+        <div style="border:1px solid var(--border-default);border-left:3px solid var(--danger);border-radius:var(--radius-lg);background:var(--danger-soft);padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--danger);text-transform:uppercase">// Coverage flags — this PTO drops us below requirements</span>
+          <sc-for list="{{ ptoConflictRows }}" as="c" hint-placeholder-count="1">
+            <div style="font-size:13px;color:var(--text-primary)">⚠ {{ c.text }}</div>
+          </sc-for>
+          <sc-for list="{{ ptoRiskRows }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;font-size:13px">
+              <span style="{{ r.dot }}"></span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);min-width:96px">{{ r.when }}</span>
+              <span style="color:var(--text-primary)">{{ r.what }}</span>
+              <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">— {{ r.who }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ ptoNoFlags }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:9px;border:1px solid var(--border-subtle);border-left:3px solid var(--success);border-radius:var(--radius-lg);background:var(--success-soft);padding:13px 16px">
+          <span style="font-size:13px;color:var(--success)">All requested time off is covered — every shift still meets its requirements.</span>
+        </div>
+      </sc-if>
+
+      <!-- request list -->
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Requests</span>
+        <sc-if value="{{ ptoHasRequests }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ ptoRows }}" as="p" hint-placeholder-count="3">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:11px 14px">
+              <span style="font-size:14px;font-weight:600;min-width:150px">{{ p.name }}</span>
+              <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase">{{ p.role }}</span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-accent)">{{ p.range }}</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ p.days }}</span>
+              <span style="font-size:12.5px;color:var(--text-secondary)">{{ p.note }}</span>
+              <div style="flex:1"></div>
+              <button onClick="{{ p.onRemove }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 6px" title="Remove request">×</button>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ ptoNoRequests }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12.5px;color:var(--text-muted);font-family:var(--font-mono)">No time-off requests yet. Add one above — it'll be respected on the next auto-generate.</div>
+        </sc-if>
       </div>
     </div>
     </sc-if>
@@ -633,6 +717,11 @@ class Component extends DCLogic {
       done: {},
       presets: [],
       presetName: '',
+      pto: [],
+      ptoEmp: '',
+      ptoStart: '',
+      ptoEnd: '',
+      ptoNote: '',
       copied: false,
       loaded: false,
     };
@@ -662,6 +751,52 @@ class Component extends DCLogic {
   shiftById(id) { return this.state.shifts.find(s => s.id === id) || null; }
   impRank(i) { return i === 'critical' ? 3 : i === 'important' ? 2 : 1; }
 
+  // ---------- PTO ----------
+  onPTO(empId, iso) { return (this.state.pto || []).some(r => r.empId === empId && iso >= r.start && iso <= r.end); }
+  ptoLen(r) { const a = new Date(r.start + 'T00:00:00'), b = new Date(r.end + 'T00:00:00'); return Math.round((b - a) / 86400000) + 1; }
+  // Greedy: which of a shift's needs can't be met from a given candidate pool.
+  unmetNeeds(shift, pool) {
+    const used = {};
+    const needs = shift.needs.slice().sort((a, b) => (this.impRank(b.importance) - this.impRank(a.importance)) || (a.roles.length - b.roles.length));
+    const out = [];
+    needs.forEach(need => {
+      let filled = 0;
+      for (const e of pool) { if (filled >= need.count) break; if (used[e.id]) continue; if (need.roles.includes(e.roleId)) { used[e.id] = true; filled++; } }
+      if (filled < need.count) out.push({ need, filled, miss: need.count - filled });
+    });
+    return out;
+  }
+  // Analyze PTO impact across the whole range: scheduling conflicts + coverage
+  // requirements that FAIL specifically because of granted PTO (i.e. would be
+  // coverable without it). Staffing gaps unrelated to PTO are left to the
+  // existing coverage/gap engine so we don't double-blame time off.
+  ptoAnalysis() {
+    const { employees, shifts, startDate, schedule } = this.state;
+    const N = this.totalDays();
+    const days3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const conflicts = [], risks = [];
+    for (let d = 0; d < N; d++) {
+      const date = this.addDays(startDate, d), iso = this.toISO(date), wd = date.getDay();
+      const when = days3[wd] + ' ' + (date.getMonth() + 1) + '/' + date.getDate();
+      employees.forEach(e => {
+        const sid = (schedule[e.id] || [])[d];
+        if (sid && this.onPTO(e.id, iso)) conflicts.push({ name: e.name, when, shift: (this.shiftById(sid) || {}).name || '' });
+      });
+      shifts.filter(s => s.days[wd]).forEach(shift => {
+        const availWith = employees.filter(e => e.avail[wd] && !this.onPTO(e.id, iso));
+        const availWithout = employees.filter(e => e.avail[wd]);
+        const unmetWith = this.unmetNeeds(shift, availWith);
+        const unmetWithout = this.unmetNeeds(shift, availWithout);
+        unmetWith.forEach(u => {
+          if (unmetWithout.some(x => x.need === u.need)) return; // shortage isn't caused by PTO
+          const blockers = employees.filter(e => u.need.roles.includes(e.roleId) && e.avail[wd] && this.onPTO(e.id, iso)).map(e => e.name);
+          if (blockers.length) risks.push({ when, shift: shift.name, need: u.need.label, miss: u.miss, importance: u.need.importance, blockers });
+        });
+      });
+    }
+    return { conflicts, risks };
+  }
+
   componentDidMount() {
     try {
       const raw = localStorage.getItem('eriks_sched_v3');
@@ -677,8 +812,8 @@ class Component extends DCLogic {
 
   persist() {
     try {
-      const { activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName } = this.state;
-      localStorage.setItem('eriks_sched_v3', JSON.stringify({ activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName }));
+      const { activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName, pto } = this.state;
+      localStorage.setItem('eriks_sched_v3', JSON.stringify({ activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName, pto }));
     } catch (e) {}
   }
   update(patch, cb) { this.setState(patch, () => { this.persist(); if (cb) cb(); }); }
@@ -696,6 +831,7 @@ class Component extends DCLogic {
 
     for (let d = 0; d < N; d++) {
       const date = this.addDays(startDate, d);
+      const iso = this.toISO(date);
       const wd = date.getDay();
       const week = Math.floor(d / 7);
       const worked = {}; // empId assigned today
@@ -710,6 +846,7 @@ class Component extends DCLogic {
               if (worked[e.id]) return false;
               if (!need.roles.includes(e.roleId)) return false;
               if (!e.avail[wd]) return false;
+              if (this.onPTO(e.id, iso)) return false;
               if (consec[e.id] >= rules.maxConsec) return false;
               if (wkHours[e.id][week] + h > e.target + 0.01) return false;
               return true;
@@ -836,6 +973,18 @@ class Component extends DCLogic {
 
   setRule(field, val) { this.update({ rules: { ...this.state.rules, [field]: val } }); }
 
+  // ---------- PTO setters ----------
+  setPtoField(field, val) { this.update({ [field]: val }); }
+  addPTO() {
+    const { ptoStart, employees } = this.state;
+    const empId = this.state.ptoEmp || (employees[0] && employees[0].id);
+    if (!empId || !ptoStart) return;
+    const end = (this.state.ptoEnd && this.state.ptoEnd >= ptoStart) ? this.state.ptoEnd : ptoStart;
+    const r = { id: 'pto' + Math.random().toString(36).slice(2, 8), empId, start: ptoStart, end, note: (this.state.ptoNote || '').trim() };
+    this.update({ pto: [r, ...(this.state.pto || [])], ptoStart: '', ptoEnd: '', ptoNote: '' });
+  }
+  removePTO(id) { this.update({ pto: (this.state.pto || []).filter(p => p.id !== id) }); }
+
   onPresetName(e) { this.update({ presetName: e.target.value }); }
   savePreset() {
     const name = (this.state.presetName || '').trim() || ('Setup ' + (this.state.presets.length + 1));
@@ -947,6 +1096,7 @@ class Component extends DCLogic {
         const active = shifts.filter(s => s.days[m.wd]);
         const locked = !!doneMap[m.d];
         const clickable = active.length > 0 && !locked;
+        const onPto = this.onPTO(e.id, this.toISO(m.date));
         let inner, label = '', sub = '', title = '';
         if (sid) {
           const s = this.shiftById(sid); const c = colorFor(sid);
@@ -954,6 +1104,10 @@ class Component extends DCLogic {
           sub = s ? (this.ampm(s.start) + '-' + this.ampm(s.end)) : '';
           title = e.name + ' — ' + (s ? s.name : '');
           inner = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', borderRadius: '5px', background: c.bg, border: '1px solid ' + c.bd, color: c.fg };
+          if (onPto) { inner = { ...inner, border: '1px solid var(--danger)', boxShadow: 'inset 0 0 0 1px var(--danger)' }; title = e.name + ' — SCHEDULED DURING PTO'; }
+        } else if (onPto) {
+          label = 'PTO'; sub = ''; title = e.name + ' — on PTO (off)';
+          inner = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', borderRadius: '5px', color: 'var(--warning)', background: 'var(--warning-soft)', border: '1px dashed rgba(232,193,107,0.4)' };
         } else {
           const avail = e.avail[m.wd];
           title = avail ? (clickable ? 'Click to assign' : 'Store closed') : (e.name + ' unavailable');
@@ -1204,10 +1358,38 @@ class Component extends DCLogic {
     });
     const printRange = (start.getMonth() + 1) + '/' + start.getDate() + ' – ' + (end.getMonth() + 1) + '/' + end.getDate();
 
+    // ----- PTO -----
+    const pto = this.state.pto || [];
+    const { conflicts: ptoConflicts, risks: ptoRisks } = this.ptoAnalysis();
+    const ptoFlagCount = ptoConflicts.length + ptoRisks.length;
+    const ptoFmt = (iso) => { const d = new Date(iso + 'T00:00:00'); return (d.getMonth() + 1) + '/' + d.getDate(); };
+    const ptoRows = pto.map(r => {
+      const pe = employees.find(x => x.id === r.empId);
+      const len = this.ptoLen(r);
+      return {
+        name: pe ? pe.name : '(removed from team)',
+        role: pe ? this.roleById(pe.roleId).abbr : '',
+        range: r.start === r.end ? ptoFmt(r.start) : (ptoFmt(r.start) + ' – ' + ptoFmt(r.end)),
+        days: len + (len === 1 ? ' day' : ' days'),
+        note: r.note || '',
+        onRemove: () => this.removePTO(r.id),
+      };
+    });
+    const ptoConflictRows = ptoConflicts.map(c => ({ text: c.name + ' is scheduled for ' + c.shift + ' on ' + c.when + ' — during their time off' }));
+    const ptoRiskRows = ptoRisks.map(r => ({
+      when: r.when,
+      what: r.shift + ' · ' + r.need + (r.miss > 1 ? ' (need ' + r.miss + ' more)' : ''),
+      who: r.blockers.join(', ') + ' off',
+      dot: { width: '8px', height: '8px', borderRadius: '999px', flex: 'none', background: r.importance === 'critical' ? 'var(--danger)' : 'var(--warning)' },
+    }));
+    const ptoOptions = employees.map(e => ({ value: e.id, label: e.name }));
+    const ptoEmpVal = this.state.ptoEmp || (employees[0] && employees[0].id) || '';
+
     return {
       tabs: [
         { label: 'Schedule', value: 'schedule' },
         { label: 'Team', value: 'team', count: employees.length },
+        { label: 'PTO', value: 'pto', count: pto.length },
         { label: 'Shifts', value: 'shifts' },
         { label: 'Roles', value: 'roles' },
         { label: 'Rules & presets', value: 'presets' },
@@ -1217,6 +1399,7 @@ class Component extends DCLogic {
       savedNote: 'Autosaved locally',
       isSchedule: activeTab === 'schedule',
       isTeam: activeTab === 'team',
+      isPTO: activeTab === 'pto',
       isShifts: activeTab === 'shifts',
       isRoles: activeTab === 'roles',
       isPresets: activeTab === 'presets',
@@ -1258,8 +1441,23 @@ class Component extends DCLogic {
       gapList,
       gapMore: totalGaps > gapList.length ? '+ ' + (totalGaps - gapList.length) + ' more open slots' : '',
 
+      ptoAlert: ptoFlagCount > 0,
+      ptoAlertLabel: ptoFlagCount + ' PTO ' + (ptoFlagCount === 1 ? 'conflict' : 'conflicts'),
+
       teamCountLabel: employees.length + ' people on roster',
       empRows, roleOptions, addEmp: () => this.addEmp(),
+
+      ptoRows, ptoOptions, ptoEmpVal,
+      ptoStart: this.state.ptoStart, ptoEnd: this.state.ptoEnd, ptoNote: this.state.ptoNote,
+      onPtoEmp: (e) => this.setPtoField('ptoEmp', e.target.value),
+      onPtoStart: (e) => this.setPtoField('ptoStart', e.target.value),
+      onPtoEnd: (e) => this.setPtoField('ptoEnd', e.target.value),
+      onPtoNote: (e) => this.setPtoField('ptoNote', e.target.value),
+      addPTO: () => this.addPTO(),
+      ptoConflictRows, ptoRiskRows,
+      ptoHasFlags: ptoFlagCount > 0, ptoNoFlags: ptoFlagCount === 0 && pto.length > 0,
+      ptoHasRequests: pto.length > 0, ptoNoRequests: pto.length === 0,
+      ptoSummary: pto.length + (pto.length === 1 ? ' request' : ' requests') + (ptoFlagCount ? ' · ' + ptoFlagCount + ' conflict' + (ptoFlagCount === 1 ? '' : 's') : ' · all clear'),
 
       shiftRows, addShift: () => this.addShift(),
       roleRows, addRole: () => this.addRole(),
