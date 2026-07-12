@@ -189,10 +189,27 @@
           </sc-for>
           <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-top:4px">Click any cell to add / cycle / clear a shift.</div>
         </div>
-        <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:9px">
-          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Coverage gaps</span>
-          <sc-if value="{{ hasGaps }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-width:320px;display:flex;flex-direction:column;gap:12px">
+          <!-- CRITICAL gaps: flagged prominently + tells you what to add -->
+          <sc-if value="{{ hasCritGaps }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px solid var(--border-default);border-left:3px solid var(--danger);border-radius:var(--radius-lg);background:var(--danger-soft);padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+              <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--danger);text-transform:uppercase">// Critical gaps — add staff here to fix</span>
+              <sc-for list="{{ critGapList }}" as="g" hint-placeholder-count="3">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;font-size:12.5px">
+                  <span style="{{ g.dot }}"></span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);min-width:92px">{{ g.when }}</span>
+                  <span style="color:var(--text-primary);font-weight:600">{{ g.what }}</span>
+                  <span style="font-family:var(--font-mono);font-size:10px;color:var(--danger);background:rgba(240,128,110,0.14);border:1px solid rgba(240,128,110,0.35);border-radius:999px;padding:1px 8px">{{ g.miss }}</span>
+                  <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-accent)">{{ g.fill }}</span>
+                </div>
+              </sc-for>
+              <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-top:2px">{{ critGapMore }}</div>
+            </div>
+          </sc-if>
+          <!-- other (important / preferred) open slots -->
+          <sc-if value="{{ hasOtherGaps }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Other open slots</span>
               <sc-for list="{{ gapList }}" as="g" hint-placeholder-count="4">
                 <div style="display:flex;align-items:center;gap:9px;font-size:12px">
                   <span style="{{ g.dot }}"></span>
@@ -605,6 +622,18 @@
     </sc-if>
 
   </main>
+
+  <footer class="noprint" style="border-top:1px solid var(--border-subtle);padding:26px 28px 34px;display:flex;flex-direction:column;align-items:center;gap:10px">
+    <pre style="margin:0;font-family:var(--font-mono);font-size:9.5px;line-height:1.12;color:var(--text-accent);opacity:0.9;white-space:pre;overflow-x:auto;max-width:100%">
+████████╗ ██████╗   ██████╗
+╚══██╔══╝ ██╔══██╗  ╚════██╗
+   ██║    ██████╔╝   █████╔╝
+   ██║    ██╔═══╝    ╚═══██╗
+   ██║    ██║       ██████╔╝
+   ╚═╝    ╚═╝       ╚═════╝ </pre>
+    <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.16em;color:var(--text-muted);text-transform:uppercase">// developed by Thomas Phillip Jones III</span>
+    <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);opacity:0.7">gamertag: TP3 · the homie 🤝</span>
+  </footer>
 </div>
 
 <div class="printonly" style="display:none;background:#fff;color:#0A1628;font-family:var(--font-body);padding:0">
@@ -1170,22 +1199,36 @@ class Component extends DCLogic {
       coverageRows.push({ label: 'On duty', cells });
     }
 
-    // gaps summary + list
+    // gaps summary + lists — critical broken out into an actionable list so
+    // it's obvious where staff need to be added, other slots listed separately
     const days3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    let totalGaps = 0, critGaps = 0; const gapList = [];
+    let totalGaps = 0, critGaps = 0, otherGaps = 0;
+    const critGapList = [], gapList = [];
     dayMeta.forEach((m) => {
       this.coverageForDay(m.d).forEach(cov => {
         cov.detail.forEach(det => {
           const miss = det.need.count - det.filled;
-          if (miss > 0) {
-            totalGaps += miss;
-            const crit = det.need.importance === 'critical';
-            if (crit) critGaps += miss;
+          if (miss <= 0) return;
+          totalGaps += miss;
+          const when = days3[m.wd] + ' ' + (m.date.getMonth() + 1) + '/' + m.date.getDate();
+          if (det.need.importance === 'critical') {
+            critGaps += miss;
+            if (critGapList.length < 60) {
+              critGapList.push({
+                when,
+                what: cov.shift.name + ' · ' + det.need.label,
+                miss: 'need ' + miss + ' more',
+                fill: 'add ' + (det.need.roles.map(rid => this.roleById(rid).abbr).join(' / ') || 'anyone'),
+                dot: { width: '8px', height: '8px', borderRadius: '999px', flex: 'none', background: 'var(--danger)' },
+              });
+            }
+          } else {
+            otherGaps += miss;
             if (gapList.length < 8) {
               gapList.push({
-                when: days3[m.wd] + ' ' + (m.date.getMonth() + 1) + '/' + m.date.getDate(),
+                when,
                 what: cov.shift.name + ' · ' + det.need.label + (miss > 1 ? ' ×' + miss : ''),
-                dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: crit ? 'var(--danger)' : 'var(--warning)' },
+                dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: 'var(--warning)' },
               });
             }
           }
@@ -1437,9 +1480,11 @@ class Component extends DCLogic {
       gapTone: totalGaps ? 'warning' : 'neutral',
       gapLabel: totalGaps + ' open slots',
       ftLabel: ftCount + ' at full-time',
-      hasGaps: totalGaps > 0, noGaps: totalGaps === 0,
+      hasCritGaps: critGaps > 0, critGapList,
+      critGapMore: critGaps > critGapList.length ? '+ ' + (critGaps - critGapList.length) + ' more critical gaps' : '',
+      hasOtherGaps: otherGaps > 0, noGaps: totalGaps === 0,
       gapList,
-      gapMore: totalGaps > gapList.length ? '+ ' + (totalGaps - gapList.length) + ' more open slots' : '',
+      gapMore: otherGaps > gapList.length ? '+ ' + (otherGaps - gapList.length) + ' more open slots' : '',
 
       ptoAlert: ptoFlagCount > 0,
       ptoAlertLabel: ptoFlagCount + ' PTO ' + (ptoFlagCount === 1 ? 'conflict' : 'conflicts'),
