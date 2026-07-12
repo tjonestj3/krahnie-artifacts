@@ -1,0 +1,110 @@
+/* ============================================================
+   KRAHNBORN — COLOR TOKENS
+   Dark-first system. Base scales + semantic aliases.
+   Accent teal #99D5CA is sampled from the Krahnborn logo mark.
+   ============================================================ */
+
+:root {
+  /* --- Navy / ink scale (cool, slightly blue) --- */
+  --navy-950: #050B16; /* deepest void */
+  --navy-900: #0A1628; /* app canvas */
+  --navy-850: #0C1B30;
+  --navy-800: #0F1E36; /* base surface */
+  --navy-700: #16294A; /* raised card */
+  --navy-600: #1E3559; /* hairline / strong border */
+  --navy-500: #2B4670; /* border */
+  --navy-400: #3E5C8A; /* subtle accent line */
+  --navy-300: #5A769E;
+
+  /* --- Teal scale (brand accent) --- */
+  --teal-200: #DCF1EC;
+  --teal-300: #C2E8E0;
+  --teal-400: #99D5CA; /* THE brand teal (logo) */
+  --teal-500: #6FC4B5; /* hover */
+  --teal-600: #4FA89A; /* pressed / strong */
+  --teal-700: #347D72;
+  --teal-800: #21564E;
+
+  /* --- Neutral text scale (reads on dark) --- */
+  --white:     #FFFFFF;
+  --slate-100: #E9EFF6; /* primary text on dark */
+  --slate-200: #C4CFDE;
+  --slate-300: #97A6BC; /* secondary text */
+  --slate-400: #6B7B95; /* muted / placeholder */
+  --slate-500: #49587220;
+  --slate-600: #34415A;
+
+  /* --- Functional hues --- */
+  --green-400:  #5FD6A6;
+  --green-600:  #2F9E73;
+  --amber-400:  #E8C16B;
+  --amber-600:  #B8902F;
+  --red-400:    #F0806E;
+  --red-600:    #C44A38;
+
+  /* ===========================================================
+     SEMANTIC ALIASES  (dark theme = default :root)
+     =========================================================== */
+
+  /* Surfaces */
+  --bg-canvas:      var(--navy-900);
+  --bg-surface:     var(--navy-800);
+  --bg-raised:      var(--navy-700);
+  --bg-inset:       var(--navy-950);
+  --bg-overlay:     rgba(5, 11, 22, 0.72);
+
+  /* Text */
+  --text-primary:   var(--slate-100);
+  --text-secondary: var(--slate-300);
+  --text-muted:     var(--slate-400);
+  --text-inverse:   var(--navy-900);
+  --text-accent:    var(--teal-400);
+  --text-on-accent: var(--navy-900);
+
+  /* Borders & lines */
+  --border-subtle:  rgba(148, 174, 209, 0.12);
+  --border-default: rgba(148, 174, 209, 0.20);
+  --border-strong:  rgba(148, 174, 209, 0.34);
+  --border-accent:  var(--teal-400);
+
+  /* Accent / interactive */
+  --accent:         var(--teal-400);
+  --accent-hover:   var(--teal-500);
+  --accent-active:  var(--teal-600);
+  --accent-soft:    rgba(153, 213, 202, 0.12);
+  --accent-ring:    rgba(153, 213, 202, 0.40);
+
+  /* Functional */
+  --success:        var(--green-400);
+  --warning:        var(--amber-400);
+  --danger:         var(--red-400);
+  --info:           var(--teal-400);
+  --success-soft:   rgba(95, 214, 166, 0.14);
+  --warning-soft:   rgba(232, 193, 107, 0.14);
+  --danger-soft:    rgba(240, 128, 110, 0.14);
+}
+
+/* ===========================================================
+   LIGHT SURFACE SCOPE
+   Use on sections that sit on white (docs, printed material).
+   =========================================================== */
+[data-theme="light"] {
+  --bg-canvas:      #F4F7FB;
+  --bg-surface:     #FFFFFF;
+  --bg-raised:      #FFFFFF;
+  --bg-inset:       #EDF2F8;
+  --bg-overlay:     rgba(10, 22, 40, 0.40);
+
+  --text-primary:   var(--navy-900);
+  --text-secondary: #3E5070;
+  --text-muted:     #6B7B95;
+  --text-inverse:   #FFFFFF;
+  --text-accent:    var(--teal-700);
+  --text-on-accent: var(--navy-900);
+
+  --border-subtle:  rgba(16, 30, 54, 0.08);
+  --border-default: rgba(16, 30, 54, 0.14);
+  --border-strong:  rgba(16, 30, 54, 0.24);
+
+  --accent-soft:    rgba(79, 168, 154, 0.12);
+}

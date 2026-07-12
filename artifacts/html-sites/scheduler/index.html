@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/theme.css" />
+  <script src="/theme.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/tokens/base.css">
+  <link rel="stylesheet" href="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/styles.css">
+  <script src="_ds/krahnborn-design-system-019ddc56-ac1e-7a37-aafa-3f50444f84bb/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{background:var(--bg-canvas);color:var(--text-primary);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+    a{color:var(--text-accent);text-decoration:none}
+    a:hover{color:var(--accent-hover)}
+    .nat{font-family:var(--font-body);font-size:13px;color:var(--text-primary);background:var(--navy-800);border:1px solid var(--border-default);border-radius:var(--radius-sm);padding:7px 9px;outline:none;transition:border-color 120ms}
+    .nat:focus{border-color:var(--accent);box-shadow:var(--ring-focus)}
+    select.nat{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--slate-400) 50%),linear-gradient(135deg,var(--slate-400) 50%,transparent 50%);background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:26px}
+    .schtable{border-collapse:separate;border-spacing:0}
+    .schtable td,.schtable th{padding:0}
+    ::-webkit-scrollbar{height:12px;width:12px}
+    ::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:8px;border:3px solid var(--bg-canvas)}
+    ::-webkit-scrollbar-track{background:transparent}
+    .printonly{display:none}
+    @media print{
+      .noprint{display:none !important}
+      .screen-only{display:none !important}
+      .printonly{display:block !important}
+      body{background:#fff !important;color:#0A1628 !important}
+      @page{size:landscape;margin:0.45in}
+    }
+  </style>
+</helmet>
+<div class="screen-only" style="min-height:100vh;display:flex;flex-direction:column">
+
+  <header class="noprint" style="display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--border-subtle);background:var(--navy-850)">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-soft);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:var(--text-accent);font-size:16px">E</div>
+      <div style="display:flex;flex-direction:column;line-height:1.1">
+        <span style="font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:-0.02em">Erik's · Burnsville</span>
+        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Staff scheduler</span>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ savedNote }}</span>
+  </header>
+
+  <div class="noprint" style="padding:14px 28px 0">
+    <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Tabs" tabs="{{ tabs }}" value="{{ activeTab }}" on-change="{{ setTab }}" variant="pill" hint-size="100%,46px"></x-import>
+  </div>
+
+  <main class="printwrap" style="flex:1;padding:22px 28px 60px">
+
+    <!-- ================= SCHEDULE ================= -->
+    <sc-if value="{{ isSchedule }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div class="noprint" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin-bottom:18px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Week starts (Sat)</span>
+          <input type="date" class="nat" value="{{ startDate }}" onChange="{{ onStartDate }}" style="width:170px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Weeks</span>
+          <input type="number" min="1" max="16" class="nat" value="{{ numWeeks }}" onChange="{{ onNumWeeks }}" style="width:72px;text-align:center">
+        </div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="primary" mono="{{ true }}" on-click="{{ generate }}" hint-size="auto,40px">Auto-generate</x-import>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ clearSchedule }}" hint-size="auto,40px">Clear</x-import>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="ghost" on-click="{{ copyText }}" hint-size="auto,40px">{{ copyLabel }}</x-import>
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="ghost" on-click="{{ emailSchedule }}" hint-size="auto,40px">Email</x-import>
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ printSchedule }}" hint-size="auto,40px">Print / PDF</x-import>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">{{ rangeLabel }}</span>
+        <div style="flex:1"></div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ critTone }}" dot="{{ true }}" hint-size="auto,24px">{{ critLabel }}</x-import>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ gapTone }}" hint-size="auto,24px">{{ gapLabel }}</x-import>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="accent" hint-size="auto,24px">{{ ftLabel }}</x-import>
+      </div>
+
+      <div class="noprint" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden">
+          <button onClick="{{ setGrid }}" style="{{ segGrid }}">Grid</button>
+          <button onClick="{{ setDayView }}" style="{{ segDay }}">By day</button>
+          <button onClick="{{ setShiftView }}" style="{{ segShift }}">By shift</button>
+        </div>
+        <sc-if value="{{ showScope }}" hint-placeholder-val="{{ true }}">
+          <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;flex-wrap:wrap">
+            <sc-for list="{{ scopeTabs }}" as="st" hint-placeholder-count="4">
+              <button onClick="{{ st.onClick }}" style="{{ st.style }}">{{ st.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isDayView }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-flex;align-items:center;gap:12px">
+            <button onClick="{{ dayView.prev }}" style="{{ navBtn }}">‹</button>
+            <span style="font-family:var(--font-display);font-weight:700;font-size:16px;min-width:190px;text-align:center">{{ dayView.label }}</span>
+            <button onClick="{{ dayView.next }}" style="{{ navBtn }}">›</button>
+            <button onClick="{{ dayView.toggleDone }}" style="{{ dayView.doneBtnStyle }}">{{ dayView.doneBtnLabel }}</button>
+          </div>
+        </sc-if>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">{{ progressLabel }}</span>
+          <sc-if value="{{ anyDone }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ resetProgress }}" style="background:none;border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:10px;padding:5px 9px;cursor:pointer">Reset progress</button>
+          </sc-if>
+        </div>
+      </div>
+
+      <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
+      <div style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850)">
+        <table class="schtable" style="table-layout:fixed;width:100%">
+          <thead>
+            <tr>
+              <th style="position:sticky;left:0;top:0;z-index:5;background:var(--navy-800);min-width:172px;width:172px;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border-default);border-right:1px solid var(--border-default)">
+                <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Employee</span>
+              </th>
+              <sc-for list="{{ headerCells }}" as="h" hint-placeholder-count="24">
+                <th style="{{ h.style }}">
+                  <button onClick="{{ h.onToggle }}" style="{{ h.checkStyle }}" title="Check off once entered into the system">{{ h.checkGlyph }}</button>
+                  <div style="font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.04em;line-height:1.3">{{ h.top }}</div>
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.2">{{ h.bottom }}</div>
+                </th>
+              </sc-for>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ gridRows }}" as="row" hint-placeholder-count="20">
+              <tr>
+                <td style="position:sticky;left:0;z-index:2;background:var(--navy-850);min-width:172px;width:172px;padding:7px 12px;border-bottom:1px solid var(--border-subtle);border-right:1px solid var(--border-default)">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <span style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</span>
+                    <span style="{{ row.ftBadgeStyle }}">{{ row.ftBadge }}</span>
+                  </div>
+                  <div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase;margin-top:2px">{{ row.roleShort }}</div>
+                </td>
+                <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="24">
+                  <td style="{{ cell.tdStyle }}" title="{{ cell.title }}" onClick="{{ cell.onClick }}">
+                    <div style="{{ cell.inner }}">
+                      <span style="font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0.02em">{{ cell.label }}</span>
+                      <span style="font-size:9.5px;opacity:0.72;line-height:1">{{ cell.sub }}</span>
+                    </div>
+                  </td>
+                </sc-for>
+              </tr>
+            </sc-for>
+            <sc-for list="{{ coverageRows }}" as="crow" hint-placeholder-count="3">
+              <tr>
+                <td style="position:sticky;left:0;z-index:2;background:var(--navy-900);min-width:172px;width:172px;padding:6px 12px;border-top:1px solid var(--border-default);border-right:1px solid var(--border-default);border-bottom:1px solid var(--border-subtle)">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.08em;color:var(--text-secondary);text-transform:uppercase">{{ crow.label }}</span>
+                </td>
+                <sc-for list="{{ crow.cells }}" as="cc" hint-placeholder-count="24">
+                  <td style="{{ cc.tdStyle }}" title="{{ cc.title }}">
+                    <span style="font-family:var(--font-mono);font-size:9px;font-weight:600">{{ cc.label }}</span>
+                  </td>
+                </sc-for>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="noprint" style="display:flex;flex-wrap:wrap;gap:32px;margin-top:18px">
+        <div style="display:flex;flex-direction:column;gap:9px;min-width:200px">
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Shifts</span>
+          <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="{{ lg.swatch }}"></span>
+              <span style="font-size:12.5px;font-weight:600">{{ lg.name }}</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ lg.time }}</span>
+            </div>
+          </sc-for>
+          <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-top:4px">Click any cell to add / cycle / clear a shift.</div>
+        </div>
+        <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:9px">
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Coverage gaps</span>
+          <sc-if value="{{ hasGaps }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <sc-for list="{{ gapList }}" as="g" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12px">
+                  <span style="{{ g.dot }}"></span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);min-width:88px">{{ g.when }}</span>
+                  <span style="color:var(--text-primary)">{{ g.what }}</span>
+                </div>
+              </sc-for>
+              <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-top:2px">{{ gapMore }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noGaps }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12.5px;color:var(--success)">All required roles covered across the schedule.</div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- BY DAY -->
+      <sc-if value="{{ isDayView }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ dayOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px">
+            <sc-for list="{{ dayView.shifts }}" as="ds" hint-placeholder-count="2">
+              <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);overflow:hidden">
+                <div style="height:3px;background:{{ ds.accent }}"></div>
+                <div style="padding:16px 18px">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                    <span style="font-family:var(--font-display);font-size:18px;font-weight:700">{{ ds.name }}</span>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ ds.time }}</span>
+                    <div style="flex:1"></div>
+                    <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ ds.covTone }}" dot="{{ true }}" hint-size="auto,24px">{{ ds.covLabel }}</x-import>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ ds.people }}" as="p" hint-placeholder-count="3">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <span style="width:28px;height:28px;border-radius:999px;background:var(--navy-700);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--text-secondary);flex:none">{{ p.initials }}</span>
+                        <span style="font-size:14px;font-weight:600">{{ p.name }}</span>
+                        <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase">{{ p.role }}</span>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ ds.empty }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:13px;color:var(--text-muted);font-style:italic">No one scheduled yet.</div>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ ds.hasGaps }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:12px;border-top:1px solid var(--border-subtle);padding-top:10px;display:flex;flex-direction:column;gap:5px">
+                      <sc-for list="{{ ds.gaps }}" as="g" hint-placeholder-count="1">
+                        <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+                          <span style="{{ g.dot }}"></span>
+                          <span style="color:var(--text-secondary)">Need {{ g.miss }} more · {{ g.label }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ dayClosed }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:40px;text-align:center;border:1px dashed var(--border-default);border-radius:var(--radius-lg);color:var(--text-muted);font-family:var(--font-mono);font-size:13px">Store closed this day — no shifts run.</div>
+        </sc-if>
+      </sc-if>
+
+      <!-- BY SHIFT -->
+      <sc-if value="{{ isShiftView }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <sc-for list="{{ shiftView.shifts }}" as="sv" hint-placeholder-count="4">
+            <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);overflow:hidden">
+              <div style="height:3px;background:{{ sv.accent }}"></div>
+              <div style="padding:15px 18px">
+                <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px">
+                  <span style="font-family:var(--font-display);font-size:18px;font-weight:700">{{ sv.name }}</span>
+                  <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ sv.time }}</span>
+                </div>
+                <sc-if value="{{ sv.empty }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12.5px;color:var(--text-muted);font-family:var(--font-mono)">Doesn't run in this range.</div>
+                </sc-if>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+                  <sc-for list="{{ sv.days }}" as="d" hint-placeholder-count="5">
+                    <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:10px 12px;background:var(--navy-800)">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                        <span style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-secondary)">{{ d.when }}</span>
+                        <div style="flex:1"></div>
+                        <span style="{{ d.countStyle }}">{{ d.countLabel }}</span>
+                      </div>
+                      <sc-for list="{{ d.people }}" as="p" hint-placeholder-count="3">
+                        <div style="font-size:13px;line-height:1.55">{{ p.name }} <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:uppercase">{{ p.role }}</span></div>
+                      </sc-for>
+                      <sc-if value="{{ d.empty }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:12px;color:var(--danger)">Unfilled</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ================= TEAM ================= -->
+    <sc-if value="{{ isTeam }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1180px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">Team roster</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:2px">{{ teamCountLabel }}</div>
+        </div>
+        <div style="flex:1"></div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ addEmp }}" hint-size="auto,38px">+ Add person</x-import>
+      </div>
+
+      <div style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg)">
+        <table style="width:100%;border-collapse:collapse;min-width:900px">
+          <thead>
+            <tr style="background:var(--navy-800)">
+              <th style="text-align:left;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Name</th>
+              <th style="text-align:left;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Role</th>
+              <th style="text-align:center;padding:10px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Type</th>
+              <th style="text-align:center;padding:10px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Hrs/wk</th>
+              <th style="text-align:center;padding:10px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Key</th>
+              <th style="text-align:center;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Availability (Sa–Fr)</th>
+              <th style="border-bottom:1px solid var(--border-default)"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ empRows }}" as="e" hint-placeholder-count="20">
+              <tr style="border-bottom:1px solid var(--border-subtle)">
+                <td style="padding:6px 12px"><input class="nat" value="{{ e.name }}" onChange="{{ e.onName }}" style="width:150px"></td>
+                <td style="padding:6px 12px">
+                  <select class="nat" value="{{ e.roleId }}" onChange="{{ e.onRole }}" style="width:150px">
+                    <sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6">
+                      <option value="{{ ro.value }}">{{ ro.label }}</option>
+                    </sc-for>
+                  </select>
+                </td>
+                <td style="padding:6px 8px;text-align:center">
+                  <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-sm);overflow:hidden">
+                    <button onClick="{{ e.setFT }}" style="{{ e.ftStyle }}">FT</button>
+                    <button onClick="{{ e.setPT }}" style="{{ e.ptStyle }}">PT</button>
+                  </div>
+                </td>
+                <td style="padding:6px 8px;text-align:center"><input type="number" class="nat" value="{{ e.target }}" onChange="{{ e.onTarget }}" style="width:56px;text-align:center"></td>
+                <td style="padding:6px 8px;text-align:center">
+                  <button onClick="{{ e.toggleKey }}" style="{{ e.keyStyle }}" title="Key holder / can open &amp; close">{{ e.keyGlyph }}</button>
+                </td>
+                <td style="padding:6px 12px">
+                  <div style="display:flex;gap:4px;justify-content:center">
+                    <sc-for list="{{ e.avail }}" as="a" hint-placeholder-count="7">
+                      <button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="padding:6px 12px;text-align:right">
+                  <button onClick="{{ e.onRemove }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;padding:4px 6px" title="Remove">×</button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= SHIFTS ================= -->
+    <sc-if value="{{ isShifts }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1000px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">Shift templates</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:2px">Named blocks + who's needed on each</div>
+        </div>
+        <div style="flex:1"></div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ addShift }}" hint-size="auto,38px">+ Add shift</x-import>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ shiftRows }}" as="s" hint-placeholder-count="2">
+          <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);overflow:hidden">
+            <div style="height:2px;background:{{ s.accent }}"></div>
+            <div style="padding:16px 18px">
+              <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px">
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Name</span>
+                  <input class="nat" value="{{ s.name }}" onChange="{{ s.onName }}" style="width:150px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Start</span>
+                  <input type="time" class="nat" value="{{ s.start }}" onChange="{{ s.onStart }}" style="width:120px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">End</span>
+                  <input type="time" class="nat" value="{{ s.end }}" onChange="{{ s.onEnd }}" style="width:120px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Runs on</span>
+                  <div style="display:flex;gap:4px">
+                    <sc-for list="{{ s.days }}" as="d" hint-placeholder-count="7">
+                      <button onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="flex:1"></div>
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-accent)">{{ s.hours }}</span>
+                <button onClick="{{ s.onRemove }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 6px" title="Remove shift">×</button>
+              </div>
+
+              <div style="margin-top:16px;border-top:1px solid var(--border-subtle);padding-top:12px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Roles needed</span>
+                  <button onClick="{{ s.addNeed }}" style="background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--text-accent);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:10px;padding:3px 8px;cursor:pointer">+ requirement</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ s.needs }}" as="n" hint-placeholder-count="3">
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--navy-800);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:8px 10px">
+                      <input class="nat" value="{{ n.label }}" onChange="{{ n.onLabel }}" style="width:150px" placeholder="Requirement">
+                      <input type="number" class="nat" value="{{ n.count }}" onChange="{{ n.onCount }}" style="width:52px;text-align:center" title="How many">
+                      <select class="nat" value="{{ n.importance }}" onChange="{{ n.onImp }}" style="width:120px">
+                        <option value="critical">Critical</option>
+                        <option value="important">Important</option>
+                        <option value="preferred">Preferred</option>
+                      </select>
+                      <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1">
+                        <sc-for list="{{ n.roleChips }}" as="rc" hint-placeholder-count="6">
+                          <button onClick="{{ rc.onClick }}" style="{{ rc.style }}">{{ rc.label }}</button>
+                        </sc-for>
+                      </div>
+                      <button onClick="{{ n.onRemove }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;padding:2px 5px">×</button>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= ROLES ================= -->
+    <sc-if value="{{ isRoles }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:720px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">Roles</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:2px">Set how important each is to cover</div>
+        </div>
+        <div style="flex:1"></div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ addRole }}" hint-size="auto,38px">+ Add role</x-import>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ roleRows }}" as="r" hint-placeholder-count="6">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:11px 14px">
+            <input class="nat" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:200px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Priority</span>
+              <select class="nat" value="{{ r.importance }}" onChange="{{ r.onImp }}" style="width:130px">
+                <option value="critical">Critical</option>
+                <option value="important">Important</option>
+                <option value="preferred">Preferred</option>
+              </select>
+            </div>
+            <button onClick="{{ r.toggleKey }}" style="{{ r.keyStyle }}">{{ r.keyLabel }}</button>
+            <div style="flex:1"></div>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">{{ r.usage }}</span>
+            <button onClick="{{ r.onRemove }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:17px;padding:3px 6px">×</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= RULES & PRESETS ================= -->
+    <sc-if value="{{ isPresets }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:860px;display:flex;flex-direction:column;gap:26px">
+      <div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">Rules</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:14px">Guardrails the auto-generator respects</div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px">
+          <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:13px 15px;min-width:200px">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:3px">Full-time hours threshold</div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-bottom:9px">Count as FT at or above</div>
+            <div style="display:flex;align-items:center;gap:8px"><input type="number" class="nat" value="{{ ruleFtThreshold }}" onChange="{{ onFtThreshold }}" style="width:62px;text-align:center"><span style="font-size:12px;color:var(--text-secondary)">hrs / week</span></div>
+          </div>
+          <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:13px 15px;min-width:200px">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:3px">Min full-timers scheduled</div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-bottom:9px">At least this many hit FT</div>
+            <div style="display:flex;align-items:center;gap:8px"><input type="number" class="nat" value="{{ ruleMinFt }}" onChange="{{ onMinFt }}" style="width:62px;text-align:center"><span style="font-size:12px;color:var(--text-secondary)">people</span></div>
+          </div>
+          <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:13px 15px;min-width:200px">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:3px">Max consecutive days</div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);margin-bottom:9px">No one works more in a row</div>
+            <div style="display:flex;align-items:center;gap:8px"><input type="number" class="nat" value="{{ ruleMaxConsec }}" onChange="{{ onMaxConsec }}" style="width:62px;text-align:center"><span style="font-size:12px;color:var(--text-secondary)">days</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px">Saved setups</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:14px">Save an optimal roster + rules, reload it any time to regenerate</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input class="nat" value="{{ presetName }}" onChange="{{ onPresetName }}" placeholder="e.g. Summer weekend-heavy" style="flex:1;max-width:340px">
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="primary" on-click="{{ savePreset }}" hint-size="auto,40px">Save current setup</x-import>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <sc-if value="{{ hasPresets }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ presetRows }}" as="p" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:11px 14px">
+                <div style="display:flex;flex-direction:column">
+                  <span style="font-size:13px;font-weight:600">{{ p.name }}</span>
+                  <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">{{ p.meta }}</span>
+                </div>
+                <div style="flex:1"></div>
+                <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" size="sm" on-click="{{ p.onLoad }}" hint-size="auto,32px">Load &amp; generate</x-import>
+                <button onClick="{{ p.onDelete }}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 6px">×</button>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ noPresets }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:12.5px;color:var(--text-muted);font-family:var(--font-mono)">No saved setups yet.</div>
+          </sc-if>
+        </div>
+        <div style="margin-top:20px;border-top:1px solid var(--border-subtle);padding-top:16px">
+          <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="ghost" on-click="{{ resetDefaults }}" hint-size="auto,36px">Reset everything to defaults</x-import>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+</div>
+
+<div class="printonly" style="display:none;background:#fff;color:#0A1628;font-family:var(--font-body);padding:0">
+  <sc-for list="{{ printWeeks }}" as="pw" hint-placeholder-count="3">
+    <section style="page-break-after:always;padding:8px 0 20px">
+      <div style="display:flex;align-items:baseline;gap:12px;border-bottom:2px solid #347D72;padding-bottom:8px;margin-bottom:12px">
+        <span style="font-family:var(--font-display);font-weight:700;font-size:22px">Erik's · Burnsville</span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:#347D72;font-weight:600">{{ pw.label }} · {{ pw.range }}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:6px 8px;border:1px solid #cbd5e1;background:#eef2f7;font-family:var(--font-mono);font-size:11px;width:110px;color:#0A1628">Shift</th>
+            <sc-for list="{{ pw.headers }}" as="ph" hint-placeholder-count="7">
+              <th style="padding:6px 6px;border:1px solid #cbd5e1;background:#eef2f7;font-family:var(--font-mono);font-size:11px;color:#0A1628">
+                <div>{{ ph.wd }}</div>
+                <div style="color:#64748b;font-size:10px;font-weight:400">{{ ph.date }}</div>
+              </th>
+            </sc-for>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ pw.rows }}" as="pr" hint-placeholder-count="4">
+            <tr>
+              <td style="padding:6px 8px;border:1px solid #cbd5e1;vertical-align:top;background:#f8fafc">
+                <div style="font-weight:700;font-size:13px">{{ pr.name }}</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:#64748b">{{ pr.time }}</div>
+              </td>
+              <sc-for list="{{ pr.cells }}" as="pc" hint-placeholder-count="7">
+                <td style="{{ pc.style }}">
+                  <sc-for list="{{ pc.people }}" as="pp" hint-placeholder-count="2">
+                    <div style="font-size:11px;line-height:1.45">{{ pp }}</div>
+                  </sc-for>
+                </td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-family:var(--font-mono);font-size:9px;color:#94a3b8">Generated from Erik's Burnsville scheduler · {{ printRange }}</div>
+    </section>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = this.makeDefaults();
+
+  // ---------- helpers ----------
+  makeDefaults() {
+    const roles = [
+      { id: 'gm',       name: 'General Manager',    abbr: 'GM',        importance: 'critical',  keyholder: true },
+      { id: 'svcmgr',   name: 'Service Manager',    abbr: 'SVC MGR',   importance: 'critical',  keyholder: true },
+      { id: 'salesmgr', name: 'Sales Manager',      abbr: 'SLS MGR',   importance: 'important', keyholder: true },
+      { id: 'asstsvc',  name: 'Asst. Service Mgr',  abbr: 'ASST SVC',  importance: 'important', keyholder: true },
+      { id: 'tech',     name: 'Service Tech',       abbr: 'TECH',      importance: 'important', keyholder: false },
+      { id: 'sales',    name: 'Sales',              abbr: 'SALES',     importance: 'preferred', keyholder: false },
+    ];
+    // days indexed 0=Sun .. 6=Sat ; seed Mon–Fri
+    const wd = (m,t,w,th,f,sa,su) => [su,m,t,w,th,f,sa];
+    const mf = [false,true,true,true,true,true,false];
+    const mkNeeds = (salesCount) => ([
+      { label: 'Manager on duty', roles: ['gm','svcmgr','salesmgr','asstsvc'], count: 1, importance: 'critical' },
+      { label: 'Service tech',    roles: ['tech','svcmgr','asstsvc'],          count: 1, importance: 'important' },
+      { label: 'Sales floor',     roles: ['sales','salesmgr'],                 count: salesCount, importance: 'important' },
+    ]);
+    const shifts = [
+      { id: 'open',  name: 'Open',     abbr: 'OPEN',  start: '09:00', end: '17:00', days: mf.slice(), needs: mkNeeds(2) },
+      { id: 'close', name: 'Close',    abbr: 'CLOSE', start: '12:00', end: '20:00', days: mf.slice(), needs: mkNeeds(2) },
+      { id: 'sat',   name: 'Saturday', abbr: 'SAT',   start: '11:00', end: '19:00', days: [false,false,false,false,false,false,true], needs: mkNeeds(3) },
+      { id: 'sun',   name: 'Sunday',   abbr: 'SUN',   start: '11:00', end: '17:00', days: [true,false,false,false,false,false,false], needs: mkNeeds(2) },
+    ];
+    const P = (str) => str.split('').map(c => c === '1'); // Su Mo Tu We Th Fr Sa
+    const emp = (name, roleId, type, target, key, av) => ({
+      id: 'e' + Math.random().toString(36).slice(2, 9),
+      name, roleId, type, target, keyholder: key, avail: P(av),
+    });
+    const employees = [
+      emp('Taylor Koens',   'gm',       'FT', 40, true,  '1111111'),
+      emp('Dana Ortiz',     'svcmgr',   'FT', 40, true,  '0111111'),
+      emp('Priya Shah',     'salesmgr', 'FT', 38, true,  '1111110'),
+      emp('Marcus Bell',    'asstsvc',  'FT', 34, true,  '1111111'),
+      emp('Ava Johnson',    'asstsvc',  'PT', 24, true,  '1100111'),
+      emp('Sam Rivera',     'tech',     'FT', 36, false, '0111110'),
+      emp('Lucas Meyer',    'tech',     'FT', 34, false, '0111111'),
+      emp('Jordan Lee',     'tech',     'PT', 20, false, '1100011'),
+      emp('Chris Okafor',   'tech',     'PT', 22, false, '0011111'),
+      emp('Owen Fischer',   'tech',     'PT', 20, false, '1110001'),
+      emp('Henry Cole',     'tech',     'PT', 20, false, '1110011'),
+      emp('Maya Patel',     'sales',    'FT', 30, false, '1111111'),
+      emp('Ethan Moore',    'sales',    'PT', 24, false, '1111100'),
+      emp('Sofia Reyes',    'sales',    'PT', 22, false, '0011011'),
+      emp('Noah Kim',       'sales',    'PT', 20, false, '0110110'),
+      emp('Nora Silva',     'sales',    'PT', 20, false, '0111101'),
+      emp('Zoe Anderson',   'sales',    'PT', 18, false, '1011010'),
+      emp('Ella Brooks',    'sales',    'PT', 18, false, '1000011'),
+      emp('Liam Carter',    'sales',    'PT', 16, false, '1100001'),
+      emp('Grace Wu',       'sales',    'PT', 15, false, '0000111'),
+    ];
+    return {
+      activeTab: 'schedule',
+      viewMode: 'grid',
+      numWeeks: 3,
+      weekScope: -1,
+      dayIndex: 0,
+      startDate: this.upcomingSaturday(),
+      roles, shifts, employees,
+      rules: { ftThreshold: 25, minFt: 2, maxConsec: 5 },
+      schedule: {},
+      done: {},
+      presets: [],
+      presetName: '',
+      copied: false,
+      loaded: false,
+    };
+  }
+
+  upcomingSaturday() {
+    const t = new Date();
+    const diff = (6 - t.getDay() + 7) % 7;
+    t.setDate(t.getDate() + diff);
+    return this.toISO(t);
+  }
+  toISO(d) {
+    const p = (n) => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  addDays(iso, n) { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + n); return d; }
+  dur(s) {
+    const a = s.start.split(':'), b = s.end.split(':');
+    return ((+b[0] * 60 + +b[1]) - (+a[0] * 60 + +a[1])) / 60;
+  }
+  ampm(hhmm) {
+    let h = +hhmm.split(':')[0]; const m = +hhmm.split(':')[1];
+    const ap = h >= 12 ? 'p' : 'a'; let hh = h % 12; if (hh === 0) hh = 12;
+    return hh + (m ? ':' + String(m).padStart(2,'0') : '') + ap;
+  }
+  roleById(id) { return this.state.roles.find(r => r.id === id) || { name: '?', abbr: '?', keyholder: false }; }
+  shiftById(id) { return this.state.shifts.find(s => s.id === id) || null; }
+  impRank(i) { return i === 'critical' ? 3 : i === 'important' ? 2 : 1; }
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem('eriks_sched_v3');
+      if (raw) {
+        const d = JSON.parse(raw);
+        this.setState(s => ({ ...s, ...d, copied: false, loaded: true }));
+        return;
+      }
+    } catch (e) {}
+    // generate an initial schedule so the grid isn't empty on first open
+    this.setState({ loaded: true }, () => this.generate());
+  }
+
+  persist() {
+    try {
+      const { activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName } = this.state;
+      localStorage.setItem('eriks_sched_v3', JSON.stringify({ activeTab, viewMode, weekScope, dayIndex, startDate, roles, shifts, employees, rules, schedule, done, presets, presetName }));
+    } catch (e) {}
+  }
+  update(patch, cb) { this.setState(patch, () => { this.persist(); if (cb) cb(); }); }
+
+  // ---------- generator ----------
+  totalDays() { return (this.state.numWeeks || 3) * 7; }
+  emptySchedule() { const sc = {}; const N = this.totalDays(); this.state.employees.forEach(e => sc[e.id] = Array(N).fill(null)); return sc; }
+
+  generate() {
+    const { employees, shifts, startDate, rules } = this.state;
+    const N = this.totalDays(); const NW = this.state.numWeeks || 3;
+    const sc = {}; employees.forEach(e => sc[e.id] = Array(N).fill(null));
+    const wkHours = {}; employees.forEach(e => wkHours[e.id] = Array(NW).fill(0));
+    const consec = {}; employees.forEach(e => consec[e.id] = 0); // trailing consecutive days
+
+    for (let d = 0; d < N; d++) {
+      const date = this.addDays(startDate, d);
+      const wd = date.getDay();
+      const week = Math.floor(d / 7);
+      const worked = {}; // empId assigned today
+      const active = shifts.filter(s => s.days[wd]).slice().sort((a, b) => a.start.localeCompare(b.start));
+
+      active.forEach(shift => {
+        const h = this.dur(shift);
+        const needs = shift.needs.slice().sort((a, b) => (this.impRank(b.importance) - this.impRank(a.importance)) || (a.roles.length - b.roles.length));
+        needs.forEach(need => {
+          for (let c = 0; c < need.count; c++) {
+            const cands = employees.filter(e => {
+              if (worked[e.id]) return false;
+              if (!need.roles.includes(e.roleId)) return false;
+              if (!e.avail[wd]) return false;
+              if (consec[e.id] >= rules.maxConsec) return false;
+              if (wkHours[e.id][week] + h > e.target + 0.01) return false;
+              return true;
+            });
+            if (!cands.length) continue;
+            cands.sort((a, b) => {
+              const ra = a.target - wkHours[a.id][week];
+              const rb = b.target - wkHours[b.id][week];
+              if (rb !== ra) return rb - ra;              // fill people furthest below their target first
+              return (b.type === 'FT' ? 1 : 0) - (a.type === 'FT' ? 1 : 0);
+            });
+            const pick = cands[0];
+            sc[pick.id][d] = shift.id;
+            worked[pick.id] = true;
+            wkHours[pick.id][week] += h;
+          }
+        });
+      });
+      // update consecutive counters
+      employees.forEach(e => { consec[e.id] = sc[e.id][d] ? consec[e.id] + 1 : 0; });
+    }
+    this.update({ schedule: sc, done: {} });
+  }
+
+  clearSchedule() { this.update({ schedule: this.emptySchedule(), done: {} }); }
+
+  toggleDone(d) { const done = { ...this.state.done }; if (done[d]) delete done[d]; else done[d] = true; this.update({ done }); }
+  resetProgress() { this.update({ done: {} }); }
+
+  cycle(empId, d) {
+    if (this.state.done && this.state.done[d]) return; // day is locked / entered
+    const date = this.addDays(this.state.startDate, d);
+    const wd = date.getDay();
+    const active = this.state.shifts.filter(s => s.days[wd]);
+    if (!active.length) return;
+    const opts = [null, ...active.map(s => s.id)];
+    const cur = (this.state.schedule[empId] || [])[d] || null;
+    const idx = opts.indexOf(cur);
+    const next = opts[(idx + 1) % opts.length];
+    const sc = {}; Object.keys(this.state.schedule).forEach(k => sc[k] = this.state.schedule[k].slice());
+    if (!sc[empId]) sc[empId] = Array(this.totalDays()).fill(null);
+    sc[empId][d] = next;
+    this.update({ schedule: sc });
+  }
+
+  // per-day coverage: returns array of {shift, needs:[{need,filled}], filledTotal, needTotal, worst}
+  coverageForDay(d) {
+    const { employees, shifts, schedule, startDate } = this.state;
+    const wd = this.addDays(startDate, d).getDay();
+    const active = shifts.filter(s => s.days[wd]);
+    return active.map(shift => {
+      const pool = employees.filter(e => (schedule[e.id] || [])[d] === shift.id);
+      const used = {};
+      const needs = shift.needs.slice().sort((a, b) => (this.impRank(b.importance) - this.impRank(a.importance)) || (a.roles.length - b.roles.length));
+      let filledTotal = 0, needTotal = 0, worst = 0;
+      const detail = needs.map(need => {
+        needTotal += need.count;
+        let filled = 0;
+        for (const e of pool) {
+          if (filled >= need.count) break;
+          if (used[e.id]) continue;
+          if (need.roles.includes(e.roleId)) { used[e.id] = true; filled++; }
+        }
+        filledTotal += filled;
+        if (filled < need.count) worst = Math.max(worst, this.impRank(need.importance));
+        return { need, filled };
+      });
+      return { shift, detail, filledTotal, needTotal, worst, headcount: pool.length };
+    });
+  }
+
+  // ---------- setters ----------
+  setTab(v) { this.update({ activeTab: v }); }
+  setViewMode(v) { this.update({ viewMode: v }); }
+  setScope(w) { this.update({ weekScope: w }); }
+  setNumWeeks(n) { const nw = Math.min(16, Math.max(1, parseInt(n) || 3)); this.update({ numWeeks: nw, weekScope: -1, dayIndex: 0 }, () => this.generate()); }
+  setDay(i) { this.update({ dayIndex: Math.min(this.totalDays() - 1, Math.max(0, i)) }); }
+  onStartDate(e) { this.update({ startDate: e.target.value }, () => this.generate()); }
+
+  setEmp(id, field, val) { this.update({ employees: this.state.employees.map(e => e.id === id ? { ...e, [field]: val } : e) }); }
+  toggleAvail(id, wd) { this.update({ employees: this.state.employees.map(e => e.id === id ? { ...e, avail: e.avail.map((a, i) => i === wd ? !a : a) } : e) }); }
+  addEmp() {
+    const ne = { id: 'e' + Math.random().toString(36).slice(2, 9), name: 'New employee', roleId: 'sales', type: 'PT', target: 16, keyholder: false, avail: [true,true,true,true,true,true,true] };
+    this.update({ employees: [...this.state.employees, ne] });
+  }
+  removeEmp(id) {
+    const sc = { ...this.state.schedule }; delete sc[id];
+    this.update({ employees: this.state.employees.filter(e => e.id !== id), schedule: sc });
+  }
+
+  setShift(id, field, val) { this.update({ shifts: this.state.shifts.map(s => s.id === id ? { ...s, [field]: val } : s) }); }
+  toggleShiftDay(id, wd) { this.update({ shifts: this.state.shifts.map(s => s.id === id ? { ...s, days: s.days.map((x, i) => i === wd ? !x : x) } : s) }); }
+  addShift() {
+    const ns = { id: 's' + Math.random().toString(36).slice(2, 7), name: 'New shift', abbr: 'SHIFT', start: '10:00', end: '18:00', days: [false,true,true,true,true,true,false], needs: [{ label: 'Sales floor', roles: ['sales','salesmgr'], count: 1, importance: 'important' }] };
+    this.update({ shifts: [...this.state.shifts, ns] });
+  }
+  removeShift(id) { this.update({ shifts: this.state.shifts.filter(s => s.id !== id) }); }
+  setNeed(sid, ni, field, val) {
+    this.update({ shifts: this.state.shifts.map(s => s.id !== sid ? s : { ...s, needs: s.needs.map((n, i) => i === ni ? { ...n, [field]: val } : n) }) });
+  }
+  toggleNeedRole(sid, ni, roleId) {
+    this.update({ shifts: this.state.shifts.map(s => {
+      if (s.id !== sid) return s;
+      return { ...s, needs: s.needs.map((n, i) => {
+        if (i !== ni) return n;
+        const has = n.roles.includes(roleId);
+        return { ...n, roles: has ? n.roles.filter(r => r !== roleId) : [...n.roles, roleId] };
+      }) };
+    }) });
+  }
+  addNeed(sid) { this.update({ shifts: this.state.shifts.map(s => s.id !== sid ? s : { ...s, needs: [...s.needs, { label: 'Requirement', roles: ['sales'], count: 1, importance: 'preferred' }] }) }); }
+  removeNeed(sid, ni) { this.update({ shifts: this.state.shifts.map(s => s.id !== sid ? s : { ...s, needs: s.needs.filter((n, i) => i !== ni) }) }); }
+
+  setRole(id, field, val) { this.update({ roles: this.state.roles.map(r => r.id === id ? { ...r, [field]: val } : r) }); }
+  addRole() {
+    const id = 'r' + Math.random().toString(36).slice(2, 7);
+    this.update({ roles: [...this.state.roles, { id, name: 'New role', abbr: 'ROLE', importance: 'preferred', keyholder: false }] });
+  }
+  removeRole(id) {
+    const inUse = this.state.employees.some(e => e.roleId === id) || this.state.shifts.some(s => s.needs.some(n => n.roles.includes(id)));
+    if (inUse) return;
+    this.update({ roles: this.state.roles.filter(r => r.id !== id) });
+  }
+
+  setRule(field, val) { this.update({ rules: { ...this.state.rules, [field]: val } }); }
+
+  onPresetName(e) { this.update({ presetName: e.target.value }); }
+  savePreset() {
+    const name = (this.state.presetName || '').trim() || ('Setup ' + (this.state.presets.length + 1));
+    const cfg = JSON.parse(JSON.stringify({ roles: this.state.roles, shifts: this.state.shifts, employees: this.state.employees, rules: this.state.rules }));
+    const p = { id: 'p' + Math.random().toString(36).slice(2, 8), name, cfg, savedAt: Date.now(), teamCount: this.state.employees.length, shiftCount: this.state.shifts.length };
+    this.update({ presets: [p, ...this.state.presets], presetName: '' });
+  }
+  loadPreset(id) {
+    const p = this.state.presets.find(x => x.id === id); if (!p) return;
+    const c = JSON.parse(JSON.stringify(p.cfg));
+    this.update({ roles: c.roles, shifts: c.shifts, employees: c.employees, rules: c.rules, activeTab: 'schedule', done: {} }, () => this.generate());
+  }
+  deletePreset(id) { this.update({ presets: this.state.presets.filter(p => p.id !== id) }); }
+  resetDefaults() {
+    const d = this.makeDefaults();
+    this.update({ ...d, loaded: true }, () => this.generate());
+  }
+
+  // ---------- export ----------
+  scheduleText() {
+    const { employees, shifts, startDate } = this.state;
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const N = this.totalDays(); const NW = this.state.numWeeks || 3;
+    const start = this.addDays(startDate, 0), end = this.addDays(startDate, N - 1);
+    let out = "ERIK'S — BURNSVILLE · " + NW + "-WEEK SCHEDULE\n";
+    out += (start.getMonth()+1)+'/'+start.getDate()+' – '+(end.getMonth()+1)+'/'+end.getDate()+'\n';
+    for (let d = 0; d < N; d++) {
+      if (d % 7 === 0) out += '\n===== WEEK ' + (d/7 + 1) + ' =====\n';
+      const date = this.addDays(startDate, d); const wd = date.getDay();
+      const active = shifts.filter(s => s.days[wd]);
+      if (!active.length) continue;
+      out += '\n' + days[wd] + ' ' + (date.getMonth()+1) + '/' + date.getDate() + '\n';
+      active.forEach(s => {
+        const people = employees.filter(e => (this.state.schedule[e.id] || [])[d] === s.id);
+        const names = people.map(e => e.name + ' (' + this.roleById(e.roleId).abbr + ')').join(', ') || '— UNFILLED —';
+        out += '  ' + s.name.toUpperCase() + ' ' + this.ampm(s.start) + '-' + this.ampm(s.end) + ': ' + names + '\n';
+      });
+    }
+    return out;
+  }
+  copyText() {
+    const txt = this.scheduleText();
+    const done = () => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, done);
+    else done();
+  }
+  emailSchedule() {
+    const subj = "Erik's Burnsville — 3-week schedule";
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(this.scheduleText());
+  }
+  printSchedule() { window.print(); }
+
+  // ---------- render ----------
+  renderVals() {
+    const { activeTab, employees, shifts, roles, startDate, schedule, rules, presets } = this.state;
+    const shortWd = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const palette = [
+      { bg: 'rgba(153,213,202,0.15)', bd: 'rgba(153,213,202,0.45)', fg: '#C2E8E0' },
+      { bg: 'rgba(94,118,158,0.22)',  bd: 'rgba(148,174,209,0.30)', fg: '#C4CFDE' },
+      { bg: 'rgba(232,193,107,0.14)', bd: 'rgba(232,193,107,0.35)', fg: '#E8C16B' },
+      { bg: 'rgba(95,214,166,0.14)',  bd: 'rgba(95,214,166,0.35)',  fg: '#5FD6A6' },
+    ];
+    const shiftIndex = {}; shifts.forEach((s, i) => shiftIndex[s.id] = i);
+    const colorFor = (id) => palette[(shiftIndex[id] || 0) % palette.length];
+
+    // day meta
+    const numWeeks = this.state.numWeeks || 3;
+    const totalDays = numWeeks * 7;
+    const doneMap = this.state.done || {};
+    const dayMeta = [];
+    for (let d = 0; d < totalDays; d++) {
+      const date = this.addDays(startDate, d);
+      dayMeta.push({ d, wd: date.getDay(), date, weekend: (date.getDay() === 0 || date.getDay() === 6) });
+    }
+    const DAYW = 54;
+    const scope = this.state.weekScope;
+    const days = scope < 0 ? dayMeta : dayMeta.filter(m => Math.floor(m.d / 7) === scope);
+    const headerCells = [];
+    days.forEach(m => {
+      const dn = !!doneMap[m.d];
+      const dayOpenH = shifts.some(s => s.days[m.wd]);
+      headerCells.push({
+        top: shortWd[m.wd],
+        bottom: (m.date.getMonth() + 1) + '/' + m.date.getDate(),
+        isDay: true, done: dn,
+        onToggle: dayOpenH ? (() => this.toggleDone(m.d)) : undefined,
+        checkGlyph: dn ? '\u2713' : '',
+        checkStyle: dayOpenH
+          ? { display: 'block', margin: '0 auto 5px', width: '18px', height: '18px', padding: 0, borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700, lineHeight: '16px', border: '1px solid ' + (dn ? 'var(--border-accent)' : 'var(--border-strong)'), background: dn ? 'var(--accent)' : 'var(--navy-950)', color: dn ? 'var(--text-on-accent)' : 'transparent' }
+          : { display: 'none' },
+        style: { width: DAYW + 'px', minWidth: DAYW + 'px', textAlign: 'center', padding: '7px 2px', position: 'sticky', top: 0, zIndex: 4, background: dn ? 'rgba(95,214,166,0.14)' : (m.weekend ? 'var(--navy-700)' : 'var(--navy-800)'), color: dn ? 'var(--success)' : (m.weekend ? 'var(--text-secondary)' : 'var(--text-primary)'), borderBottom: '1px solid ' + (dn ? 'var(--success)' : 'var(--border-default)'), borderLeft: '1px solid var(--border-subtle)' },
+      });
+      if ((m.d + 1) % 7 === 0) {
+        headerCells.push({ top: 'W' + (m.d + 1) / 7, bottom: 'hrs', checkStyle: { display: 'none' }, checkGlyph: '', style: { width: '40px', minWidth: '40px', textAlign: 'center', padding: '7px 2px', position: 'sticky', top: 0, zIndex: 4, background: 'var(--navy-900)', color: 'var(--text-accent)', borderBottom: '1px solid var(--border-default)', borderLeft: '1px solid var(--border-default)' } });
+      }
+    });
+
+    // weekly hours
+    const durMap = {}; shifts.forEach(s => durMap[s.id] = this.dur(s));
+    const wkHours = {}; employees.forEach(e => wkHours[e.id] = Array(numWeeks).fill(0));
+    dayMeta.forEach(m => employees.forEach(e => { const sid = (schedule[e.id] || [])[m.d]; if (sid) wkHours[e.id][Math.floor(m.d / 7)] += (durMap[sid] || 0); }));
+
+    const cellTd = (extra) => ({ width: DAYW + 'px', minWidth: DAYW + 'px', height: '44px', padding: '2px', borderLeft: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', ...extra });
+
+    const gridRows = employees.map(e => {
+      const cells = [];
+      days.forEach(m => {
+        const sid = (schedule[e.id] || [])[m.d];
+        const active = shifts.filter(s => s.days[m.wd]);
+        const locked = !!doneMap[m.d];
+        const clickable = active.length > 0 && !locked;
+        let inner, label = '', sub = '', title = '';
+        if (sid) {
+          const s = this.shiftById(sid); const c = colorFor(sid);
+          label = s ? s.abbr : '?';
+          sub = s ? (this.ampm(s.start) + '-' + this.ampm(s.end)) : '';
+          title = e.name + ' — ' + (s ? s.name : '');
+          inner = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', borderRadius: '5px', background: c.bg, border: '1px solid ' + c.bd, color: c.fg };
+        } else {
+          const avail = e.avail[m.wd];
+          title = avail ? (clickable ? 'Click to assign' : 'Store closed') : (e.name + ' unavailable');
+          label = (!avail && clickable) ? '·' : '';
+          inner = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', borderRadius: '5px', color: avail ? 'var(--navy-400)' : 'var(--navy-500)', background: (!avail ? 'repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(148,174,209,0.05) 4px,rgba(148,174,209,0.05) 6px)' : 'transparent') };
+        }
+        if (locked && active.length > 0) title = 'Locked — uncheck this day to edit';
+        cells.push({
+          tdStyle: cellTd({ background: doneMap[m.d] ? 'rgba(95,214,166,0.05)' : (m.weekend && !sid ? 'rgba(94,118,158,0.05)' : 'transparent'), cursor: clickable ? 'pointer' : 'default', opacity: doneMap[m.d] ? 0.45 : 1 }),
+          inner, label, sub, title,
+          onClick: clickable ? (() => this.cycle(e.id, m.d)) : undefined,
+        });
+        if ((m.d + 1) % 7 === 0) {
+          const wk = Math.floor(m.d / 7); const hrs = wkHours[e.id][wk];
+          const over = hrs >= rules.ftThreshold;
+          cells.push({
+            tdStyle: cellTd({ width: '40px', minWidth: '40px', borderLeft: '1px solid var(--border-default)', background: 'var(--navy-900)' }),
+            inner: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: over ? 'var(--text-accent)' : 'var(--text-muted)', fontWeight: over ? '700' : '400' },
+            label: hrs ? hrs + 'h' : '·', sub: '', title: e.name + ' · week ' + (wk + 1) + ' · ' + hrs + 'h', onClick: undefined,
+          });
+        }
+      });
+      const isFT = e.type === 'FT';
+      return {
+        name: e.name,
+        roleShort: this.roleById(e.roleId).abbr + (e.keyholder ? ' · key' : ''),
+        ftBadge: isFT ? 'FT' : 'PT',
+        ftBadgeStyle: { fontFamily: 'var(--font-mono)', fontSize: '8.5px', fontWeight: 600, padding: '1px 5px', borderRadius: '999px', letterSpacing: '0.06em', color: isFT ? 'var(--text-accent)' : 'var(--text-muted)', background: isFT ? 'var(--accent-soft)' : 'rgba(148,174,209,0.1)', border: '1px solid ' + (isFT ? 'var(--border-accent)' : 'var(--border-subtle)') },
+        cells,
+      };
+    });
+
+    // coverage rows (one per shift) + on-duty row
+    const covBase = (extra) => ({ width: DAYW + 'px', minWidth: DAYW + 'px', height: '32px', textAlign: 'center', borderLeft: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', ...extra });
+    const coverageRows = shifts.map((shift, si) => {
+      const cells = [];
+      days.forEach((m) => {
+        const active = shifts.filter(s => s.days[m.wd]).some(s => s.id === shift.id);
+        if (!active) {
+          cells.push({ tdStyle: covBase({ background: 'var(--navy-900)', color: 'var(--navy-400)' }), label: '·', title: '' });
+        } else {
+          const cov = this.coverageForDay(m.d).find(c => c.shift.id === shift.id);
+          const ok = cov.filledTotal >= cov.needTotal && cov.worst === 0;
+          const color = ok ? 'var(--success)' : cov.worst >= 3 ? 'var(--danger)' : 'var(--warning)';
+          const bg = ok ? 'rgba(95,214,166,0.08)' : cov.worst >= 3 ? 'rgba(240,128,110,0.10)' : 'rgba(232,193,107,0.08)';
+          cells.push({ tdStyle: covBase({ background: bg, color }), label: cov.filledTotal + '/' + cov.needTotal, title: shift.name + ' coverage' });
+        }
+        if ((m.d + 1) % 7 === 0) cells.push({ tdStyle: covBase({ width: '40px', minWidth: '40px', background: 'var(--navy-900)', borderLeft: '1px solid var(--border-default)' }), label: '', title: '' });
+      });
+      return { label: shift.abbr + ' cover', cells };
+    });
+    // on-duty total row
+    {
+      const cells = [];
+      days.forEach(m => {
+        const total = employees.filter(e => (schedule[e.id] || [])[m.d]).length;
+        cells.push({ tdStyle: covBase({ background: 'var(--navy-850)', color: total ? 'var(--text-secondary)' : 'var(--navy-400)', fontWeight: 600 }), label: total || '·', title: 'On duty' });
+        if ((m.d + 1) % 7 === 0) cells.push({ tdStyle: covBase({ width: '40px', minWidth: '40px', background: 'var(--navy-900)', borderLeft: '1px solid var(--border-default)' }), label: '', title: '' });
+      });
+      coverageRows.push({ label: 'On duty', cells });
+    }
+
+    // gaps summary + list
+    const days3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let totalGaps = 0, critGaps = 0; const gapList = [];
+    dayMeta.forEach((m) => {
+      this.coverageForDay(m.d).forEach(cov => {
+        cov.detail.forEach(det => {
+          const miss = det.need.count - det.filled;
+          if (miss > 0) {
+            totalGaps += miss;
+            const crit = det.need.importance === 'critical';
+            if (crit) critGaps += miss;
+            if (gapList.length < 8) {
+              gapList.push({
+                when: days3[m.wd] + ' ' + (m.date.getMonth() + 1) + '/' + m.date.getDate(),
+                what: cov.shift.name + ' · ' + det.need.label + (miss > 1 ? ' ×' + miss : ''),
+                dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: crit ? 'var(--danger)' : 'var(--warning)' },
+              });
+            }
+          }
+        });
+      });
+    });
+    const ftCount = employees.filter(e => wkHours[e.id].some(h => h >= rules.ftThreshold)).length;
+
+    const legend = shifts.map((s, i) => {
+      const c = colorFor(s.id);
+      return { name: s.name, time: this.ampm(s.start) + '–' + this.ampm(s.end), swatch: { width: '16px', height: '16px', borderRadius: '4px', background: c.bg, border: '1px solid ' + c.bd, flex: 'none' } };
+    });
+
+    const start = this.addDays(startDate, 0), end = this.addDays(startDate, totalDays - 1);
+    const rangeLabel = (start.getMonth() + 1) + '/' + start.getDate() + ' – ' + (end.getMonth() + 1) + '/' + end.getDate() + ' · ' + numWeeks + (numWeeks === 1 ? ' week' : ' weeks');
+
+    // ----- team rows -----
+    const segBtn = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '11px', padding: '6px 11px', border: 'none', cursor: 'pointer', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--text-on-accent)' : 'var(--text-muted)', fontWeight: on ? 700 : 400 });
+    const dayBtn = (on) => ({ width: '26px', height: '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: on ? 700 : 400, cursor: 'pointer', padding: 0 });
+    const keyBtn = (on) => ({ width: '30px', height: '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', cursor: 'pointer', fontSize: '13px', padding: 0 });
+    // availability display order Sa Su Mo Tu We Th Fr -> wd 6,0,1,2,3,4,5
+    const availOrder = [6, 0, 1, 2, 3, 4, 5];
+    const roleOptions = roles.map(r => ({ value: r.id, label: r.name }));
+    const empRows = employees.map(e => ({
+      id: e.id, name: e.name, roleId: e.roleId, target: e.target,
+      onName: (ev) => this.setEmp(e.id, 'name', ev.target.value),
+      onRole: (ev) => this.setEmp(e.id, 'roleId', ev.target.value),
+      onTarget: (ev) => this.setEmp(e.id, 'target', Math.max(0, parseInt(ev.target.value) || 0)),
+      setFT: () => this.setEmp(e.id, 'type', 'FT'),
+      setPT: () => this.setEmp(e.id, 'type', 'PT'),
+      ftStyle: segBtn(e.type === 'FT'), ptStyle: segBtn(e.type === 'PT'),
+      toggleKey: () => this.setEmp(e.id, 'keyholder', !e.keyholder),
+      keyStyle: keyBtn(e.keyholder), keyGlyph: e.keyholder ? '✓' : '–',
+      onRemove: () => this.removeEmp(e.id),
+      avail: availOrder.map(wd => ({ label: shortWd[wd], onClick: () => this.toggleAvail(e.id, wd), style: dayBtn(e.avail[wd]) })),
+    }));
+
+    // ----- shift rows -----
+    const roleChip = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '9.5px', padding: '3px 7px', borderRadius: '999px', cursor: 'pointer', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-850)', color: on ? 'var(--text-accent)' : 'var(--text-muted)' });
+    const shiftRows = shifts.map((s, si) => ({
+      id: s.id, name: s.name, start: s.start, end: s.end,
+      accent: colorFor(s.id).bd,
+      hours: this.dur(s) + 'h shift',
+      onName: (ev) => this.setShift(s.id, 'name', ev.target.value),
+      onStart: (ev) => this.setShift(s.id, 'start', ev.target.value),
+      onEnd: (ev) => this.setShift(s.id, 'end', ev.target.value),
+      onRemove: () => this.removeShift(s.id),
+      addNeed: () => this.addNeed(s.id),
+      days: availOrder.map(wd => ({ label: shortWd[wd], onClick: () => this.toggleShiftDay(s.id, wd), style: dayBtn(s.days[wd]) })),
+      needs: s.needs.map((n, ni) => ({
+        label: n.label, count: n.count, importance: n.importance,
+        onLabel: (ev) => this.setNeed(s.id, ni, 'label', ev.target.value),
+        onCount: (ev) => this.setNeed(s.id, ni, 'count', Math.max(1, parseInt(ev.target.value) || 1)),
+        onImp: (ev) => this.setNeed(s.id, ni, 'importance', ev.target.value),
+        onRemove: () => this.removeNeed(s.id, ni),
+        roleChips: roles.map(r => ({ label: r.abbr, onClick: () => this.toggleNeedRole(s.id, ni, r.id), style: roleChip(n.roles.includes(r.id)) })),
+      })),
+    }));
+
+    // ----- role rows -----
+    const roleRows = roles.map(r => {
+      const used = employees.filter(e => e.roleId === r.id).length;
+      return {
+        id: r.id, name: r.name, importance: r.importance,
+        onName: (ev) => this.setRole(r.id, 'name', ev.target.value),
+        onImp: (ev) => this.setRole(r.id, 'importance', ev.target.value),
+        toggleKey: () => this.setRole(r.id, 'keyholder', !r.keyholder),
+        keyStyle: { fontFamily: 'var(--font-mono)', fontSize: '10px', padding: '6px 11px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', border: '1px solid ' + (r.keyholder ? 'var(--border-accent)' : 'var(--border-subtle)'), background: r.keyholder ? 'var(--accent-soft)' : 'var(--navy-800)', color: r.keyholder ? 'var(--text-accent)' : 'var(--text-muted)' },
+        keyLabel: r.keyholder ? 'Key holder' : 'Not key',
+        usage: used + ' on team',
+        onRemove: () => this.removeRole(r.id),
+      };
+    });
+
+    // ----- presets -----
+    const presetRows = presets.map(p => ({
+      name: p.name,
+      meta: p.teamCount + ' people · ' + p.shiftCount + ' shifts',
+      onLoad: () => this.loadPreset(p.id),
+      onDelete: () => this.deletePreset(p.id),
+    }));
+
+    // ----- view mode + scope controls -----
+    const viewMode = this.state.viewMode;
+    const isGridView = viewMode === 'grid', isDayViewM = viewMode === 'day', isShiftViewM = viewMode === 'shift';
+    const seg = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '11.5px', padding: '8px 15px', border: 'none', cursor: 'pointer', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--text-on-accent)' : 'var(--text-secondary)', fontWeight: on ? 700 : 500 });
+    const scopeSeg = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '10.5px', padding: '7px 12px', border: 'none', cursor: 'pointer', background: on ? 'var(--navy-600)' : 'transparent', color: on ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: on ? 700 : 500 });
+    const navBtn = { width: '34px', height: '34px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', background: 'var(--navy-800)', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '18px', lineHeight: 1 };
+    const initials = (n) => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+    const wdFull = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const scopeTabs = [{ label: 'All ' + numWeeks + ' wk', style: scopeSeg(scope < 0), onClick: () => this.setScope(-1) }].concat(
+      Array.from({ length: numWeeks }, (_, w) => ({ label: 'Wk ' + (w + 1), style: scopeSeg(scope === w), onClick: () => this.setScope(w) }))
+    );
+    // ----- progress -----
+    const openDaysArr = dayMeta.filter(m => shifts.some(s => s.days[m.wd]));
+    const openTotal = openDaysArr.length;
+    const doneCount = openDaysArr.filter(m => doneMap[m.d]).length;
+    const progressLabel = doneCount + ' / ' + openTotal + ' days entered';
+    const progressPct = openTotal ? Math.round(doneCount / openTotal * 100) : 0;
+
+    // ----- day view -----
+    const di = Math.min(totalDays - 1, Math.max(0, this.state.dayIndex));
+    const dm = dayMeta[di];
+    const dcov = this.coverageForDay(di);
+    const dayView = {
+      label: wdFull[dm.wd] + ' · ' + (dm.date.getMonth() + 1) + '/' + dm.date.getDate(),
+      weekLabel: 'Week ' + (Math.floor(di / 7) + 1),
+      prev: () => this.setDay(di - 1), next: () => this.setDay(di + 1),
+      done: !!doneMap[di],
+      toggleDone: () => this.toggleDone(di),
+      doneBtnLabel: doneMap[di] ? '✓ Entered' : 'Mark entered',
+      doneBtnStyle: { fontFamily: 'var(--font-mono)', fontSize: '11.5px', fontWeight: 700, padding: '8px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: '1px solid ' + (doneMap[di] ? 'var(--border-accent)' : 'var(--border-default)'), background: doneMap[di] ? 'var(--accent)' : 'var(--navy-800)', color: doneMap[di] ? 'var(--text-on-accent)' : 'var(--text-secondary)' },
+      shifts: dcov.map(c => {
+        const c2 = colorFor(c.shift.id);
+        const ok = c.filledTotal >= c.needTotal && c.worst === 0;
+        const ppl = employees.filter(e => (schedule[e.id] || [])[di] === c.shift.id);
+        const gaps = c.detail.filter(d => d.filled < d.need.count).map(d => ({ label: d.need.label, miss: (d.need.count - d.filled), dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: d.need.importance === 'critical' ? 'var(--danger)' : 'var(--warning)' } }));
+        return {
+          name: c.shift.name, time: this.ampm(c.shift.start) + '–' + this.ampm(c.shift.end), accent: c2.bd,
+          covTone: ok ? 'success' : (c.worst >= 3 ? 'danger' : 'warning'),
+          covLabel: c.filledTotal + ' / ' + c.needTotal + ' filled',
+          people: ppl.map(e => ({ name: e.name, role: this.roleById(e.roleId).abbr, initials: initials(e.name) })),
+          empty: ppl.length === 0,
+          gaps, hasGaps: gaps.length > 0,
+        };
+      }),
+    };
+    const dayOpen = dcov.length > 0;
+
+    // ----- shift view (scoped) -----
+    const shiftView = { shifts: shifts.map(s => {
+      const c2 = colorFor(s.id);
+      const sdays = days.filter(m => s.days[m.wd]);
+      return {
+        name: s.name, time: this.ampm(s.start) + '–' + this.ampm(s.end), accent: c2.bd, empty: sdays.length === 0,
+        days: sdays.map(m => {
+          const ppl = employees.filter(e => (schedule[e.id] || [])[m.d] === s.id);
+          const cov = this.coverageForDay(m.d).find(c => c.shift.id === s.id);
+          const ok = cov && cov.filledTotal >= cov.needTotal && cov.worst === 0;
+          const tone = ok ? 'var(--success)' : (cov && cov.worst >= 3 ? 'var(--danger)' : 'var(--warning)');
+          return {
+            when: shortWd[m.wd] + ' ' + (m.date.getMonth() + 1) + '/' + m.date.getDate(),
+            people: ppl.map(e => ({ name: e.name, role: this.roleById(e.roleId).abbr })),
+            empty: ppl.length === 0,
+            countLabel: cov ? (cov.filledTotal + '/' + cov.needTotal) : '',
+            countStyle: { fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600, color: tone },
+          };
+        }),
+      };
+    }) };
+
+    // ----- print handout (all 3 weeks, grouped by shift) -----
+    const wdAbbr3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const ptdBase = { padding: '5px 6px', border: '1px solid #cbd5e1', verticalAlign: 'top' };
+    const printWeeks = Array.from({ length: numWeeks }, (_, w) => w).map(w => {
+      const wdays = dayMeta.filter(m => Math.floor(m.d / 7) === w);
+      return {
+        label: 'Week ' + (w + 1),
+        range: (wdays[0].date.getMonth() + 1) + '/' + wdays[0].date.getDate() + ' – ' + (wdays[6].date.getMonth() + 1) + '/' + wdays[6].date.getDate(),
+        headers: wdays.map(m => ({ wd: wdAbbr3[m.wd], date: (m.date.getMonth() + 1) + '/' + m.date.getDate() })),
+        rows: shifts.map(s => ({
+          name: s.name, time: this.ampm(s.start) + '–' + this.ampm(s.end),
+          cells: wdays.map(m => {
+            if (!s.days[m.wd]) return { style: { ...ptdBase, background: '#f1f5f9', color: '#94a3b8', textAlign: 'center' }, people: ['—'] };
+            const ppl = employees.filter(e => (schedule[e.id] || [])[m.d] === s.id).map(e => { const parts = e.name.split(' '); return parts[0] + ' ' + (parts[1] ? parts[1].charAt(0) + '.' : '') + ' (' + this.roleById(e.roleId).abbr + ')'; });
+            return { style: { ...ptdBase, background: ppl.length ? '#fff' : '#fef2f2', color: ppl.length ? '#0A1628' : '#b91c1c' }, people: ppl.length ? ppl : ['(open)'] };
+          }),
+        })),
+      };
+    });
+    const printRange = (start.getMonth() + 1) + '/' + start.getDate() + ' – ' + (end.getMonth() + 1) + '/' + end.getDate();
+
+    return {
+      tabs: [
+        { label: 'Schedule', value: 'schedule' },
+        { label: 'Team', value: 'team', count: employees.length },
+        { label: 'Shifts', value: 'shifts' },
+        { label: 'Roles', value: 'roles' },
+        { label: 'Rules & presets', value: 'presets' },
+      ],
+      activeTab,
+      setTab: (v) => this.setTab(v),
+      savedNote: 'Autosaved locally',
+      isSchedule: activeTab === 'schedule',
+      isTeam: activeTab === 'team',
+      isShifts: activeTab === 'shifts',
+      isRoles: activeTab === 'roles',
+      isPresets: activeTab === 'presets',
+
+      startDate,
+      onStartDate: (e) => this.onStartDate(e),
+      generate: () => this.generate(),
+      clearSchedule: () => this.clearSchedule(),
+      copyText: () => this.copyText(),
+      copyLabel: this.state.copied ? 'Copied ✓' : 'Copy text',
+      emailSchedule: () => this.emailSchedule(),
+      printSchedule: () => this.printSchedule(),
+
+      viewMode,
+      isGridView, isDayView: isDayViewM, isShiftView: isShiftViewM,
+      showScope: isGridView || isShiftViewM,
+      setGrid: () => this.setViewMode('grid'),
+      setDayView: () => this.setViewMode('day'),
+      setShiftView: () => this.setViewMode('shift'),
+      segGrid: seg(isGridView), segDay: seg(isDayViewM), segShift: seg(isShiftViewM),
+      scopeTabs,
+      numWeeks,
+      onNumWeeks: (e) => this.setNumWeeks(e.target.value),
+      progressLabel, progressPct, anyDone: doneCount > 0,
+      resetProgress: () => this.resetProgress(),
+      navBtn,
+      dayView, dayOpen, dayClosed: !dayOpen,
+      shiftView,
+      printWeeks, printRange,
+
+      rangeLabel,
+      headerCells, gridRows, coverageRows, legend,
+      critTone: critGaps ? 'danger' : 'success',
+      critLabel: critGaps ? critGaps + ' critical gaps' : 'No critical gaps',
+      gapTone: totalGaps ? 'warning' : 'neutral',
+      gapLabel: totalGaps + ' open slots',
+      ftLabel: ftCount + ' at full-time',
+      hasGaps: totalGaps > 0, noGaps: totalGaps === 0,
+      gapList,
+      gapMore: totalGaps > gapList.length ? '+ ' + (totalGaps - gapList.length) + ' more open slots' : '',
+
+      teamCountLabel: employees.length + ' people on roster',
+      empRows, roleOptions, addEmp: () => this.addEmp(),
+
+      shiftRows, addShift: () => this.addShift(),
+      roleRows, addRole: () => this.addRole(),
+
+      ruleFtThreshold: rules.ftThreshold,
+      ruleMinFt: rules.minFt,
+      ruleMaxConsec: rules.maxConsec,
+      onFtThreshold: (e) => this.setRule('ftThreshold', Math.max(1, parseInt(e.target.value) || 25)),
+      onMinFt: (e) => this.setRule('minFt', Math.max(0, parseInt(e.target.value) || 0)),
+      onMaxConsec: (e) => this.setRule('maxConsec', Math.max(1, parseInt(e.target.value) || 5)),
+
+      presetName: this.state.presetName,
+      onPresetName: (e) => this.onPresetName(e),
+      savePreset: () => this.savePreset(),
+      presetRows, hasPresets: presets.length > 0, noPresets: presets.length === 0,
+      resetDefaults: () => this.resetDefaults(),
+    };
+  }
+}
+</script>
+</body>
+</html>

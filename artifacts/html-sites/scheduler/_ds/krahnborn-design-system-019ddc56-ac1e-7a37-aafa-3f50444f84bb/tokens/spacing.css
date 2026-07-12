@@ -1,0 +1,61 @@
+/* ============================================================
+   KRAHNBORN — SPACING, RADIUS, SHADOW, MOTION, LAYOUT
+   4px base grid.
+   ============================================================ */
+
+:root {
+  /* --- Spacing (4px grid) --- */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* --- Radius --- */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-pill: 999px;
+
+  /* --- Border widths --- */
+  --border-hair: 1px; /* @kind other */
+  --border-thick: 2px; /* @kind other */
+
+  /* --- Shadows (tuned for dark canvas) --- */
+  --shadow-xs:  0 1px 2px rgba(5, 11, 22, 0.40);
+  --shadow-sm:  0 2px 6px rgba(5, 11, 22, 0.45);
+  --shadow-md:  0 8px 24px rgba(5, 11, 22, 0.50);
+  --shadow-lg:  0 20px 48px rgba(5, 11, 22, 0.55);
+  --shadow-xl:  0 36px 80px rgba(5, 11, 22, 0.60);
+
+  /* Teal glow — used sparingly on key interactive / hero accents */
+  --glow-teal:  0 0 0 1px rgba(153, 213, 202, 0.30), 0 8px 30px rgba(153, 213, 202, 0.18);
+  --ring-focus: 0 0 0 3px var(--accent-ring);
+
+  /* --- Motion --- */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --ease-snap:  cubic-bezier(0.34, 1.4, 0.64, 1); /* @kind other */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-base:   200ms; /* @kind other */
+  --dur-slow:   360ms; /* @kind other */
+
+  /* --- Layout --- */
+  --container-sm:  640px;
+  --container-md:  900px;
+  --container-lg:  1140px;
+  --container-xl:  1320px;
+  --gutter:        clamp(20px, 5vw, 80px); /* @kind spacing */
+}
