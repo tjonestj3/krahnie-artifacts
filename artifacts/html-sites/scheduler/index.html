@@ -78,6 +78,8 @@
     <!-- ================= SCHEDULE ================= -->
     <sc-if value="{{ isSchedule }}" hint-placeholder-val="{{ true }}">
     <div>
+      <!-- DESKTOP control bar -->
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
       <div class="noprint" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin-bottom:18px">
         <div style="display:flex;flex-direction:column;gap:5px">
           <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Week starts (Sat)</span>
@@ -96,6 +98,33 @@
           <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ printSchedule }}" hint-size="auto,40px">Print / PDF</x-import>
         </div>
       </div>
+      </sc-if>
+
+      <!-- MOBILE control bar: compact date/weeks row + prominent Auto-generate + ••• menu -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <div class="noprint" style="display:flex;flex-direction:column;gap:11px;margin-bottom:16px">
+        <div style="display:flex;align-items:flex-end;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0">
+            <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Week starts (Sat)</span>
+            <input type="date" class="nat" value="{{ startDate }}" onChange="{{ onStartDate }}" style="width:100%">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">Weeks</span>
+            <input type="number" min="1" max="16" class="nat" value="{{ numWeeks }}" onChange="{{ onNumWeeks }}" style="width:62px;text-align:center">
+          </div>
+          <button onClick="{{ toggleMore }}" title="More actions" style="width:48px;height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--navy-800);color:var(--text-secondary);font-size:18px;letter-spacing:1px;cursor:pointer;flex:none">•••</button>
+        </div>
+        <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="primary" mono="{{ true }}" on-click="{{ generate }}" hint-size="100%,48px">Auto-generate</x-import>
+        <sc-if value="{{ moreOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--navy-850);padding:11px">
+            <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="ghost" on-click="{{ copyText }}" hint-size="auto,42px">{{ copyLabel }}</x-import>
+            <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="ghost" on-click="{{ emailSchedule }}" hint-size="auto,42px">Email</x-import>
+            <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ printSchedule }}" hint-size="auto,42px">Print / PDF</x-import>
+            <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ clearSchedule }}" hint-size="auto,42px">Clear</x-import>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
 
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px">
         <span style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em">{{ rangeLabel }}</span>
@@ -202,6 +231,7 @@
               <div style="display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border-subtle)">
                 <span style="font-family:var(--font-display);font-size:16px;font-weight:700">{{ wd.label }}</span>
                 <div style="flex:1"></div>
+                <button onClick="{{ wd.edit }}" style="font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:7px 12px;border-radius:var(--radius-sm);cursor:pointer;flex:none;border:1px solid var(--border-accent);background:var(--accent-soft);color:var(--text-accent)">Edit</button>
                 <button onClick="{{ wd.doneToggle }}" style="{{ wd.doneStyle }}">{{ wd.doneLabel }}</button>
               </div>
               <div style="padding:12px 15px;display:flex;flex-direction:column;gap:16px">
@@ -332,6 +362,24 @@
                 </div>
               </div>
             </sc-for>
+          </div>
+
+          <!-- per-day editor: tap a person to set / cycle their shift for this day -->
+          <div style="margin-top:22px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:9px;margin-bottom:11px">
+              <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase">// Assign staff</span>
+              <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-secondary)">{{ editHint }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <sc-for list="{{ dayEditRows }}" as="er" hint-placeholder-count="8">
+                <div style="{{ er.rowStyle }}" onClick="{{ er.onClick }}">
+                  <span style="font-size:14px;font-weight:600">{{ er.name }}</span>
+                  <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase">{{ er.role }}</span>
+                  <div style="flex:1"></div>
+                  <span style="{{ er.chipStyle }}">{{ er.chip }}</span>
+                </div>
+              </sc-for>
+            </div>
           </div>
         </sc-if>
         <sc-if value="{{ dayClosed }}" hint-placeholder-val="{{ false }}">
@@ -842,6 +890,7 @@ class Component extends DCLogic {
       activeTab: 'schedule',
       viewMode: 'grid',
       isMobile: (typeof window !== 'undefined' && window.innerWidth <= 640),
+      moreOpen: false,
       numWeeks: 3,
       weekScope: -1,
       dayIndex: 0,
@@ -1062,6 +1111,7 @@ class Component extends DCLogic {
 
   // ---------- setters ----------
   setTab(v) { this.update({ activeTab: v }); }
+  toggleMore() { this.setState(s => ({ moreOpen: !s.moreOpen })); }
   setViewMode(v) { this.update({ viewMode: v }); }
   setScope(w) { this.update({ weekScope: w }); }
   setNumWeeks(n) { const nw = Math.min(16, Math.max(1, parseInt(n) || 3)); this.update({ numWeeks: nw, weekScope: -1, dayIndex: 0 }, () => this.generate()); }
@@ -1475,6 +1525,24 @@ class Component extends DCLogic {
     };
     const dayOpen = dcov.length > 0;
 
+    // ----- day editor: tap a person to cycle their shift for the current day
+    // (restores the grid's click-to-assign on card views) -----
+    const dayEditLocked = !!doneMap[di];
+    const dayEditRows = employees.map(e => {
+      const sid = (schedule[e.id] || [])[di];
+      const s = sid ? this.shiftById(sid) : null;
+      const c = sid ? colorFor(sid) : null;
+      const avail = e.avail[dm.wd];
+      return {
+        name: e.name,
+        role: this.roleById(e.roleId).abbr,
+        chip: s ? s.abbr : (avail ? 'Off' : 'N/A'),
+        chipStyle: { fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--radius-sm)', minWidth: '66px', textAlign: 'center', flex: 'none', background: s ? c.bg : 'var(--navy-800)', border: '1px solid ' + (s ? c.bd : 'var(--border-subtle)'), color: s ? c.fg : 'var(--text-muted)' },
+        rowStyle: { display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--navy-850)', cursor: dayEditLocked ? 'default' : 'pointer', opacity: avail ? 1 : 0.5 },
+        onClick: dayEditLocked ? undefined : (() => this.cycle(e.id, di)),
+      };
+    });
+
     // ----- mobile "week" list: every open day in the current scope, stacked vertically
     // (replaces the horizontal grid on phones — scroll down instead of sideways) -----
     const doneChip = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '10.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', flex: 'none', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-default)'), background: on ? 'var(--accent)' : 'var(--navy-800)', color: on ? 'var(--text-on-accent)' : 'var(--text-secondary)' });
@@ -1483,6 +1551,7 @@ class Component extends DCLogic {
       doneToggle: () => this.toggleDone(m.d),
       doneLabel: doneMap[m.d] ? '✓ Entered' : 'Mark entered',
       doneStyle: doneChip(!!doneMap[m.d]),
+      edit: () => this.update({ viewMode: 'day', dayIndex: m.d }),
       shifts: buildDayShifts(m.d),
     }));
 
@@ -1568,6 +1637,7 @@ class Component extends DCLogic {
       activeTab,
       setTab: (v) => this.setTab(v),
       isMobile, isDesktop: !isMobile,
+      moreOpen: this.state.moreOpen, toggleMore: () => this.toggleMore(),
       savedNote: 'Autosaved locally',
       isSchedule: activeTab === 'schedule',
       isTeam: activeTab === 'team',
@@ -1594,6 +1664,8 @@ class Component extends DCLogic {
       segGrid: seg(isGridView), segDay: seg(isDayViewM), segShift: seg(isShiftViewM),
       gridLabel: isMobile ? 'Week' : 'Grid', dayLabel: isMobile ? 'Day' : 'By day', shiftLabel: isMobile ? 'Shift' : 'By shift',
       weekList, hasWeekList: weekList.length > 0,
+      dayEditRows, dayEditLocked,
+      editHint: dayEditLocked ? 'Day marked entered — unmark to edit' : 'Tap a name to set / change their shift',
       scopeTabs,
       numWeeks,
       onNumWeeks: (e) => this.setNumWeeks(e.target.value),
