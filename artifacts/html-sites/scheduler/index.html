@@ -110,9 +110,9 @@
 
       <div class="noprint" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:16px">
         <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden">
-          <button onClick="{{ setGrid }}" style="{{ segGrid }}">Grid</button>
-          <button onClick="{{ setDayView }}" style="{{ segDay }}">By day</button>
-          <button onClick="{{ setShiftView }}" style="{{ segShift }}">By shift</button>
+          <button onClick="{{ setGrid }}" style="{{ segGrid }}">{{ gridLabel }}</button>
+          <button onClick="{{ setDayView }}" style="{{ segDay }}">{{ dayLabel }}</button>
+          <button onClick="{{ setShiftView }}" style="{{ segShift }}">{{ shiftLabel }}</button>
         </div>
         <sc-if value="{{ showScope }}" hint-placeholder-val="{{ true }}">
           <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden;flex-wrap:wrap">
@@ -139,6 +139,7 @@
       </div>
 
       <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
       <div class="hscroll" style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850)">
         <table class="schtable" style="table-layout:fixed;width:100%">
           <thead>
@@ -190,6 +191,57 @@
           </tbody>
         </table>
       </div>
+      </sc-if>
+
+      <!-- MOBILE: the "week" as a vertical stack of day cards — scroll down, not sideways -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ hasWeekList }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ weekList }}" as="wd" hint-placeholder-count="4">
+            <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);overflow:hidden">
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border-subtle)">
+                <span style="font-family:var(--font-display);font-size:16px;font-weight:700">{{ wd.label }}</span>
+                <div style="flex:1"></div>
+                <button onClick="{{ wd.doneToggle }}" style="{{ wd.doneStyle }}">{{ wd.doneLabel }}</button>
+              </div>
+              <div style="padding:12px 15px;display:flex;flex-direction:column;gap:16px">
+                <sc-for list="{{ wd.shifts }}" as="ds" hint-placeholder-count="2">
+                  <div>
+                    <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+                      <span style="width:3px;height:16px;border-radius:2px;background:{{ ds.accent }};flex:none"></span>
+                      <span style="font-family:var(--font-display);font-size:15px;font-weight:700">{{ ds.name }}</span>
+                      <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ ds.time }}</span>
+                      <div style="flex:1"></div>
+                      <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Badge" tone="{{ ds.covTone }}" dot="{{ true }}" hint-size="auto,22px">{{ ds.covLabel }}</x-import>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:7px">
+                      <sc-for list="{{ ds.people }}" as="p" hint-placeholder-count="3">
+                        <div style="display:flex;align-items:center;gap:10px">
+                          <span style="width:30px;height:30px;border-radius:999px;background:var(--navy-700);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-secondary);flex:none">{{ p.initials }}</span>
+                          <span style="font-size:14px;font-weight:600">{{ p.name }}</span>
+                          <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase">{{ p.role }}</span>
+                        </div>
+                      </sc-for>
+                      <sc-if value="{{ ds.empty }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:13px;color:var(--text-muted);font-style:italic">No one scheduled yet.</div>
+                      </sc-if>
+                      <sc-if value="{{ ds.hasGaps }}" hint-placeholder-val="{{ false }}">
+                        <sc-for list="{{ ds.gaps }}" as="g" hint-placeholder-count="1">
+                          <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+                            <span style="{{ g.dot }}"></span>
+                            <span style="color:var(--text-secondary)">Need {{ g.miss }} more · {{ g.label }}</span>
+                          </div>
+                        </sc-for>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </sc-if>
 
       <div class="noprint" style="display:flex;flex-wrap:wrap;gap:32px;margin-top:18px">
         <div style="display:flex;flex-direction:column;gap:9px;min-width:200px">
@@ -1391,6 +1443,22 @@ class Component extends DCLogic {
     const progressLabel = doneCount + ' / ' + openTotal + ' days entered';
     const progressPct = openTotal ? Math.round(doneCount / openTotal * 100) : 0;
 
+    // ----- day cards (shared by the single-day view and the mobile week list) -----
+    const buildDayShifts = (d) => this.coverageForDay(d).map(c => {
+      const c2 = colorFor(c.shift.id);
+      const ok = c.filledTotal >= c.needTotal && c.worst === 0;
+      const ppl = employees.filter(e => (schedule[e.id] || [])[d] === c.shift.id);
+      const gaps = c.detail.filter(x => x.filled < x.need.count).map(x => ({ label: x.need.label, miss: (x.need.count - x.filled), dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: x.need.importance === 'critical' ? 'var(--danger)' : 'var(--warning)' } }));
+      return {
+        name: c.shift.name, time: this.ampm(c.shift.start) + '–' + this.ampm(c.shift.end), accent: c2.bd,
+        covTone: ok ? 'success' : (c.worst >= 3 ? 'danger' : 'warning'),
+        covLabel: c.filledTotal + ' / ' + c.needTotal + ' filled',
+        people: ppl.map(e => ({ name: e.name, role: this.roleById(e.roleId).abbr, initials: initials(e.name) })),
+        empty: ppl.length === 0,
+        gaps, hasGaps: gaps.length > 0,
+      };
+    });
+
     // ----- day view -----
     const di = Math.min(totalDays - 1, Math.max(0, this.state.dayIndex));
     const dm = dayMeta[di];
@@ -1403,22 +1471,20 @@ class Component extends DCLogic {
       toggleDone: () => this.toggleDone(di),
       doneBtnLabel: doneMap[di] ? '✓ Entered' : 'Mark entered',
       doneBtnStyle: { fontFamily: 'var(--font-mono)', fontSize: '11.5px', fontWeight: 700, padding: '8px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: '1px solid ' + (doneMap[di] ? 'var(--border-accent)' : 'var(--border-default)'), background: doneMap[di] ? 'var(--accent)' : 'var(--navy-800)', color: doneMap[di] ? 'var(--text-on-accent)' : 'var(--text-secondary)' },
-      shifts: dcov.map(c => {
-        const c2 = colorFor(c.shift.id);
-        const ok = c.filledTotal >= c.needTotal && c.worst === 0;
-        const ppl = employees.filter(e => (schedule[e.id] || [])[di] === c.shift.id);
-        const gaps = c.detail.filter(d => d.filled < d.need.count).map(d => ({ label: d.need.label, miss: (d.need.count - d.filled), dot: { width: '7px', height: '7px', borderRadius: '999px', flex: 'none', background: d.need.importance === 'critical' ? 'var(--danger)' : 'var(--warning)' } }));
-        return {
-          name: c.shift.name, time: this.ampm(c.shift.start) + '–' + this.ampm(c.shift.end), accent: c2.bd,
-          covTone: ok ? 'success' : (c.worst >= 3 ? 'danger' : 'warning'),
-          covLabel: c.filledTotal + ' / ' + c.needTotal + ' filled',
-          people: ppl.map(e => ({ name: e.name, role: this.roleById(e.roleId).abbr, initials: initials(e.name) })),
-          empty: ppl.length === 0,
-          gaps, hasGaps: gaps.length > 0,
-        };
-      }),
+      shifts: buildDayShifts(di),
     };
     const dayOpen = dcov.length > 0;
+
+    // ----- mobile "week" list: every open day in the current scope, stacked vertically
+    // (replaces the horizontal grid on phones — scroll down instead of sideways) -----
+    const doneChip = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '10.5px', fontWeight: 700, padding: '7px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', flex: 'none', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-default)'), background: on ? 'var(--accent)' : 'var(--navy-800)', color: on ? 'var(--text-on-accent)' : 'var(--text-secondary)' });
+    const weekList = days.filter(m => shifts.some(s => s.days[m.wd])).map(m => ({
+      label: wdFull[m.wd] + ' · ' + (m.date.getMonth() + 1) + '/' + m.date.getDate(),
+      doneToggle: () => this.toggleDone(m.d),
+      doneLabel: doneMap[m.d] ? '✓ Entered' : 'Mark entered',
+      doneStyle: doneChip(!!doneMap[m.d]),
+      shifts: buildDayShifts(m.d),
+    }));
 
     // ----- shift view (scoped) -----
     const shiftView = { shifts: shifts.map(s => {
@@ -1526,6 +1592,8 @@ class Component extends DCLogic {
       setDayView: () => this.setViewMode('day'),
       setShiftView: () => this.setViewMode('shift'),
       segGrid: seg(isGridView), segDay: seg(isDayViewM), segShift: seg(isShiftViewM),
+      gridLabel: isMobile ? 'Week' : 'Grid', dayLabel: isMobile ? 'Day' : 'By day', shiftLabel: isMobile ? 'Shift' : 'By shift',
+      weekList, hasWeekList: weekList.length > 0,
       scopeTabs,
       numWeeks,
       onNumWeeks: (e) => this.setNumWeeks(e.target.value),
