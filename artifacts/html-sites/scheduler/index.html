@@ -338,6 +338,7 @@
         <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ addEmp }}" hint-size="auto,38px">+ Add person</x-import>
       </div>
 
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
       <div class="hscroll" style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg)">
         <table style="width:100%;border-collapse:collapse;min-width:900px">
           <thead>
@@ -387,6 +388,44 @@
           </tbody>
         </table>
       </div>
+      </sc-if>
+
+      <!-- MOBILE: roster as stacked cards — every field visible, no sideways scroll -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ empRows }}" as="e" hint-placeholder-count="6">
+            <div style="border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850);padding:14px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <input class="nat" value="{{ e.name }}" onChange="{{ e.onName }}" style="flex:1;font-weight:600">
+                <button onClick="{{ e.onRemove }}" style="background:none;border:1px solid var(--border-subtle);color:var(--text-muted);cursor:pointer;font-size:18px;line-height:1;width:40px;height:40px;border-radius:var(--radius-sm);flex:none" title="Remove">×</button>
+              </div>
+              <select class="nat" value="{{ e.roleId }}" onChange="{{ e.onRole }}" style="width:100%">
+                <sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6"><option value="{{ ro.value }}">{{ ro.label }}</option></sc-for>
+              </select>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+                <div style="display:inline-flex;border:1px solid var(--border-default);border-radius:var(--radius-sm);overflow:hidden">
+                  <button onClick="{{ e.setFT }}" style="{{ e.ftStyle }}">FT</button>
+                  <button onClick="{{ e.setPT }}" style="{{ e.ptStyle }}">PT</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input type="number" class="nat" value="{{ e.target }}" onChange="{{ e.onTarget }}" style="width:66px;text-align:center">
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">hrs/wk</span>
+                </div>
+                <div style="flex:1"></div>
+                <button onClick="{{ e.toggleKey }}" style="{{ e.keyStyle }}" title="Key holder / can open &amp; close">{{ e.keyGlyph }}</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase">Availability (Sa–Fr)</span>
+                <div style="display:flex;gap:7px;flex-wrap:wrap">
+                  <sc-for list="{{ e.avail }}" as="a" hint-placeholder-count="7">
+                    <button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
     </div>
     </sc-if>
 
@@ -750,6 +789,7 @@ class Component extends DCLogic {
     return {
       activeTab: 'schedule',
       viewMode: 'grid',
+      isMobile: (typeof window !== 'undefined' && window.innerWidth <= 640),
       numWeeks: 3,
       weekScope: -1,
       dayIndex: 0,
@@ -841,17 +881,24 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    this._onResize = () => {
+      const m = window.innerWidth <= 640;
+      if (m !== this.state.isMobile) this.setState({ isMobile: m });
+    };
+    window.addEventListener('resize', this._onResize);
+    const mob = (typeof window !== 'undefined') && window.innerWidth <= 640;
     try {
       const raw = localStorage.getItem('eriks_sched_v3');
       if (raw) {
         const d = JSON.parse(raw);
-        this.setState(s => ({ ...s, ...d, copied: false, loaded: true }));
+        this.setState(s => ({ ...s, ...d, isMobile: mob, copied: false, loaded: true }));
         return;
       }
     } catch (e) {}
-    // generate an initial schedule so the grid isn't empty on first open
-    this.setState({ loaded: true }, () => this.generate());
+    // fresh open: phones land on the card-based "By day" view, desktop on the grid
+    this.setState({ loaded: true, isMobile: mob, viewMode: mob ? 'day' : 'grid' }, () => this.generate());
   }
+  componentWillUnmount() { if (this._onResize) window.removeEventListener('resize', this._onResize); }
 
   persist() {
     try {
@@ -1083,6 +1130,7 @@ class Component extends DCLogic {
   // ---------- render ----------
   renderVals() {
     const { activeTab, employees, shifts, roles, startDate, schedule, rules, presets } = this.state;
+    const isMobile = !!this.state.isMobile;
     const shortWd = ['Su','Mo','Tu','We','Th','Fr','Sa'];
     const palette = [
       { bg: 'rgba(153,213,202,0.15)', bd: 'rgba(153,213,202,0.45)', fg: '#C2E8E0' },
@@ -1260,9 +1308,9 @@ class Component extends DCLogic {
     const rangeLabel = (start.getMonth() + 1) + '/' + start.getDate() + ' – ' + (end.getMonth() + 1) + '/' + end.getDate() + ' · ' + numWeeks + (numWeeks === 1 ? ' week' : ' weeks');
 
     // ----- team rows -----
-    const segBtn = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: '11px', padding: '6px 11px', border: 'none', cursor: 'pointer', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--text-on-accent)' : 'var(--text-muted)', fontWeight: on ? 700 : 400 });
-    const dayBtn = (on) => ({ width: '26px', height: '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: on ? 700 : 400, cursor: 'pointer', padding: 0 });
-    const keyBtn = (on) => ({ width: '30px', height: '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', cursor: 'pointer', fontSize: '13px', padding: 0 });
+    const segBtn = (on) => ({ fontFamily: 'var(--font-mono)', fontSize: isMobile ? '13px' : '11px', padding: isMobile ? '10px 16px' : '6px 11px', border: 'none', cursor: 'pointer', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--text-on-accent)' : 'var(--text-muted)', fontWeight: on ? 700 : 400 });
+    const dayBtn = (on) => ({ width: isMobile ? '38px' : '26px', height: isMobile ? '38px' : '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', fontFamily: 'var(--font-mono)', fontSize: isMobile ? '12px' : '9.5px', fontWeight: on ? 700 : 400, cursor: 'pointer', padding: 0 });
+    const keyBtn = (on) => ({ width: isMobile ? '46px' : '30px', height: isMobile ? '38px' : '26px', borderRadius: 'var(--radius-sm)', border: '1px solid ' + (on ? 'var(--border-accent)' : 'var(--border-subtle)'), background: on ? 'var(--accent-soft)' : 'var(--navy-800)', color: on ? 'var(--text-accent)' : 'var(--navy-400)', cursor: 'pointer', fontSize: isMobile ? '16px' : '13px', padding: 0 });
     // availability display order Sa Su Mo Tu We Th Fr -> wd 6,0,1,2,3,4,5
     const availOrder = [6, 0, 1, 2, 3, 4, 5];
     const roleOptions = roles.map(r => ({ value: r.id, label: r.name }));
@@ -1453,6 +1501,7 @@ class Component extends DCLogic {
       ],
       activeTab,
       setTab: (v) => this.setTab(v),
+      isMobile, isDesktop: !isMobile,
       savedNote: 'Autosaved locally',
       isSchedule: activeTab === 'schedule',
       isTeam: activeTab === 'team',
