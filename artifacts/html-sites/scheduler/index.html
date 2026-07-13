@@ -32,6 +32,20 @@
     ::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:8px;border:3px solid var(--bg-canvas)}
     ::-webkit-scrollbar-track{background:transparent}
     .printonly{display:none}
+    /* ---------- horizontal-scroll surfaces (grid + roster) ---------- */
+    .hscroll{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+    .tabbar{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .tabbar::-webkit-scrollbar{display:none}
+    /* ---------- phone: tighter, notch-safe, no iOS focus-zoom ---------- */
+    @media (max-width:640px){
+      html,body{overflow-x:hidden}
+      /* 16px input text stops mobile Safari from zooming the page on focus */
+      .nat{font-size:16px}
+      header.noprint{padding:calc(12px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left)) !important}
+      .tabbar{padding:12px 14px 0 !important}
+      main.printwrap{padding:18px calc(14px + env(safe-area-inset-right)) calc(92px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left)) !important}
+      footer.noprint{padding:22px 14px calc(30px + env(safe-area-inset-bottom)) !important}
+    }
     @media print{
       .noprint{display:none !important}
       .screen-only{display:none !important}
@@ -55,7 +69,7 @@
     <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ savedNote }}</span>
   </header>
 
-  <div class="noprint" style="padding:14px 28px 0">
+  <div class="noprint tabbar" style="padding:14px 28px 0">
     <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Tabs" tabs="{{ tabs }}" value="{{ activeTab }}" on-change="{{ setTab }}" variant="pill" hint-size="100%,46px"></x-import>
   </div>
 
@@ -125,7 +139,7 @@
       </div>
 
       <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
-      <div style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850)">
+      <div class="hscroll" style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--navy-850)">
         <table class="schtable" style="table-layout:fixed;width:100%">
           <thead>
             <tr>
@@ -324,11 +338,11 @@
         <x-import component-from-global-scope="KrahnbornDesignSystem_019ddc.Button" variant="secondary" on-click="{{ addEmp }}" hint-size="auto,38px">+ Add person</x-import>
       </div>
 
-      <div style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg)">
+      <div class="hscroll" style="overflow:auto;border:1px solid var(--border-subtle);border-radius:var(--radius-lg)">
         <table style="width:100%;border-collapse:collapse;min-width:900px">
           <thead>
             <tr style="background:var(--navy-800)">
-              <th style="text-align:left;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Name</th>
+              <th style="text-align:left;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default);position:sticky;left:0;z-index:3;background:var(--navy-800)">Name</th>
               <th style="text-align:left;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Role</th>
               <th style="text-align:center;padding:10px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Type</th>
               <th style="text-align:center;padding:10px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-default)">Hrs/wk</th>
@@ -340,7 +354,7 @@
           <tbody>
             <sc-for list="{{ empRows }}" as="e" hint-placeholder-count="20">
               <tr style="border-bottom:1px solid var(--border-subtle)">
-                <td style="padding:6px 12px"><input class="nat" value="{{ e.name }}" onChange="{{ e.onName }}" style="width:150px"></td>
+                <td style="padding:6px 12px;position:sticky;left:0;z-index:2;background:var(--bg-canvas)"><input class="nat" value="{{ e.name }}" onChange="{{ e.onName }}" style="width:150px"></td>
                 <td style="padding:6px 12px">
                   <select class="nat" value="{{ e.roleId }}" onChange="{{ e.onRole }}" style="width:150px">
                     <sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6">
