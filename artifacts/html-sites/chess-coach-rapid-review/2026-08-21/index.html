@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head>
+  <link rel="stylesheet" href="/theme.css" />
+  <script src="/theme.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Krahnie Chess Reviewer</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="vendor/chessground/chessground.base.css" />
+  <link rel="stylesheet" href="vendor/chessground/chessground.brown.css" />
+  <link rel="stylesheet" href="vendor/chessground/chessground.cburnett.css" />
+  <script type="importmap">
+    {"imports":{"chess.js":"./vendor/chessjs/chess.js","chessground":"./vendor/chessground/chessground.min.js"}}
+  </script>
+</head>
+<body>
+<main class="wrap">
+  <header class="topbar">
+    <span class="badge">♟ Krahnie Chess Reviewer</span>
+    <span class="pill" id="enginePill">engine: idle</span>
+  </header>
+
+  <!-- ============ IMPORT SCREEN ============ -->
+  <section id="importScreen">
+    <h1>Game Review</h1>
+    <p class="lede">Pull games from Lichess or Chess.com — or paste any PGN — and get a full engine review: accuracy, move-by-move labels from Brilliant to Blunder, and drills built from your own mistakes.</p>
+
+    <div class="panel" style="margin-top:18px">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="lichess" type="button">Lichess</button>
+        <button class="tab" data-tab="chesscom" type="button">Chess.com</button>
+        <button class="tab" data-tab="pgn" type="button">Paste PGN</button>
+      </div>
+
+      <div class="tab-body active" data-body="lichess">
+        <input type="text" id="liUser" placeholder="Lichess username" autocomplete="off" />
+        <select id="liPerf">
+          <option value="">All speeds</option>
+          <option value="bullet">Bullet</option>
+          <option value="blitz">Blitz</option>
+          <option value="rapid" selected>Rapid</option>
+          <option value="classical">Classical</option>
+        </select>
+        <select id="liMax">
+          <option value="10">Last 10</option>
+          <option value="20" selected>Last 20</option>
+          <option value="50">Last 50</option>
+        </select>
+        <button class="coach-btn primary" id="liFetch" type="button">Fetch games</button>
+      </div>
+
+      <div class="tab-body" data-body="chesscom">
+        <input type="text" id="ccUser" placeholder="Chess.com username" autocomplete="off" />
+        <select id="ccMonths">
+          <option value="1">This month</option>
+          <option value="2" selected>Last 2 months</option>
+          <option value="4">Last 4 months</option>
+        </select>
+        <button class="coach-btn primary" id="ccFetch" type="button">Fetch games</button>
+      </div>
+
+      <div class="tab-body" data-body="pgn">
+        <textarea id="pgnText" placeholder="Paste a PGN here — headers optional, one game"></textarea>
+        <button class="coach-btn primary" id="pgnReview" type="button">Review this game</button>
+      </div>
+
+      <div class="status-line" id="importStatus"></div>
+      <div class="games" id="gameList"></div>
+    </div>
+
+    <section id="recentSection" hidden>
+      <h2>Recent reviews</h2>
+      <div class="games" id="recentList"></div>
+    </section>
+  </section>
+
+  <!-- ============ REVIEW SCREEN ============ -->
+  <section id="reviewScreen" hidden>
+    <div class="topbar" style="margin-bottom:12px">
+      <button class="coach-btn" id="backBtn" type="button">← All games</button>
+      <span class="pill" id="gameMeta"></span>
+    </div>
+
+    <div class="analysis-bar" id="analysisBar">
+      <select id="modeSelect" class="pill">
+        <option value="fast">Fast (~30s)</option>
+        <option value="balanced" selected>Balanced (~1min)</option>
+        <option value="deep">Deep (~3min)</option>
+      </select>
+      <div class="progress-track"><span class="progress-fill" id="progressFill"></span></div>
+      <span class="pill" id="progressText">waiting…</span>
+      <button class="coach-btn" id="cancelBtn" type="button" hidden>Cancel</button>
+    </div>
+
+    <div class="review-grid">
+      <div class="board-col">
+        <div class="player-bar" id="topPlayer"></div>
+        <div class="board-box"><div id="board"></div></div>
+        <div class="player-bar" id="bottomPlayer"></div>
+        <div class="board-controls">
+          <button class="coach-btn" id="btnStart" type="button" title="Start">⏮</button>
+          <button class="coach-btn" id="btnPrev" type="button" title="Previous (←)">◀</button>
+          <button class="coach-btn" id="btnNext" type="button" title="Next (→)">▶</button>
+          <button class="coach-btn" id="btnEnd" type="button" title="End">⏭</button>
+          <button class="coach-btn" id="btnFlip" type="button" title="Flip board">⇅</button>
+        </div>
+        <div class="move-feedback" id="moveComment">Analysis will start automatically.</div>
+      </div>
+
+      <div class="side-col">
+        <div class="acc-cards" id="accCards"></div>
+        <div class="panel graph-panel" style="margin-top:12px">
+          <svg id="evalGraph" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="panel" style="margin-top:12px">
+          <div class="tally-grid" id="tallyGrid"></div>
+        </div>
+        <div class="panel moves-panel" style="margin-top:12px" id="moveList"></div>
+      </div>
+    </div>
+
+    <section class="panel" id="coachSummary" hidden></section>
+
+    <section class="panel" id="trainerSection" hidden>
+      <h2>Train your misses</h2>
+      <p class="lede" style="font-size:15px">Every flagged moment from this game, as a drill: find the move you should have played. Drag a piece or tap source → target.</p>
+      <div class="trainer-grid" style="margin-top:14px">
+        <div>
+          <div class="trainer-board"><div id="trainerBoard"></div></div>
+          <div class="move-feedback" id="trainerFeedback">Pick a moment on the right.</div>
+          <div class="board-controls">
+            <button class="coach-btn" id="trainerReset" type="button">Reset try</button>
+            <button class="coach-btn" id="trainerShow" type="button">Show answer</button>
+          </div>
+        </div>
+        <div class="moments" id="momentList"></div>
+      </div>
+    </section>
+  </section>
+
+  <p class="footer">Local-first review tool · Stockfish 18 lite (WASM, in your browser) · games stay on this device</p>
+</main>
+<script type="module" src="js/main.js"></script>
+</body></html>
