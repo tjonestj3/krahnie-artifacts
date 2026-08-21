@@ -1,20 +1,20 @@
-// openings.js — EPD → {eco, name} lookup from the vendored lichess/chess-openings dataset.
+// openings.js — EPD → {eco, name} lookup from the vendored lichess/chess-openings
+// dataset. In the Vite build the data lives in public/data and is served at BASE_URL.
 let table = null;
 
-// Direct injection (used by tests / non-browser contexts).
 export function setOpenings(data) { table = data; }
 
 export async function loadOpenings() {
   if (table) return table;
-  const res = await fetch(new URL('../data/openings.json', import.meta.url));
+  const base = (import.meta.env && import.meta.env.BASE_URL) || './';
+  const res = await fetch(base + 'data/openings.json');
   table = await res.json();
   return table;
 }
 
 const epd = fen => fen.split(' ').slice(0, 4).join(' ');
 
-// positions[0..n] → { flags: bool per move, eco, name } — a move is Book iff its
-// resulting position is in the table, ply <= maxPly, and every prior move was Book too.
+// positions[0..n] → { flags: bool per move, eco, name }.
 export function bookWalk(positions, maxPly = 20) {
   const flags = [];
   let eco = null, name = null;

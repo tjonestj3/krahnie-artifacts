@@ -3,8 +3,10 @@
 // downstream ever sees a side-to-move score.
 
 export class Engine {
-  constructor(workerUrl) {
+  constructor(workerUrl, { hashMB = 32, multiPv = 2 } = {}) {
     this.workerUrl = workerUrl;
+    this.hashMB = hashMB;
+    this.multiPv = multiPv;
     this.worker = null;
     this.ready = null;
     this.job = null;          // current `go` in flight
@@ -18,11 +20,19 @@ export class Engine {
     this.worker.onmessage = e => this._onLine(String(e.data));
     this.ready = (async () => {
       await this._send('uci', l => l === 'uciok');
-      this._post('setoption name Hash value 32');
-      this._post('setoption name MultiPV value 2');
+      this._post(`setoption name Hash value ${this.hashMB}`);
+      this._post(`setoption name MultiPV value ${this.multiPv}`);
       await this._send('isready', l => l === 'readyok');
     })();
     return this.ready;
+  }
+
+  // Set MultiPV at runtime (used by the live-analysis engine).
+  async setMultiPv(n) {
+    this.multiPv = n;
+    await this.init();
+    this._post(`setoption name MultiPV value ${n}`);
+    await this._send('isready', l => l === 'readyok');
   }
 
   _post(cmd) { this.worker.postMessage(cmd); }
@@ -32,6 +42,11 @@ export class Engine {
       this.listeners.push({ until, resolve });
       this._post(cmd);
     });
+  }
+
+  // Wait for a line without posting a command.
+  _await(until) {
+    return new Promise(resolve => this.listeners.push({ until, resolve }));
   }
 
   _onLine(line) {
@@ -88,6 +103,46 @@ export class Engine {
     const result = this.queue.then(run, run);
     this.queue = result.then(() => {}, () => {});
     return result;
+  }
+
+  // Live/infinite analysis for the interactive board. Streams progressive updates
+  // via onUpdate({depth, pvs}) (White-centric) until stopLive() is called or the
+  // position changes. Returns immediately; call stopLive() to end.
+  async analyzeLive(fen, { multiPv = 3, onUpdate } = {}) {
+    await this.init();
+    if (this.multiPv !== multiPv) await this.setMultiPv(multiPv);
+    // interrupt any prior live search cleanly
+    await this.stopLive();
+    const blackToMove = fen.split(' ')[1] === 'b';
+    const best = {};
+    this.job = {
+      live: true,
+      onLine: line => {
+        if (line.startsWith('bestmove')) { this.job = null; return; }
+        if (!line.startsWith('info ') || !line.includes(' pv ') || !line.includes('score')) return;
+        if (line.includes('lowerbound') || line.includes('upperbound')) return;
+        const m = line.match(/\bdepth (\d+)(?:.*?\bmultipv (\d+))?.*?\bscore (cp|mate) (-?\d+).*?\bpv (.+)$/);
+        if (!m) return;
+        const [, d, mpv, kind, val, pv] = m;
+        const idx = (mpv ? +mpv : 1) - 1;
+        const sign = blackToMove ? -1 : 1;
+        best[idx] = { depth: +d, ...(kind === 'mate' ? { mate: sign * +val } : { cp: sign * +val }), pv: pv.trim().split(/\s+/) };
+        const pvs = Object.keys(best).sort((a, b) => a - b).map(i => best[i]);
+        onUpdate?.({ depth: best[0]?.depth ?? 0, pvs });
+      },
+    };
+    this._post(`position fen ${fen}`);
+    this._post('go infinite');
+  }
+
+  // Stop the live search and wait for the flushed bestmove so the worker is idle.
+  async stopLive() {
+    if (!this.job?.live) return;
+    const done = this._await(l => l.startsWith('bestmove'));
+    this.job.live = false; // stop feeding onUpdate immediately
+    this._post('stop');
+    await done;
+    this.job = null;
   }
 
   // Abort the current search (worker stays alive; the flushed bestmove resolves the job).

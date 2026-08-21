@@ -155,3 +155,53 @@ function parsePgnMoves(pgn) {
   }
   return { sanMoves, clocks: found && clocks.length === sanMoves.length ? clocks : null, headers };
 }
+
+// ---- Live "watch me" helpers ----
+
+// Lichess: online/playing status + current gameId. Public, no auth, cheap (poll ~5s).
+export async function lichessStatus(username) {
+  const res = await fetch(`https://lichess.org/api/users/status?ids=${encodeURIComponent(username)}&withGameIds=true`);
+  if (!res.ok) throw new Error(`Lichess status: HTTP ${res.status}`);
+  const arr = await res.json();
+  const s = arr[0] || {};
+  return { online: !!s.online, playing: !!s.playing, streaming: !!s.streaming, gameId: s.playingId || s.gameId || null };
+}
+
+// Lichess: stream an ongoing game's states (NDJSON). Calls onState({fen,lastMove,wc,bc,status})
+// per update. Public, no auth. Returns when the game ends or the signal aborts.
+export async function streamLichessGame(gameId, onState, signal) {
+  const res = await fetch(`https://lichess.org/api/stream/game/${gameId}`, { signal });
+  if (!res.ok) throw new Error(`Lichess game stream: HTTP ${res.status}`);
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let nl;
+    while ((nl = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if (!line) continue;
+      let obj; try { obj = JSON.parse(line); } catch { continue; }
+      // First line is gameFull (has .id, .white, .black), later lines are gameState-ish
+      onState(obj);
+    }
+  }
+}
+
+// Chess.com: best-effort online signal (no true "playing" flag in the public API).
+export async function chesscomOnline(username) {
+  const res = await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(username.toLowerCase())}`);
+  if (!res.ok) throw new Error(`Chess.com profile: HTTP ${res.status}`);
+  const p = await res.json();
+  const lastOnline = (p.last_online || 0) * 1000;
+  return {
+    online: Date.now() - lastOnline < 5 * 60 * 1000,
+    lastOnline,
+    profileUrl: p.url || `https://www.chess.com/member/${username}`,
+    avatar: p.avatar || null,
+    name: p.name || username,
+  };
+}

@@ -1,0 +1,9 @@
+# Build-tool dependencies and local build output (never committed).
+# The PUBLISHED site is the built output under artifacts/, which we do commit.
+node_modules/
+apps/*/node_modules/
+apps/*/dist/
+*.log
+.DS_Store
+.vite/
+apps/*/tsconfig.tsbuildinfo

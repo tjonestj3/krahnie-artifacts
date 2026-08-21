@@ -63,6 +63,31 @@ export async function analyzeFull(timeline, engine, mode, { onProgress, onCheckp
   return { evals, completed: true, analyzedThrough: total - 1 };
 }
 
+// Pool version of the full pass: positions analyzed concurrently across N workers.
+// Loses per-position TT carryover but gains ~Nx wall-clock. Progress is by count
+// (positions finish out of order).
+export async function analyzeFullPool(timeline, pool, mode, { onProgress, onCheckpoint, token } = {}) {
+  const { positions, terminal } = timeline;
+  const opts = MODES[mode] || MODES.balanced;
+  const total = positions.length;
+  const fens = positions.slice();
+  const evals = new Array(total);
+  if (terminal) { fens[total - 1] = null; evals[total - 1] = { pvs: [terminalEval(terminal)], depth: 0 }; }
+  await pool.init();
+  let done = terminal ? 1 : 0;
+  const results = await pool.analyzeMany(fens, opts, {
+    token,
+    onResult: ({ index, eval: ev }) => {
+      evals[index] = ev;
+      done++;
+      onProgress?.({ index: done - 1, total, eval: ev });
+      if (onCheckpoint && done % 12 === 0) onCheckpoint(evals.slice(), done);
+    },
+  });
+  for (let i = 0; i < total; i++) if (results[i]) evals[i] = results[i];
+  return { evals, completed: !token?.cancelled, analyzedThrough: total - 1 };
+}
+
 // Lichess hybrid: server evals cover PV1 for every position; run a targeted local
 // MultiPV-2 pass only where the classifier needs bestUci/PV2.
 // lichessEvals[i] = eval AFTER move i+1 (lila convention), White-centric.
