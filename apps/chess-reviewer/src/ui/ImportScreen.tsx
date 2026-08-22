@@ -166,15 +166,19 @@ function GameCard({ g, onClick }: { g: ImportedGame; onClick: () => void }) {
 
 function RecentCard({ r, onClick }: { r: ReviewedGame; onClick: () => void }) {
   const my = r.perspective;
-  const acc = my && r.accuracy?.[my] != null ? `${r.accuracy[my]}% you`
+  const myAcc = my ? r.accuracy?.[my] : null;
+  const acc = myAcc != null ? `${myAcc}% you`
     : r.accuracy?.white != null ? `${r.accuracy.white}% / ${r.accuracy.black}%` : '';
+  const accCls = myAcc == null ? '' : myAcc >= 85 ? ' hi' : myAcc >= 70 ? ' mid' : ' lo';
   const partial = r.analysis?.status === 'partial' ? ' · ⏸ partial' : '';
+  const res = !my ? '' : r.result === '1/2-1/2' ? 'draw' : (r.result === '1-0') === (my === 'white') ? 'win' : 'loss';
   return (
     <button className="game-card" onClick={onClick}>
-      <div className="game-top"><span className="platform">{r.source}</span><span className="result-tag">{r.result || ''}</span></div>
+      <div className="game-top"><span className="platform">{r.source}</span>
+        <span className={'result-tag ' + res}>{res || r.result || ''}</span></div>
       <h3>{r.white.name} vs {r.black.name}</h3>
       <p>{r.playedAt ? new Date(r.playedAt).toISOString().slice(0, 10) : ''} · {r.timeControl?.class || ''}{partial}</p>
-      {acc && <span className="done">{acc}</span>}
+      {acc && <span className={'done acc-chip' + accCls}>{acc}</span>}
     </button>
   );
 }

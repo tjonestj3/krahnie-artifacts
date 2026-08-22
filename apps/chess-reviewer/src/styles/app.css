@@ -320,3 +320,19 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .sum-cnt:disabled{opacity:.3;cursor:default}
 .sum-cnt.me{border-color:rgba(255,209,102,.35)}
 .sum-hint{margin:10px 0 0;color:var(--muted);font-size:12px;text-align:center}
+
+/* ===== v6: progress dashboard ===== */
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 4px}
+.dash-chart{width:100%;height:170px;display:block;border-radius:12px;background:rgba(11,16,32,.6)}
+.dash-table{display:grid;gap:2px}
+.dt-row{display:grid;grid-template-columns:1fr 64px 64px 64px;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;font-size:14px;font-weight:700}
+.dt-row:nth-child(even){background:rgba(255,255,255,.035)}
+.dt-head{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:900}
+.dt-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt-row span:not(.dt-name){text-align:right}
+.acc-chip{font-weight:900}
+.acc-chip.hi{color:var(--green)}.acc-chip.mid{color:var(--amber)}.acc-chip.lo{color:var(--red)}
+@media(max-width:760px){
+  .dash-cards{grid-template-columns:1fr 1fr}
+  .dt-row{grid-template-columns:1fr 48px 52px 52px;font-size:13px}
+}

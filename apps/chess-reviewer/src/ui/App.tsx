@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { ImportScreen } from './ImportScreen';
 import { ReviewScreen, type AnalysisState } from './ReviewScreen';
+import { Dashboard } from './Dashboard';
+import { userGames, openingLine } from '../lib/stats';
 import { buildTimeline, analyzeFullPool, analyzeHybrid, classifyGame } from '../lib/analyze.js';
 import { EnginePool, poolSize } from '../lib/enginepool.js';
 import { Engine } from '../lib/engine.js';
 import { loadOpenings } from '../lib/openings.js';
-import { putGame, getGame, metaGet, metaSet } from '../lib/store.js';
+import { putGame, getGame, allGames, metaGet, metaSet } from '../lib/store.js';
 import type { ImportedGame, ReviewedGame } from '../lib/types';
 
 const WORKER_URL = new URL('engine/stockfish-18-lite-single.js', document.baseURI).href;
 
 export function App() {
-  const [screen, setScreen] = useState<'import' | 'review'>('import');
+  const [screen, setScreen] = useState<'import' | 'review' | 'dash'>('import');
+  const [records, setRecords] = useState<ReviewedGame[]>([]);
   const [record, setRecord] = useState<ReviewedGame | null>(null);
   const [positions, setPositions] = useState<string[]>([]);
   const [analysis, setAnalysis] = useState<AnalysisState>({ status: 'analyzing', done: 0, total: 1, mode: 'balanced' });
@@ -21,7 +24,11 @@ export function App() {
   const tokenRef = useRef<{ cancelled: boolean } | null>(null);
   const currentGameRef = useRef<{ g: ImportedGame; timeline: any } | null>(null);
 
-  useEffect(() => { loadOpenings().catch(() => {}); }, []);
+  useEffect(() => { loadOpenings().catch(() => {}); refreshRecords(); }, []);
+
+  function refreshRecords() {
+    allGames().then((gs: ReviewedGame[]) => setRecords(gs || [])).catch(() => {});
+  }
 
   function getPool() {
     if (!poolRef.current) poolRef.current = new EnginePool(WORKER_URL, { size: poolSize(), hashMB: 16, multiPv: 2 });
@@ -93,7 +100,7 @@ export function App() {
       finalizeRecord(rec, g, timeline, evals, judgments);
       rec.analysis.mode = mode; rec.analysis.status = 'complete'; rec.analysis.analyzedThrough = total - 1;
       delete (rec.analysis as any).partialEvals;
-      if (rec.id) putGame(rec).catch(() => {});
+      if (rec.id) putGame(rec).then(refreshRecords).catch(() => {});
       setRecord({ ...rec });
       setAnalysis({ status: 'complete', done: total, total, mode });
       setEnginePill('ready');
@@ -113,16 +120,26 @@ export function App() {
 
   function onCancel() { if (tokenRef.current) tokenRef.current.cancelled = true; }
 
+  const statsPoints = userGames(records);
+
   return (
     <main className="wrap">
       <header className="topbar">
         <span className="badge">♟ Krahnie Chess Reviewer</span>
-        <span className={'pill ' + pillClass(enginePill)}>engine: {enginePill}</span>
+        <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {screen === 'import' && <button className="coach-btn sm" onClick={() => setScreen('dash')}>📊 Progress</button>}
+          <span className={'pill ' + pillClass(enginePill)}>engine: {enginePill}</span>
+        </span>
       </header>
 
       {screen === 'import' && <ImportScreen onOpen={openGame} onOpenRecord={openRecord} />}
+      {screen === 'dash' && (
+        <Dashboard games={records} onBack={() => setScreen('import')}
+          onOpenRecord={async id => { const rec = await getGame(id).catch(() => null); if (rec) openRecord(rec); }} />
+      )}
       {screen === 'review' && record && (
         <ReviewScreen game={record} positions={positions} workerUrl={WORKER_URL} analysis={analysis}
+          personalLine={openingLine(statsPoints.filter(p => p.id !== record.id), record.openingName)}
           onBack={() => { onCancel(); setScreen('import'); }} onModeChange={onModeChange} onCancel={onCancel} />
       )}
 

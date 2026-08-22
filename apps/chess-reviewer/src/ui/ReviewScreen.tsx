@@ -28,6 +28,7 @@ interface Props {
   positions: string[];
   workerUrl: string;
   analysis: AnalysisState;
+  personalLine?: string | null;
   onBack: () => void;
   onModeChange: (mode: string) => void;
   onCancel: () => void;
@@ -43,7 +44,7 @@ function legalDests(fen: string): Map<string, string[]> {
   return d;
 }
 
-export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onModeChange, onCancel }: Props) {
+export function ReviewScreen({ game, positions, workerUrl, analysis, personalLine, onBack, onModeChange, onCancel }: Props) {
   const rootRef = useRef<TreeNode>(treeFromMoves(game.moves as any));
   const plyRef = useRef(0);
   // Rebuild the tree when the game loads or its analysis lands — but stay on the
@@ -163,7 +164,7 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
 
         <div className="side-col">
           <div>
-            <CoachCard node={current} game={game} />
+            <CoachCard node={current} game={game} personalLine={personalLine} />
             <button className="btn-next" disabled={!current.children[0]}
               onClick={() => nav(current.children[0])}>Next</button>
           </div>

@@ -4,7 +4,8 @@ import type { ReviewedGame } from '../lib/types';
 
 // The chess.com-style coach comment: "dxe4 is the last book move  [+0.22]" with a
 // context line underneath. Fixed height so stepping never shifts the layout.
-export function CoachCard({ node, game }: { node: TreeNode; game: ReviewedGame }) {
+// `personalLine` adds cross-game flavor ("You've played the Caro-Kann 12 times…").
+export function CoachCard({ node, game, personalLine }: { node: TreeNode; game: ReviewedGame; personalLine?: string | null }) {
   if (node.ply === 0) {
     return (
       <div className="coach-card">
@@ -33,7 +34,7 @@ export function CoachCard({ node, game }: { node: TreeNode; game: ReviewedGame }
         <b>{moveNo} {headline}</b>
         {m.evalAfter && <span className="eval-chip">{fmtEval(m.evalAfter)}</span>}
       </div>
-      <div className="sub">{subFor(m, label, game)}</div>
+      <div className="sub">{subFor(m, label, game)}{label === 'book' && personalLine ? ` ${personalLine}` : ''}</div>
     </div>
   );
 }
