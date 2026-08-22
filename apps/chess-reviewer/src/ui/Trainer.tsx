@@ -64,9 +64,8 @@ export function Trainer({ game, positions }: { game: ReviewedGame; positions: st
   const shapes = showBest && m.bestUci ? [{ orig: m.bestUci.slice(0, 2), dest: m.bestUci.slice(2, 4), brush: 'green' }] : [];
 
   return (
-    <section className="panel">
-      <h2>Train your misses</h2>
-      <p className="lede" style={{ fontSize: 15 }}>Every flagged moment from this game, as a drill. Drag a piece or tap source → target.</p>
+    <div>
+      <p className="lede" style={{ fontSize: 15, marginTop: 4 }}>Every flagged moment from this game, as a drill. Drag a piece or tap source → target.</p>
       <div className="trainer-grid" style={{ marginTop: 14 }}>
         <div>
           <div className="trainer-board">
@@ -90,6 +89,6 @@ export function Trainer({ game, positions }: { game: ReviewedGame; positions: st
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

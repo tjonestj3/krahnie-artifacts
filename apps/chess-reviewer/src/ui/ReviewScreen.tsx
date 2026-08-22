@@ -11,7 +11,9 @@ import {
   treeFromMoves, playMove, playUciLine, deleteNode, promoteNode, lastMainlineNode,
   type TreeNode,
 } from '../lib/gametree';
-import { LABEL_TEXT, FLAGGED, GOODISH, fmtEval, BADGE as BADGE_MAP, type Label, type Eval } from '../lib/labels';
+import { LABEL_TEXT, FLAGGED, BADGE as BADGE_MAP, type Label, type Eval } from '../lib/labels';
+import { Collapse } from './Collapse';
+import { CoachCard } from './CoachCard';
 import type { ReviewedGame } from '../lib/types';
 
 export interface AnalysisState {
@@ -76,7 +78,7 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
     const h = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.matches?.('input,textarea,select')) return;
       if (e.key === 'ArrowLeft') { nav(current.parent); e.preventDefault(); }
-      else if (e.key === 'ArrowRight') { nav(current.children[0]); e.preventDefault(); }
+      else if (e.key === 'ArrowRight' || e.key === ' ') { nav(current.children[0]); e.preventDefault(); }
       else if (e.key === 'Home') { nav(rootRef.current); e.preventDefault(); }
       else if (e.key === 'End') { nav(lastMainlineNode(rootRef.current)); e.preventDefault(); }
       else if (e.key === 'f') setOrientation(o => o === 'white' ? 'black' : 'white');
@@ -139,35 +141,49 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
             </div>
           </div>
           <div className="player-bar"><PlayerName game={game} side={botSide} /><Clock game={game} side={botSide} node={current} /></div>
-          <div className="board-controls">
+          <div className="nav-row">
             <button className="coach-btn" onClick={() => nav(rootRef.current)} title="Start">⏮</button>
             <button className="coach-btn" onClick={() => nav(current.parent)} title="Previous (←)">◀</button>
             <button className="coach-btn" onClick={() => nav(current.children[0])} title="Next (→)">▶</button>
             <button className="coach-btn" onClick={() => nav(lastMainlineNode(rootRef.current))} title="End">⏭</button>
             <button className="coach-btn" onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')} title="Flip (f)">⇅</button>
           </div>
-          <MoveComment node={current} />
         </div>
 
         <div className="side-col">
-          <EnginePanel fen={current.fen} enabled={engineOn} onToggle={setEngineOn}
-            update={liveUpdate} thinking={thinking} onPlayLine={onPlayLine} onHoverLine={setHoverUci} />
-          <div style={{ height: 12 }} />
+          <div>
+            <CoachCard node={current} game={game} />
+            <button className="btn-next" disabled={!current.children[0]}
+              onClick={() => nav(current.children[0])}>Next</button>
+          </div>
           <AccuracyCards game={game} />
-          <div style={{ height: 12 }} />
-          <div className="panel graph-panel">
+          <Collapse id="engine" title="Engine" defaultOpen>
+            <EnginePanel fen={current.fen} enabled={engineOn} onToggle={setEngineOn}
+              update={liveUpdate} thinking={thinking} onPlayLine={onPlayLine} onHoverLine={setHoverUci} />
+          </Collapse>
+          <Collapse id="moves" title="Moves" defaultOpen>
+            <MoveTree root={rootRef.current} currentId={current.id} onNav={nav} onDelete={onDelete} onPromote={onPromote} />
+          </Collapse>
+          <Collapse id="graph" title="Eval graph" defaultOpen>
             <EvalGraph whiteWins={game.whiteWins} moves={game.moves} ply={current.isMainline ? current.ply : mainlinePly(current)}
               onSeek={ply => nav(nodeAtMainlinePly(rootRef.current, ply))} />
-          </div>
-          <div style={{ height: 12 }} />
-          <TallyPanel game={game} />
-          <div style={{ height: 12 }} />
-          <MoveTree root={rootRef.current} currentId={current.id} onNav={nav} onDelete={onDelete} onPromote={onPromote} />
+          </Collapse>
+          <Collapse id="labels" title="Move labels" defaultOpen={false}>
+            <TallyPanel game={game} />
+          </Collapse>
         </div>
       </div>
 
-      {analysis.status === 'complete' && <CoachSummary game={game} onSeek={ply => nav(nodeAtMainlinePly(rootRef.current, ply))} />}
-      {analysis.status === 'complete' && <Trainer game={game} positions={positions} />}
+      {analysis.status === 'complete' && (
+        <Collapse id="summary" title="Coach summary" defaultOpen>
+          <CoachSummary game={game} onSeek={ply => nav(nodeAtMainlinePly(rootRef.current, ply))} />
+        </Collapse>
+      )}
+      {analysis.status === 'complete' && (
+        <Collapse id="trainer" title="Train your misses" defaultOpen>
+          <Trainer game={game} positions={positions} />
+        </Collapse>
+      )}
     </section>
   );
 }
@@ -246,26 +262,6 @@ function PlayerName({ game, side }: { game: ReviewedGame; side: 'white' | 'black
   );
 }
 
-function MoveComment({ node }: { node: TreeNode }) {
-  const m = node.review;
-  if (node.ply === 0) return <div className="move-feedback stable">Start of the game. Step with ◀ ▶ or arrow keys, click any move, or just play a move on the board to explore a variation. Press <b>e</b> for the engine.</div>;
-  if (!node.isMainline || !m) return <div className="move-feedback stable">Variation: {node.san}. This is your own line — the engine (press <b>e</b>) will evaluate it live.</div>;
-  const label = m.label as Label | null;
-  const bad = label && FLAGGED.has(label);
-  const good = label && GOODISH.has(label);
-  const cls = bad ? 'bad' : good ? 'good' : '';
-  return (
-    <div className={'move-feedback stable ' + cls}>
-      {label && <b className={'lbl mbadge ' + label} style={{ marginRight: 6 }}>{LABEL_TEXT[label]}</b>}
-      <b>{Math.ceil(m.ply / 2)}{m.mover === 'w' ? '.' : '…'} {m.san}</b>
-      {m.evalAfter && <> · eval {fmtEval(m.evalAfter)}</>}
-      {bad && m.bestSan && <> · better was <b>{m.bestSan}</b> (green arrow)</>}
-      {label === 'brilliant' && <> · a sacrifice that works.</>}
-      {label === 'great' && <> · the only move that holds.</>}
-    </div>
-  );
-}
-
 function AccuracyCards({ game }: { game: ReviewedGame }) {
   const card = (side: 'white' | 'black') => {
     const acc = game.accuracy?.[side]; const acpl = game.acpl?.[side];
@@ -285,13 +281,11 @@ function TallyPanel({ game }: { game: ReviewedGame }) {
   if (!game.tallies) return null;
   const t = game.tallies;
   return (
-    <div className="panel">
-      <div className="tally-grid">
-        <span></span><span className="hd">LABEL</span><span className="cnt hd">W</span><span className="cnt hd">B</span>
-        {TALLY_ORDER.filter(l => t.white[l] + t.black[l] > 0 || FLAGGED.has(l)).map(l => (
-          <Row key={l} l={l} w={t.white[l]} b={t.black[l]} />
-        ))}
-      </div>
+    <div className="tally-grid">
+      <span></span><span className="hd">LABEL</span><span className="cnt hd">W</span><span className="cnt hd">B</span>
+      {TALLY_ORDER.filter(l => t.white[l] + t.black[l] > 0 || FLAGGED.has(l)).map(l => (
+        <Row key={l} l={l} w={t.white[l]} b={t.black[l]} />
+      ))}
     </div>
   );
 }
@@ -313,9 +307,8 @@ function CoachSummary({ game, onSeek }: { game: ReviewedGame; onSeek: (ply: numb
     .sort((a, b) => (b.winLoss || 0) - (a.winLoss || 0)).slice(0, 3);
   const who = side ? game[side].name : 'both sides';
   return (
-    <section className="panel">
-      <h2>Coach summary</h2>
-      <p className="lede" style={{ fontSize: 16 }}>
+    <div>
+      <p className="lede" style={{ fontSize: 16, marginTop: 4 }}>
         {game.openingName && <><b>{game.openingName}</b>{game.eco ? ` (${game.eco})` : ''}. </>}
         Reviewing for {who}. {worst.length ? 'Your biggest swings this game:' : 'A clean game — nothing major to fix.'}
       </p>
@@ -333,6 +326,6 @@ function CoachSummary({ game, onSeek }: { game: ReviewedGame; onSeek: (ply: numb
         <span className="pill">Checks</span><span className="pill">Captures</span><span className="pill">Threats</span>
         <span className="pill">Their reply</span><span className="pill">Only then: move</span>
       </div>
-    </section>
+    </div>
   );
 }

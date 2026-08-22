@@ -39,7 +39,7 @@ export function EnginePanel({ fen, enabled, onToggle, update, thinking, onPlayLi
   const stale = !!update && update.fen !== fen;
   const lines = update?.pvs || [];
   return (
-    <div className="panel engine-panel">
+    <div className="engine-panel">
       <div className="engine-head">
         <label className="switch">
           <input type="checkbox" checked={enabled} onChange={e => onToggle(e.target.checked)} />
