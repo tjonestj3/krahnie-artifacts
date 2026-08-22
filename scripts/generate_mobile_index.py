@@ -199,13 +199,25 @@ def prompt(cmd: str, comment: str = "") -> str:
     return f'<div class="cmdline">{prompt_spans(cmd, comment)}</div>'
 
 
+def is_standalone(p: Path) -> bool:
+    """Artifacts that declare a standalone theme open directly, not in the viewer frame."""
+    if p.suffix.lower() not in (".html", ".htm"):
+        return False
+    try:
+        head = p.read_text(encoding="utf-8", errors="ignore")[:2048]
+    except OSError:
+        return False
+    return "standalone theme" in head
+
+
 def row_html(p: Path) -> str:
     rel = p.relative_to(ROOT).as_posix()
     subtitle = "/".join(p.relative_to(ARTIFACTS).parts[:-1]) if ARTIFACTS in p.parents else str(p.parent)
     title = titleize(p)
     search = escape(f"{title} {subtitle} {rel}".lower())
+    direct = ' data-direct="1"' if is_standalone(p) else ""
     return (
-        f'<a class="row" href="{escape(rel)}" data-s="{search}">'
+        f'<a class="row" href="{escape(rel)}" data-s="{search}"{direct}>'
         f'<span class="row-ico">{icon(p)}</span>'
         f'<span class="row-main"><span class="row-name">{escape(title)}</span>'
         f'<span class="row-path">{escape(subtitle)}/</span></span>'
@@ -907,8 +919,10 @@ JS = r"""
   consoleEl.addEventListener('click', () => { if((getSelection()+'') === '') IN.focus(); });
   document.addEventListener('keydown', e => { if(e.key === '/' && document.activeElement !== IN && !/^(input|textarea)$/i.test(document.activeElement.tagName)){ e.preventDefault(); IN.focus(); } });
 
-  // open artifacts inside the themed viewer frame (modifier-click opens raw)
+  // open artifacts inside the themed viewer frame (modifier-click opens raw;
+  // standalone-themed artifacts always open directly, no viewer chrome)
   rows.forEach(r => r.addEventListener('click', e => {
+    if(r.dataset.direct) return;
     if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault(); openArtifact(r.getAttribute('href'));
   }));

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Chess } from 'chess.js';
 import { Board, type Shape } from './Board';
-import { EvalBar } from './EvalBar';
+import { EvalBar, EvalBarH } from './EvalBar';
+import { MoveStrip } from './MoveStrip';
 import { EnginePanel } from './EnginePanel';
 import { MoveTree } from './MoveTree';
 import { EvalGraph } from './EvalGraph';
@@ -104,8 +105,15 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
   const topSide = orientation === 'white' ? 'black' : 'white';
   const botSide = orientation === 'white' ? 'white' : 'black';
 
+  const mainline = useMemo(() => {
+    const line: TreeNode[] = [];
+    let n = rootRef.current;
+    while (n.children[0]) { line.push(n.children[0]); n = n.children[0]; }
+    return line;
+  }, [rootRef.current, game.moves.length, analysis.status]);
+
   return (
-    <section>
+    <section className="review-screen-pad">
       <div className="topbar" style={{ marginBottom: 12 }}>
         <button className="coach-btn" onClick={onBack}>← All games</button>
         <GameMeta game={game} />
@@ -130,6 +138,7 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
       <div className="review-grid">
         <div className="board-col">
           <div className="player-bar"><PlayerName game={game} side={topSide} /><Clock game={game} side={topSide} node={current} /></div>
+          <EvalBarH ev={boardEval} />
           <div className="board-row">
             <EvalBar ev={boardEval} orientation={orientation} />
             <div className="board-wrap board-anchor">
@@ -141,6 +150,7 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
             </div>
           </div>
           <div className="player-bar"><PlayerName game={game} side={botSide} /><Clock game={game} side={botSide} node={current} /></div>
+          <MoveStrip mainline={mainline} currentId={current.id} onNav={nav} />
           <div className="nav-row">
             <button className="coach-btn" onClick={() => nav(rootRef.current)} title="Start">⏮</button>
             <button className="coach-btn" onClick={() => nav(current.parent)} title="Previous (←)">◀</button>
@@ -184,6 +194,14 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
           <Trainer game={game} positions={positions} />
         </Collapse>
       )}
+
+      {/* mobile thumb bar (CSS hides it on desktop) */}
+      <div className="mobile-bar">
+        <button className="coach-btn" onClick={() => nav(rootRef.current)} title="Start">⏮</button>
+        <button className="coach-btn" onClick={() => nav(current.parent)} title="Previous">◀</button>
+        <button className="btn-next" disabled={!current.children[0]} onClick={() => nav(current.children[0])}>Next ▶</button>
+        <button className="coach-btn" onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')} title="Flip">⇅</button>
+      </div>
     </section>
   );
 }
