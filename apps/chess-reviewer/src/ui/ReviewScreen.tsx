@@ -15,6 +15,7 @@ import {
 import { LABEL_TEXT, FLAGGED, BADGE as BADGE_MAP, type Label, type Eval } from '../lib/labels';
 import { Collapse } from './Collapse';
 import { CoachCard } from './CoachCard';
+import { SummaryPanel } from './SummaryPanel';
 import type { ReviewedGame } from '../lib/types';
 
 export interface AnalysisState {
@@ -166,7 +167,13 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
             <button className="btn-next" disabled={!current.children[0]}
               onClick={() => nav(current.children[0])}>Next</button>
           </div>
-          <AccuracyCards game={game} />
+          {game.tallies && (
+            <Collapse id="report" title="Summary" defaultOpen>
+              <SummaryPanel game={game} currentPly={current.isMainline ? current.ply : mainlinePly(current)}
+                onSeek={ply => nav(nodeAtMainlinePly(rootRef.current, ply))} />
+            </Collapse>
+          )}
+          {!game.tallies && <AccuracyCards game={game} />}
           <Collapse id="engine" title="Engine" defaultOpen>
             <EnginePanel fen={current.fen} enabled={engineOn} onToggle={setEngineOn}
               update={liveUpdate} thinking={thinking} onPlayLine={onPlayLine} onHoverLine={setHoverUci} />
@@ -177,9 +184,6 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
           <Collapse id="graph" title="Eval graph" defaultOpen>
             <EvalGraph whiteWins={game.whiteWins} moves={game.moves} ply={current.isMainline ? current.ply : mainlinePly(current)}
               onSeek={ply => nav(nodeAtMainlinePly(rootRef.current, ply))} />
-          </Collapse>
-          <Collapse id="labels" title="Move labels" defaultOpen={false}>
-            <TallyPanel game={game} />
           </Collapse>
         </div>
       </div>
@@ -292,28 +296,6 @@ function AccuracyCards({ game }: { game: ReviewedGame }) {
     );
   };
   return <div className="acc-cards">{card('white')}{card('black')}</div>;
-}
-
-const TALLY_ORDER: Label[] = ['brilliant', 'great', 'best', 'excellent', 'good', 'book', 'inaccuracy', 'mistake', 'blunder', 'miss'];
-function TallyPanel({ game }: { game: ReviewedGame }) {
-  if (!game.tallies) return null;
-  const t = game.tallies;
-  return (
-    <div className="tally-grid">
-      <span></span><span className="hd">LABEL</span><span className="cnt hd">W</span><span className="cnt hd">B</span>
-      {TALLY_ORDER.filter(l => t.white[l] + t.black[l] > 0 || FLAGGED.has(l)).map(l => (
-        <Row key={l} l={l} w={t.white[l]} b={t.black[l]} />
-      ))}
-    </div>
-  );
-}
-function Row({ l, w, b }: { l: Label; w: number; b: number }) {
-  return <>
-    <span className={'mbadge ' + l}>{BADGE_MAP[l]}</span>
-    <span>{LABEL_TEXT[l]}</span>
-    <span className="cnt">{w}</span>
-    <span className="cnt" style={{ color: 'var(--muted)' }}>{b}</span>
-  </>;
 }
 
 function CoachSummary({ game, onSeek }: { game: ReviewedGame; onSeek: (ply: number) => void }) {

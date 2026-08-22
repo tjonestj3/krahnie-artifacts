@@ -299,3 +299,24 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 /* grid items must be allowed to shrink below content width (the move strip's
    min-content width would otherwise blow the layout open on mobile) */
 .review-grid > *{min-width:0}
+
+/* ===== v5: game-report summary panel ===== */
+.sum-acc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 12px}
+.sum-player{text-align:center;padding:10px 8px;border-radius:14px;border:1px solid var(--line);background:rgba(23,32,50,.7)}
+.sum-player.me{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.08)}
+.sum-player small{display:block;color:var(--muted);font-weight:800;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sum-player b{display:block;font-size:28px;margin-top:2px}
+.sum-player em{display:block;font-style:normal;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:800}
+.sum-row{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;padding:3px 0}
+.sum-label{display:flex;gap:9px;align-items:center;justify-content:center}
+.sum-label .chip-lbl{flex:0 0 22px;width:22px;height:22px;font-size:11px}
+.sum-name{font-weight:800;font-size:14px}
+.lc-brilliant{color:var(--teal)}.lc-great{color:var(--blue)}.lc-best{color:var(--green)}
+.lc-excellent{color:#b8f5c0}.lc-good{color:#cdd6ee}.lc-book{color:var(--violet)}
+.lc-inaccuracy{color:var(--amber)}.lc-mistake{color:var(--orange)}
+.lc-blunder{color:var(--red)}.lc-miss{color:#ff8fa3}
+.sum-cnt{border:1px solid var(--line);background:rgba(255,255,255,.05);color:#e8edfb;border-radius:10px;padding:6px 0;font:900 15px Inter,ui-sans-serif;cursor:pointer;width:100%}
+.sum-cnt:hover:not(:disabled){border-color:rgba(110,231,255,.7);background:rgba(110,231,255,.12)}
+.sum-cnt:disabled{opacity:.3;cursor:default}
+.sum-cnt.me{border-color:rgba(255,209,102,.35)}
+.sum-hint{margin:10px 0 0;color:var(--muted);font-size:12px;text-align:center}
