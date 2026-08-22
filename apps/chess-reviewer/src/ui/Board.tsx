@@ -19,7 +19,7 @@ export function Board(props: BoardProps) {
 
   useEffect(() => {
     if (!ref.current) return;
-    cg.current = Chessground(ref.current, { animation: { duration: 160 }, coordinates: true });
+    cg.current = Chessground(ref.current, { animation: { duration: 120 }, coordinates: true });
     return () => { cg.current?.destroy?.(); cg.current = null; };
   }, []);
 

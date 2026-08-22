@@ -41,18 +41,26 @@ function legalDests(fen: string): Map<string, string[]> {
 
 export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onModeChange, onCancel }: Props) {
   const rootRef = useRef<TreeNode>(treeFromMoves(game.moves as any));
-  // Rebuild the tree if a different game loads.
-  const gameId = game.id + ':' + game.moves.length + ':' + analysis.status;
-  useEffect(() => { rootRef.current = treeFromMoves(game.moves as any); setCurrent(rootRef.current); setVer(v => v + 1); }, [game.id, analysis.status]);
+  const plyRef = useRef(0);
+  // Rebuild the tree when the game loads or its analysis lands — but stay on the
+  // same ply, so a completing analysis doesn't yank the user back to move 0.
+  useEffect(() => {
+    rootRef.current = treeFromMoves(game.moves as any);
+    const keepPly = analysis.status === 'complete' ? plyRef.current : 0;
+    setCurrent(nodeAtMainlinePly(rootRef.current, keepPly));
+    setVer(v => v + 1);
+  }, [game.id, analysis.status]);
 
   const [current, setCurrent] = useState<TreeNode>(rootRef.current);
+  useEffect(() => { plyRef.current = current.isMainline ? current.ply : mainlinePly(current); }, [current]);
   const [, setVer] = useState(0);
   const [engineOn, setEngineOn] = useState(false);
   const [hoverUci, setHoverUci] = useState<string[] | null>(null);
   const [orientation, setOrientation] = useState<'white' | 'black'>(game.perspective === 'black' ? 'black' : 'white');
   useEffect(() => { setOrientation(game.perspective === 'black' ? 'black' : 'white'); }, [game.id]);
 
-  const liveUpdate = useLiveEngine(workerUrl, current.fen, engineOn, 3);
+  const { update: liveUpdate, thinking } = useLiveEngine(workerUrl, current.fen, engineOn, 3);
+  const dests = useMemo(() => legalDests(current.fen), [current.fen]);
 
   const nav = (n: TreeNode | null | undefined) => { if (n) setCurrent(n); };
   const onMove = (from: string, to: string) => {
@@ -78,9 +86,10 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
     return () => window.removeEventListener('keydown', h);
   }, [current]);
 
-  // board eval (white-centric): live engine if on, else the review eval after this move
-  const boardEval: Eval | null = engineOn && liveUpdate?.pvs?.[0]
-    ? (liveUpdate.pvs[0].mate != null ? { mate: liveUpdate.pvs[0].mate } : { cp: liveUpdate.pvs[0].cp })
+  // board eval (white-centric): fresh live engine if on, else the review eval after this move
+  const liveFresh = engineOn && liveUpdate && liveUpdate.fen === current.fen ? liveUpdate.pvs?.[0] : null;
+  const boardEval: Eval | null = liveFresh
+    ? (liveFresh.mate != null ? { mate: liveFresh.mate } : { cp: liveFresh.cp })
     : (current.review?.evalAfter ?? (current.ply === 0 ? { cp: 15 } : null));
 
   // arrows: best-move suggestion for a flagged mainline move, plus hovered PV line
@@ -100,32 +109,36 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
         <GameMeta game={game} />
       </div>
 
-      {analysis.status !== 'complete' && (
-        <div className="analysis-bar">
-          <select className="pill" value={analysis.mode} onChange={e => onModeChange(e.target.value)}>
-            <option value="fast">Fast (~10s)</option>
-            <option value="balanced">Balanced (~20s)</option>
-            <option value="deep">Deep (~1min)</option>
-          </select>
-          <div className="progress-track"><span className="progress-fill" style={{ width: `${Math.round((analysis.done / Math.max(1, analysis.total)) * 100)}%` }} /></div>
-          <span className="pill busy">{analysis.label || `analyzing ${analysis.done}/${analysis.total}`}</span>
-          <button className="coach-btn" onClick={onCancel}>Cancel</button>
-        </div>
-      )}
+      {/* Always mounted at constant height — the bar switching to "done" must not shift the board */}
+      <div className="analysis-bar">
+        <select className="pill" value={analysis.mode} onChange={e => onModeChange(e.target.value)} disabled={analysis.status === 'complete'}>
+          <option value="fast">Fast (~10s)</option>
+          <option value="balanced">Balanced (~20s)</option>
+          <option value="deep">Deep (~1min)</option>
+        </select>
+        <div className="progress-track"><span className="progress-fill" style={{ width: `${analysis.status === 'complete' ? 100 : Math.round((analysis.done / Math.max(1, analysis.total)) * 100)}%` }} /></div>
+        {analysis.status === 'complete'
+          ? <span className="pill ok">✓ review complete</span>
+          : <>
+            <span className="pill busy">{analysis.label || `analyzing ${analysis.done}/${analysis.total}`}</span>
+            <button className="coach-btn" onClick={onCancel}>Cancel</button>
+          </>}
+      </div>
 
       <div className="review-grid">
         <div className="board-col">
-          <div className="player-bar"><PlayerName game={game} side={topSide} /></div>
+          <div className="player-bar"><PlayerName game={game} side={topSide} /><Clock game={game} side={topSide} node={current} /></div>
           <div className="board-row">
             <EvalBar ev={boardEval} orientation={orientation} />
-            <div className="board-wrap">
+            <div className="board-wrap board-anchor">
               <Board fen={current.fen} orientation={orientation}
                 lastMove={current.uci ? [current.uci.slice(0, 2), current.uci.slice(2, 4)] : null}
-                dests={legalDests(current.fen)} movableColor={current.fen.split(' ')[1] === 'b' ? 'black' : 'white'}
+                dests={dests} movableColor={current.fen.split(' ')[1] === 'b' ? 'black' : 'white'}
                 onMove={onMove} shapes={shapes} />
+              <LabelPop node={current} orientation={orientation} />
             </div>
           </div>
-          <div className="player-bar"><PlayerName game={game} side={botSide} /></div>
+          <div className="player-bar"><PlayerName game={game} side={botSide} /><Clock game={game} side={botSide} node={current} /></div>
           <div className="board-controls">
             <button className="coach-btn" onClick={() => nav(rootRef.current)} title="Start">⏮</button>
             <button className="coach-btn" onClick={() => nav(current.parent)} title="Previous (←)">◀</button>
@@ -138,7 +151,7 @@ export function ReviewScreen({ game, positions, workerUrl, analysis, onBack, onM
 
         <div className="side-col">
           <EnginePanel fen={current.fen} enabled={engineOn} onToggle={setEngineOn}
-            update={liveUpdate} onPlayLine={onPlayLine} onHoverLine={setHoverUci} />
+            update={liveUpdate} thinking={thinking} onPlayLine={onPlayLine} onHoverLine={setHoverUci} />
           <div style={{ height: 12 }} />
           <AccuracyCards game={game} />
           <div style={{ height: 12 }} />
@@ -176,6 +189,45 @@ function nodeAtMainlinePly(root: TreeNode, ply: number): TreeNode {
   return n;
 }
 
+// Chess.com-style pop: a colored label badge anchored to the destination square of the
+// move just played. Keyed by node id so it re-pops on every step.
+function LabelPop({ node, orientation }: { node: TreeNode; orientation: 'white' | 'black' }) {
+  const label = node.isMainline ? (node.review?.label as Label | null) : null;
+  if (!label || !node.uci) return null;
+  const dest = node.uci.slice(2, 4);
+  const file = dest.charCodeAt(0) - 97, rank = +dest[1];
+  const col = orientation === 'white' ? file : 7 - file;
+  const row = orientation === 'white' ? 8 - rank : rank - 1;
+  // anchor at the square's top-right corner
+  const left = (col + 1) * 12.5, top = row * 12.5;
+  return (
+    <div key={node.id} className={'label-pop ' + label}
+      style={{ left: `${Math.min(98, left)}%`, top: `${Math.max(2, top)}%` }}
+      title={LABEL_TEXT[label]}>
+      {BADGE_MAP[label]}
+    </div>
+  );
+}
+
+// Remaining clock for one side at the current position (from imported [%clk] data).
+function Clock({ game, side, node }: { game: ReviewedGame; side: 'white' | 'black'; node: TreeNode }) {
+  const mover = side === 'white' ? 'w' : 'b';
+  const ply = node.isMainline ? node.ply : mainlinePly(node);
+  let clk: number | null = null;
+  for (let i = Math.min(ply, game.moves.length) - 1; i >= 0; i--) {
+    if (game.moves[i].mover === mover && game.moves[i].clk != null) { clk = game.moves[i].clk!; break; }
+  }
+  if (clk == null) {
+    if (!game.moves.some(m => m.clk != null)) return null;
+    clk = (game.timeControl?.initial ?? 0) * 100;
+    if (!clk) return null;
+  }
+  const totalSec = Math.floor(clk / 100);
+  const mm = Math.floor(totalSec / 60), ss = totalSec % 60;
+  const toMove = node.fen.split(' ')[1] === mover;
+  return <span className={'clk' + (toMove ? ' active' : '')}>{mm}:{String(ss).padStart(2, '0')}</span>;
+}
+
 function GameMeta({ game }: { game: ReviewedGame }) {
   const tc = game.timeControl?.initial != null ? `${Math.round(game.timeControl.initial / 60)}+${game.timeControl.increment ?? 0}` : '';
   const date = game.playedAt ? new Date(game.playedAt).toISOString().slice(0, 10) : '';
@@ -196,14 +248,14 @@ function PlayerName({ game, side }: { game: ReviewedGame; side: 'white' | 'black
 
 function MoveComment({ node }: { node: TreeNode }) {
   const m = node.review;
-  if (node.ply === 0) return <div className="move-feedback">Start of the game. Step with ◀ ▶ or arrow keys, click any move, or just play a move on the board to explore a variation. Press <b>e</b> for the engine.</div>;
-  if (!node.isMainline || !m) return <div className="move-feedback">Variation: {node.san}. This is your own line — the engine (press <b>e</b>) will evaluate it live.</div>;
+  if (node.ply === 0) return <div className="move-feedback stable">Start of the game. Step with ◀ ▶ or arrow keys, click any move, or just play a move on the board to explore a variation. Press <b>e</b> for the engine.</div>;
+  if (!node.isMainline || !m) return <div className="move-feedback stable">Variation: {node.san}. This is your own line — the engine (press <b>e</b>) will evaluate it live.</div>;
   const label = m.label as Label | null;
   const bad = label && FLAGGED.has(label);
   const good = label && GOODISH.has(label);
   const cls = bad ? 'bad' : good ? 'good' : '';
   return (
-    <div className={'move-feedback ' + cls}>
+    <div className={'move-feedback stable ' + cls}>
       {label && <b className={'lbl mbadge ' + label} style={{ marginRight: 6 }}>{LABEL_TEXT[label]}</b>}
       <b>{Math.ceil(m.ply / 2)}{m.mover === 'w' ? '.' : '…'} {m.san}</b>
       {m.evalAfter && <> · eval {fmtEval(m.evalAfter)}</>}

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import type { TreeNode } from '../lib/gametree';
 import { BADGE, LABEL_TEXT, type Label } from '../lib/labels';
 
@@ -54,8 +54,20 @@ function renderFrom(pos: TreeNode, currentId: number, onNav: (n: TreeNode) => vo
 }
 
 export function MoveTree({ root, currentId, onNav, onDelete, onPromote }: Props) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  // Keep the active move visible by scrolling the PANEL only — never the page
+  // (scrollIntoView would bounce the whole viewport while stepping).
+  useEffect(() => {
+    const panel = panelRef.current;
+    const active = panel?.querySelector('.mv.active') as HTMLElement | null;
+    if (!panel || !active) return;
+    const top = active.offsetTop - panel.offsetTop;
+    const bottom = top + active.offsetHeight;
+    if (top < panel.scrollTop + 8) panel.scrollTop = top - 40;
+    else if (bottom > panel.scrollTop + panel.clientHeight - 8) panel.scrollTop = bottom - panel.clientHeight + 40;
+  }, [currentId]);
   return (
-    <div className="panel moves-panel">
+    <div className="panel moves-panel" ref={panelRef}>
       {root.children.length === 0
         ? <span className="lede" style={{ fontSize: 13 }}>No moves.</span>
         : <Fragment>{renderFrom(root, currentId, onNav, onDelete, onPromote, true)}</Fragment>}
