@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { ImportScreen } from './ImportScreen';
 import { ReviewScreen, type AnalysisState } from './ReviewScreen';
 import { Dashboard } from './Dashboard';
+import { SettingsPanel } from './SettingsPanel';
 import { userGames, openingLine } from '../lib/stats';
 import { buildTimeline, analyzeFullPool, analyzeHybrid, classifyGame } from '../lib/analyze.js';
+import { chesscomStyleAccuracy } from '../lib/classify.js';
 import { EnginePool, poolSize } from '../lib/enginepool.js';
 import { Engine } from '../lib/engine.js';
 import { loadOpenings } from '../lib/openings.js';
@@ -128,6 +130,7 @@ export function App() {
         <span className="badge">♟ Krahnie Chess Reviewer</span>
         <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {screen === 'import' && <button className="coach-btn sm" onClick={() => setScreen('dash')}>📊 Progress</button>}
+          <SettingsPanel />
           <span className={'pill ' + pillClass(enginePill)}>engine: {enginePill}</span>
         </span>
       </header>
@@ -149,6 +152,7 @@ export function App() {
 }
 
 function pillClass(s: string) { return s === 'ready' ? 'ok' : s === 'error' ? 'err' : s === 'loading' ? 'busy' : ''; }
+const r1 = (x: number) => Math.round(x * 10) / 10;
 
 function baseRecord(g: ImportedGame, timeline: any): ReviewedGame {
   return {
@@ -167,7 +171,14 @@ function finalizeRecord(rec: ReviewedGame, g: ImportedGame, timeline: any, evals
   const c: any = classifyGame(timeline, evals, { judgments });
   rec.moves = c.moves.map((m: any, i: number) => ({ ...m, clk: rec.moves[i]?.clk ?? null }));
   rec.whiteWins = c.whiteWins.map((w: number) => Math.round(w * 10) / 10);
-  rec.accuracy = g.lichessAccuracy?.white != null ? { white: g.lichessAccuracy.white, black: g.lichessAccuracy.black } : c.accuracy;
+  // Accuracy precedence: the platform's own official number when it analyzed the game
+  // (exact match with what the user sees there); else our engine estimate — calibrated
+  // to chess.com's scale for chess.com/PGN games, lichess-style for lichess games.
+  rec.accuracy =
+    g.ccAccuracy?.white != null ? { white: r1(g.ccAccuracy.white), black: r1(g.ccAccuracy.black) } :
+    g.lichessAccuracy?.white != null ? { white: g.lichessAccuracy.white, black: g.lichessAccuracy.black } :
+    g.source === 'lichess' ? c.accuracy :
+    { white: chesscomStyleAccuracy(c.accuracy.white), black: chesscomStyleAccuracy(c.accuracy.black) };
   rec.acpl = c.acpl;
   rec.tallies = c.tallies;
   rec.eco = rec.eco || c.eco;

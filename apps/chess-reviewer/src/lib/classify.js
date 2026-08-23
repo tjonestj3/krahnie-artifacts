@@ -193,7 +193,7 @@ export function gameAccuracy(moves, whiteWins) {
   for (const side of ['w', 'b']) {
     const accs = [], ws = [];
     moves.forEach((m, i) => {
-      if (m.mover !== side || m.label === 'book') return;
+      if (m.mover !== side) return; // book moves count too (they're ~100% accurate) — matching lichess/chess.com
       accs.push(moveAccuracy(m.winLoss));
       ws.push(weights[i]);
     });
@@ -203,6 +203,16 @@ export function gameAccuracy(moves, whiteWins) {
     out[side] = Math.round(((weighted + harmonic) / 2) * 10) / 10;
   }
   return { white: out.w, black: out.b };
+}
+
+// Calibrated map from our lichess-style accuracy to a chess.com-style (CAPS-like) number.
+// Least-squares fit on 54 sides of the user's own chess.com-analyzed games (2026-08,
+// balanced-mode evals): cc ≈ 0.6075*ours + 28.31 — MAE 4.8 vs 6.6 uncalibrated, R²≈0.53.
+// CAPS2 itself is proprietary; this is an empirical approximation, refit-able anytime
+// by re-running the calibration script against fresh analyzed games.
+export function chesscomStyleAccuracy(acc) {
+  if (acc == null) return null;
+  return Math.round(Math.max(0, Math.min(100, 0.6075 * acc + 28.31)) * 10) / 10;
 }
 
 // Average centipawn loss per side (capped per move at 1000).

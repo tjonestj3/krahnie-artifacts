@@ -336,3 +336,20 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   .dash-cards{grid-template-columns:1fr 1fr}
   .dt-row{grid-template-columns:1fr 48px 52px 52px;font-size:13px}
 }
+
+/* ===== v7: appearance settings (board / pieces / background) ===== */
+.settings-wrap{position:relative}
+.settings-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:240px;padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.set-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin:8px 0 6px}
+.set-title:first-child{margin-top:0}
+.set-row{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:36px;height:36px;border-radius:10px;border:2px solid var(--line);cursor:pointer;background-size:cover;background-position:center;display:grid;place-items:center;font-size:20px;color:#fff;padding:0}
+.swatch:hover{border-color:rgba(110,231,255,.7)}
+.swatch.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,209,102,.35)}
+.swatch.piece{background-color:#2a3346;background-size:80%;background-repeat:no-repeat}
+
+/* app background variants (data-bg on <html>) */
+html[data-bg="plum"] body{background:radial-gradient(circle at 15% -10%,#5f244b 0 26rem,transparent 44rem),radial-gradient(circle at 90% 10%,#3b1f66 0 20rem,transparent 40rem),linear-gradient(180deg,#0d0812,#140b1d 62%,#08050d)}
+html[data-bg="forestbg"] body{background:radial-gradient(circle at 12% -10%,#1d4030 0 26rem,transparent 44rem),radial-gradient(circle at 90% 8%,#14532d 0 18rem,transparent 38rem),linear-gradient(180deg,#07120c,#0b1811 62%,#050d08)}
+html[data-bg="slate"] body{background:radial-gradient(circle at 12% -10%,#2a3140 0 26rem,transparent 44rem),linear-gradient(180deg,#0e1116,#141821 62%,#090b0f)}
+html[data-bg="carbon"] body{background:linear-gradient(180deg,#141519,#1a1b20 62%,#0e0f12)}
